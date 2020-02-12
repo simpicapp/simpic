@@ -1,0 +1,47 @@
+= Simpic
+
+Simpic is a simple picture hosting service, effectively a slimmed down and self-hosted alternative to Google Photos.
+
+== Feature status / Roadmap
+
+* Skeleton project ✅
+* Uploading/retrieving of individual images ✅
+* Paginated list of all images sorted by time
+* Albums
+** List albums
+** Create new album
+** List photos in album
+** Add/remove photos in album
+* Authentication and ACLs
+** Create default user on startup/first use
+** Add/modify/delete users
+** Middleware to implement authorisation
+** Ability to share each picture or album with a group of users (including "Public")
+* Docker image
+* Exif data extraction
+* Deleting images
+* Thumbnailing
+* Transcoding (e.g. RAW to JPEG)
+* Frontend
+* Other storage drivers
+** In-memory cache
+** S3
+
+== Running
+
+----
+go run cmd/serve/main.go --help
+Usage of /tmp/go-build197815524/b001/exe/main:
+  -dsn string
+        the DSN to use to connect to the database [SIMPIC_DSN]
+  -migrations string
+        file system path for the DB migration files [SIMPIC_MIGRATIONS] (default "migrations")
+  -path string
+        the path to store data in [SIMPIC_PATH] (default "data")
+  -port int
+        the port to listen on [SIMPIC_PORT] (default 8080)
+----
+
+Flags may be passed as environment variables (specified within `[]` in the help text).
+
+Requires a Postgres database.
