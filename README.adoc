@@ -45,3 +45,13 @@ Usage of /tmp/go-build197815524/b001/exe/main:
 Flags may be passed as environment variables (specified within `[]` in the help text).
 
 Requires a Postgres database.
+
+== Contributing
+
+Contributions are welcome!
+
+There is a https://pre-commit.com/[pre-commit] to go fmt and run basic checks on
+commit; to enable it simply:
+
+    pip install pre-commit
+    pre-commit install
