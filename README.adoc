@@ -4,9 +4,9 @@ Simpic is a simple picture hosting service, effectively a slimmed down and self-
 
 == Feature status / Roadmap
 
-* Skeleton project ✅
-* Uploading/retrieving of individual images ✅
-* Paginated list of all images sorted by time
+* Skeleton project ✔
+* Uploading/retrieving of individual images ✔
+* Paginated list of all images sorted by time ✔
 * Albums
 ** List albums
 ** Create new album
@@ -26,6 +26,8 @@ Simpic is a simple picture hosting service, effectively a slimmed down and self-
 * Other storage drivers
 ** In-memory cache
 ** S3
+* Video support?
+* Auto-upload from Android app
 
 == Running
 
