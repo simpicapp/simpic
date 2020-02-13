@@ -2,32 +2,10 @@
 
 Simpic is a simple picture hosting service, effectively a slimmed down and self-hosted alternative to Google Photos.
 
-== Feature status / Roadmap
+== Feature status
 
-* Skeleton project ✔
-* Uploading/retrieving of individual images ✔
-* Paginated list of all images sorted by time ✔
-* Albums
-** List albums
-** Create new album
-** List photos in album
-** Add/remove photos in album
-* Authentication and ACLs
-** Create default user on startup/first use
-** Add/modify/delete users
-** Middleware to implement authorisation
-** Ability to share each picture or album with a group of users (including "Public")
-* Docker image
-* Exif data extraction
-* Deleting images
-* Thumbnailing ✔
-* Transcoding (e.g. RAW to JPEG)
-* Frontend
-* Other storage drivers
-** In-memory cache
-** S3
-* Video support?
-* Auto-upload from Android app
+Simpic is currently pre-MVP. Unless you want to help develop it, there's probably not much here for you yet.
+You can see planned features in the https://github.com/csmith/simpic/issues[issue tracker].
 
 == Running
 
