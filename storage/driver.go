@@ -8,4 +8,5 @@ import (
 type Driver interface {
 	Read(id uuid.UUID) (io.ReadCloser, error)
 	Write(id uuid.UUID) (io.WriteCloser, error)
+	Exists(id uuid.UUID) bool
 }

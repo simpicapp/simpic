@@ -20,7 +20,7 @@ Simpic is a simple picture hosting service, effectively a slimmed down and self-
 * Docker image
 * Exif data extraction
 * Deleting images
-* Thumbnailing
+* Thumbnailing ✔
 * Transcoding (e.g. RAW to JPEG)
 * Frontend
 * Other storage drivers

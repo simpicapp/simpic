@@ -35,6 +35,32 @@ func (s *server) handleGetPhoto() http.HandlerFunc {
 	}
 }
 
+func (s *server) handleGetThumbnail() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		id, err := uuid.FromString(vars["uuid"])
+		if err != nil {
+			log.Printf("unable to parse UUID '%s': %v\n", vars["uuid"], err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		stream, err := s.thumbnailer.Thumbnail(id)
+		if err != nil {
+			log.Printf("unable to retrieve thumbnail '%s': %v\n", id, err)
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		defer func() {
+			_ = stream.Close()
+		}()
+
+		w.Header().Set("Content-Type", "image/jpeg")
+		_, _ = io.Copy(w, stream)
+	}
+}
+
 func (s *server) handleStorePhoto() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := r.ParseMultipartForm(32 << 20); err != nil {

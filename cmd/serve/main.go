@@ -7,6 +7,7 @@ import (
 	"github.com/csmith/simpic/storage"
 	"github.com/jamiealquiza/envy"
 	"log"
+	"path"
 )
 
 var (
@@ -28,8 +29,11 @@ func main() {
 
 	driver := storage.DiskDriver{Path: *dataDir}
 
+	thumbnailer := simpic.NewThumbnailer(driver, storage.DiskDriver{Path: path.Join(*dataDir, "thumbnails")}, 220)
+
 	http.Start(
 		db,
+		thumbnailer,
 		simpic.NewRetriever(db, driver),
 		simpic.NewStorer(db, driver),
 		*port)

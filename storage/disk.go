@@ -28,6 +28,11 @@ func (d DiskDriver) Write(id uuid.UUID) (io.WriteCloser, error) {
 	return os.Create(file)
 }
 
+func (d DiskDriver) Exists(id uuid.UUID) bool {
+	_, err := os.Stat(d.pathFor(id))
+	return err == nil
+}
+
 func (d DiskDriver) pathFor(id uuid.UUID) string {
 	str := id.String()
 	return path.Join(d.Path, str[len(str)-2:], str)
