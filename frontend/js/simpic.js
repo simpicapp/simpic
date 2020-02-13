@@ -1,14 +1,7 @@
 import Vue from './vendor/vue'
-import timeline from './timeline'
+import App from './app'
 
-const app = new Vue({
-    components: {
-        timeline
-    },
+new Vue({
     el: '#main',
-    template: `
-    <main>
-        <timeline/>
-    </main>
-    `
+    render: h => h(App)
 });
