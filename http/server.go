@@ -8,6 +8,7 @@ import (
 )
 
 type server struct {
+	staticDir   string
 	router      *mux.Router
 	db          *simpic.Database
 	retriever   *simpic.Retriever
@@ -15,13 +16,14 @@ type server struct {
 	thumbnailer *simpic.Thumbnailer
 }
 
-func Start(db *simpic.Database, thumbnailer *simpic.Thumbnailer, retriever *simpic.Retriever, storer *simpic.Storer, port int) error {
+func Start(db *simpic.Database, thumbnailer *simpic.Thumbnailer, retriever *simpic.Retriever, storer *simpic.Storer, staticDir string, port int) error {
 	s := server{
 		router:      mux.NewRouter(),
 		db:          db,
 		retriever:   retriever,
 		storer:      storer,
 		thumbnailer: thumbnailer,
+		staticDir:   staticDir,
 	}
 
 	s.routes()

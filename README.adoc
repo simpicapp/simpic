@@ -31,6 +31,8 @@ Simpic is a simple picture hosting service, effectively a slimmed down and self-
 
 == Running
 
+First: `parcel build frontend/index.html`
+
 ----
 go run cmd/serve/main.go --help
 Usage of /tmp/go-build197815524/b001/exe/main:
