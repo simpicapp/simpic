@@ -1,4 +1,4 @@
-import Vue from './vue'
+import Vue from './vendor/vue'
 import timeline from './timeline'
 
 const app = new Vue({
