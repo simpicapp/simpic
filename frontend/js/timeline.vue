@@ -1,19 +1,25 @@
 <template>
     <div class="timeline">
         <p v-if="loading">Loading...</p>
-        <img v-for="photo in photos" v-bind:key="photo.id" v-bind:src="'/thumbnail/' + photo.id"
-             v-bind:alt="photo.file_name">
+        <thumbnail v-for="photo in photos" v-bind:photo="photo"></thumbnail>
     </div>
 </template>
 
 <style>
-
+    .timeline {
+        display: flex;
+        flex-wrap: wrap;
+    }
 </style>
 
 <script>
     import {EventBus} from './bus';
+    import thumbnail from "../thumbnail";
 
     export default {
+        components: {
+            thumbnail
+        },
         data: function () {
             return {
                 loading: true,

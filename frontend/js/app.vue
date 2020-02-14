@@ -5,10 +5,15 @@
         </div>
         <timeline></timeline>
         <uploader></uploader>
+        <lightbox></lightbox>
     </main>
 </template>
 
 <style>
+    body {
+        font-family: sans-serif;
+    }
+
     #drop-target {
         position: absolute;
         top: 0;
@@ -25,6 +30,7 @@
 </style>
 
 <script>
+    import lightbox from "./lightbox";
     import timeline from "./timeline";
     import uploader from "./uploader";
     import { EventBus } from './bus';
@@ -32,7 +38,8 @@
     export default {
         components: {
             timeline,
-            uploader
+            uploader,
+            lightbox
         },
         data() {
             return {
