@@ -1,0 +1,26 @@
+---
+version: '3'
+
+services:
+
+  parceller:
+    image: node:12-stretch
+    restart: always
+    ports:
+      - 127.0.0.1:8081:8081/tcp
+    volumes:
+      - ./frontend:/work/frontend
+      - ./dist:/work/dist
+    command: /bin/sh -c 'npm install -g parcel-bundler && cd /work && parcel watch --hmr-port 8081 frontend/index.html'
+
+
+  postgres:
+    image: postgres:12
+    restart: always
+    ports:
+      - 127.0.0.1:5432:5432/tcp
+    volumes:
+      - ./data/pg:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: nWK9aY9gkh
+      POSTGRES_USER: simpic

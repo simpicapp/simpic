@@ -54,6 +54,21 @@ It currently has the following options:
 | TCP port to listen on for requests. Defaults to 8080.
 |===
 
+== Developing
+
+The docker-compose.dev.yml file in this repository contains a simple postgres service
+that is exposed on localhost:5432, and a service to live rebuild the JavaScript frontend
+that exposes a websocket endpoint on localhost:8081.
+
+With these two running, you can run Simpic as a normal Go binary with the following env
+var to use the local postgres server:
+
+----
+SIMPIC_DSN=user=simpic dbname=simpic password=nWK9aY9gkh sslmode=disable
+----
+
+The frontend will then automatically rebuild and reload in response to changes to the
+source.
 
 == Contributing
 
