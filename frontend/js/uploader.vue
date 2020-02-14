@@ -1,6 +1,5 @@
 <template>
-    <div id="uploader" v-if="visible">
-        <h2>Uploading...</h2>
+    <popup title="Uploading..." id="uploader" v-if="visible" v-on:close="visible = false">
         <table>
             <tbody>
             <tr v-for="file in files">
@@ -12,32 +11,23 @@
             </tr>
             </tbody>
         </table>
-    </div>
+    </popup>
 </template>
 
-<style>
-    #uploader {
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-        background: white;
-        border: 2px solid black;
-        border-radius: 2px;
-        box-shadow: cornflowerblue 5px 5px;
-    }
-
-    #uploader h2 {
-        text-align: center;
-        border-bottom: 1px solid black;
-        font-size: medium;
-        margin: 0;
+<style scoped>
+    td {
+        padding: 10px;
     }
 </style>
 
 <script>
     import {EventBus} from './bus';
+    import popup from "./popup";
 
     export default {
+        components: {
+            popup
+        },
         data() {
             return {
                 visible: false,
