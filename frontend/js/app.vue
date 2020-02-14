@@ -3,7 +3,8 @@
         <div id="drop-target" v-if="dragging">
             Drop files here
         </div>
-        <timeline/>
+        <timeline></timeline>
+        <uploader></uploader>
     </main>
 </template>
 
@@ -25,10 +26,13 @@
 
 <script>
     import timeline from "./timeline";
+    import uploader from "./uploader";
+    import { EventBus } from './bus';
 
     export default {
         components: {
-            timeline
+            timeline,
+            uploader
         },
         data() {
             return {
@@ -36,23 +40,24 @@
             }
         },
         methods: {
-            dropHandler: function (e) {
+            dropHandler(e) {
                 this.dragging = false;
                 e.stopPropagation();
                 e.preventDefault();
+                EventBus.$emit('files-dropped', e.dataTransfer.files);
             },
-            dragOverHandler: function (e) {
+            dragOverHandler(e) {
                 this.dragging = true;
                 e.stopPropagation();
                 e.preventDefault();
                 e.dataTransfer.dropEffect = 'copy';
             },
-            dragStartHandler: function (e) {
+            dragStartHandler(e) {
                 this.dragging = true;
                 e.stopPropagation();
                 e.preventDefault();
             },
-            dragEndHandler: function (e) {
+            dragEndHandler(e) {
                 this.dragging = false;
                 e.stopPropagation();
                 e.preventDefault();
@@ -61,17 +66,13 @@
         mounted() {
             document.addEventListener('drop', this.dropHandler);
             document.addEventListener('dragover', this.dragOverHandler);
-            document.addEventListener('dragstart', this.dragStartHandler);
             document.addEventListener('dragenter', this.dragStartHandler);
-            document.addEventListener('dragend', this.dragEndHandler);
             document.addEventListener('dragleave', this.dragEndHandler);
         },
         beforeDestroy() {
             document.removeEventListener('drop', this.dropHandler);
             document.removeEventListener('dragover', this.dragOverHandler);
-            document.removeEventListener('dragstart', this.dragStartHandler);
             document.removeEventListener('dragenter', this.dragStartHandler);
-            document.removeEventListener('dragend', this.dragEndHandler);
             document.removeEventListener('dragleave', this.dragEndHandler);
         }
     }
