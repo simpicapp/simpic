@@ -9,24 +9,51 @@ You can see planned features in the https://github.com/csmith/simpic/issues[issu
 
 == Running
 
-First: `parcel build frontend/index.html`
+The simplest and easiest approach to running Simpic is to use Docker. You can use the example
+docker-compose.yml file in this repository to quickly build footnote:[Eventually Simpic will
+be published to Docker Hub and you'll be able to pull the image from there instead of
+building yourself.] and start an instance of Simpic alongside its own Postgres server.
+
+Assuming you have https://docs.docker.com/install/[installed docker]
+and https://docs.docker.com/compose/install/[docker-compose], all you need to do is:
 
 ----
-go run cmd/serve/main.go --help
-Usage of /tmp/go-build197815524/b001/exe/main:
-  -dsn string
-        the DSN to use to connect to the database [SIMPIC_DSN]
-  -migrations string
-        file system path for the DB migration files [SIMPIC_MIGRATIONS] (default "migrations")
-  -path string
-        the path to store data in [SIMPIC_PATH] (default "data")
-  -port int
-        the port to listen on [SIMPIC_PORT] (default 8080)
+docker-compose up -d
 ----
 
-Flags may be passed as environment variables (specified within `[]` in the help text).
+And then Simpic will be accessible on port 8080.
 
-Requires a Postgres database.
+=== Configuration
+
+Simpic is configured using either command line arguments or, preferably, environment variables.
+It currently has the following options:
+
+[%header,cols="m,m,3"]
+|===
+|CLI arg|Env var|Description
+
+| -dsn
+| SIMPIC_DNS
+| The 'data source name' to use to connect to the Postgres database. See:
+  https://pkg.go.dev/github.com/lib/pq?tab=doc#hdr-Connection_String_Parameters[list of all valid parameters].
+
+| -frontend
+| SIMPIC_FRONTEND
+| File system path to serve the compiled frontend files from. Defaults to `dist`.
+
+| -migrations
+| SIMPIC_MIGRATIONS
+| File system path to the database migration files. Defaults to `migrations`.
+
+| -path
+| SIMPIC_PATH
+| File system path to store image and thumbnail data. Defaults to `data`.
+
+| -port
+| SIMPIC_PORT
+| TCP port to listen on for requests. Defaults to 8080.
+|===
+
 
 == Contributing
 

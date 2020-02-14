@@ -1,0 +1,25 @@
+---
+version: '3'
+
+services:
+
+  simpic:
+    build: .
+    restart: always
+    ports:
+      - 8080:8080/tcp
+    volumes:
+      - ./data:/data
+    environment:
+      SIMPIC_DSN: host=postgres user=simpic dbname=simpic password=nWK9aY9gkh sslmode=disable
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:12
+    restart: always
+    volumes:
+      - ./data/pg:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: nWK9aY9gkh
+      POSTGRES_USER: simpic
