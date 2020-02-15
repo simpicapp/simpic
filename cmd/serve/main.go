@@ -38,6 +38,7 @@ func main() {
 	http.Start(
 		db,
 		thumbnailer,
+		userManager,
 		simpic.NewRetriever(db, driver),
 		simpic.NewStorer(db, driver),
 		*frontendDir,

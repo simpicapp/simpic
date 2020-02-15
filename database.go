@@ -8,6 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	uuid "github.com/satori/go.uuid"
+	"strings"
 )
 
 type Database struct {
@@ -104,8 +105,22 @@ func (d *Database) AddUser(user *User) error {
 		    user_password_salt, user_password_hash,
 			user_session_key
 		) VALUES ($1, $2, $3, $4, $5)`,
-		user.Name, user.Admin,
+		strings.ToLower(user.Name), user.Admin,
 		user.PasswordSalt, user.PasswordHash,
 		user.SessionKey)
 	return err
+}
+
+func (d *Database) GetUser(username string) (*User, error) {
+	var user User
+	return &user,
+		d.db.Get(&user,
+			`SELECT
+				user_id, user_name,
+       			user_password_salt, user_password_hash,
+       			user_session_key, user_admin
+			FROM users
+			WHERE user_name = $1
+			LIMIT 1
+		`, strings.ToLower(username))
 }

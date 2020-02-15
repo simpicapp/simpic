@@ -67,6 +67,12 @@ func (u *UserManager) AddUser(username, password string, admin bool) (*User, err
 	return user, nil
 }
 
+func (u *UserManager) CheckPassword(user *User, password string) bool {
+	salted := u.salted(password, user.PasswordSalt)
+	err := bcrypt.CompareHashAndPassword(user.PasswordHash, salted)
+	return err == nil
+}
+
 func (u *UserManager) randomBytes(len int) []byte {
 	res := make([]byte, len)
 	n, err := rand.Read(res)
