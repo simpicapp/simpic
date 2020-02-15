@@ -28,6 +28,9 @@ func main() {
 		return
 	}
 
+	userManager := simpic.NewUserManager(db)
+	userManager.CreateAdmin()
+
 	driver := storage.DiskDriver{Path: *dataDir}
 
 	thumbnailer := simpic.NewThumbnailer(driver, storage.DiskDriver{Path: path.Join(*dataDir, "thumbnails")}, 220)

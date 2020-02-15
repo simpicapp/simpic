@@ -32,6 +32,14 @@ It currently has the following options:
 |===
 |CLI arg|Env var|Description
 
+| -create-admin-password
+| SIMPIC_CREATE_ADMIN_PASSWORD
+.2+^.^| If both are specified, a new admin account with those credentials will be created.
+
+| -create-admin-username
+| SIMPIC_CREATE_ADMIN_USERNAME
+
+
 | -dsn
 | SIMPIC_DNS
 | The 'data source name' to use to connect to the Postgres database. See:

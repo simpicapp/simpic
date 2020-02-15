@@ -15,5 +15,10 @@ repos:
       - id: go-fmt
       - id: go-vet
       - id: go-build
+  - repo: https://github.com/syntaqx/git-hooks
+    rev: v0.0.16
+    hooks:
+      - id: go-mod-tidy
+      - id: go-generate
 
 exclude: vendor

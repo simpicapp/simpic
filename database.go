@@ -96,3 +96,16 @@ func (d *Database) StorePhoto(photo *Photo) error {
 		photo.Timestamp, photo.Type)
 	return err
 }
+
+func (d *Database) AddUser(user *User) error {
+	_, err := d.db.Exec(
+		`INSERT INTO users (
+			user_name, user_admin,
+		    user_password_salt, user_password_hash,
+			user_session_key
+		) VALUES ($1, $2, $3, $4, $5)`,
+		user.Name, user.Admin,
+		user.PasswordSalt, user.PasswordHash,
+		user.SessionKey)
+	return err
+}
