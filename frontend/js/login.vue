@@ -1,5 +1,5 @@
 <template>
-    <popup title="Login" position="center" v-if="visible">
+    <popup title="Login" position="center" v-if="visible" v-on:close="visible = false">
         <form>
             <label for="username">Username</label>
             <input type="text" id="username">
@@ -26,6 +26,7 @@
 </style>
 
 <script>
+    import {EventBus} from "./bus";
     import popup from "./popup";
 
     export default {
@@ -36,6 +37,17 @@
             return {
                 visible: false
             }
+        },
+        methods: {
+            show() {
+                this.visible = true;
+            }
+        },
+        created() {
+            EventBus.$on('login', this.show);
+        },
+        beforeDestroy() {
+            EventBus.$off('login', this.show);
         }
     }
 </script>
