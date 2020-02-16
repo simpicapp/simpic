@@ -25,11 +25,35 @@ new Vue({
         ]
     }),
     data: {
-        loggedIn: false,
-        token: "",
-        username: ""
+        token: localStorage.getItem("simpicAuthToken"),
     },
     el: '#main',
     template: `<App></App>`,
     components: {App},
+    methods: {
+        authHeaders() {
+            if (this.loggedIn) {
+                return {'Authorization': 'Bearer ' + this.token}
+            } else {
+                return {}
+            }
+        }
+    },
+    computed: {
+        loggedIn() {
+            return !!this.token;
+        },
+        username() {
+            if (this.token) {
+                return JSON.parse(atob(this.token.split(".")[1]))['unm']
+            } else {
+                return null
+            }
+        }
+    },
+    watch: {
+        token(newValue) {
+            localStorage.setItem('simpicAuthToken', newValue)
+        }
+    }
 });

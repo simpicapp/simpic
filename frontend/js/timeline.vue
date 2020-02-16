@@ -30,7 +30,13 @@
         methods: {
             update() {
                 const comp = this;
-                fetch('/timeline')
+                fetch('/timeline', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        ...this.$root.authHeaders()
+                    },
+                })
                     .then((response) => response.json())
                     .then((json) => comp.photos = json)
                     .then(() => comp.loading = false)
