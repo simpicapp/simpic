@@ -24,6 +24,11 @@ new Vue({
             }
         ]
     }),
+    data: {
+        loggedIn: false,
+        token: "",
+        username: ""
+    },
     el: '#main',
     template: `<App></App>`,
     components: {App},

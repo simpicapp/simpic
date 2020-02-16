@@ -5,6 +5,7 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/x509"
+	"database/sql"
 	"encoding/json"
 	"flag"
 	"github.com/csmith/simpic"
@@ -54,8 +55,14 @@ func (s *server) handleAuthenticate() http.HandlerFunc {
 
 		user, err := s.db.GetUser(data.Username)
 		if err != nil {
-			log.Printf("Unable to retriever user '%s': %v\n", data.Username, err)
-			w.WriteHeader(http.StatusBadRequest)
+			if err == sql.ErrNoRows {
+				log.Printf("No such user '%s'\n", data.Username)
+				w.WriteHeader(http.StatusForbidden)
+			} else {
+				log.Printf("Unable to retrieve user '%s': %v\n", data.Username, err)
+				w.WriteHeader(http.StatusBadRequest)
+			}
+
 			return
 		}
 
