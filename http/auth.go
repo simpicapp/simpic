@@ -72,11 +72,7 @@ func (s *server) handleAuthenticate() http.HandlerFunc {
 			return
 		}
 
-		w.Header().Add("Content-type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		_ = json.NewEncoder(w).Encode(LoginResponse{
-			Token: token,
-		})
+		writeJSON(w, http.StatusOK, LoginResponse{Token: token})
 	}
 }
 

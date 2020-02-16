@@ -1,7 +1,6 @@
 package http
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -15,7 +14,7 @@ func (s *server) handleTimeline() http.HandlerFunc {
 		)
 		param, ok := r.URL.Query()["offset"]
 		if ok && len(param) > 0 {
-			offset, err = strconv.Atoi(param[0])
+			offset, _ = strconv.Atoi(param[0])
 		}
 
 		photos, err := s.db.GetPhotosByTime(offset, 100)
@@ -25,6 +24,6 @@ func (s *server) handleTimeline() http.HandlerFunc {
 			return
 		}
 
-		_ = json.NewEncoder(w).Encode(photos)
+		writeJSON(w, http.StatusOK, photos)
 	}
 }
