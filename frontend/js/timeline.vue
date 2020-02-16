@@ -1,8 +1,8 @@
 <template>
-    <div class="timeline">
+    <main class="timeline">
         <p v-if="loading">Loading...</p>
-        <thumbnail v-for="photo in photos" v-bind:photo="photo"></thumbnail>
-    </div>
+        <thumbnail v-for="photo in photos" v-bind:photo="photo" v-bind:key="photo.id"></thumbnail>
+    </main>
 </template>
 
 <style>

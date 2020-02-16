@@ -1,22 +1,42 @@
 <template>
-    <popup title="Uploading..." id="uploader" v-if="visible" v-on:close="visible = false">
-        <table>
-            <tbody>
-            <tr v-for="file in files">
-                <td>{{ file.name }}</td>
-                <td v-if="file.failed">Error</td>
-                <td v-else-if="file.finished">Done</td>
-                <td v-else-if="file.started">Uploading</td>
-                <td v-else>Waiting</td>
-            </tr>
-            </tbody>
-        </table>
-    </popup>
+    <div>
+        <div id="drop-target" v-if="dragging">
+            Drop files here
+        </div>
+        <popup title="Uploading..." id="uploader" v-if="visible" v-on:close="visible = false">
+            <table>
+                <tbody>
+                <tr v-for="file in files">
+                    <td>{{ file.name }}</td>
+                    <td v-if="file.failed">Error</td>
+                    <td v-else-if="file.finished">Done</td>
+                    <td v-else-if="file.started">Uploading</td>
+                    <td v-else>Waiting</td>
+                </tr>
+                </tbody>
+            </table>
+        </popup>
+    </div>
 </template>
 
 <style scoped>
     td {
         padding: 10px;
+    }
+
+    #drop-target {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1000;
+        background-color: lightsteelblue;
+        border: 20px dashed midnightblue;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: xx-large;
     }
 </style>
 
@@ -31,24 +51,20 @@
         data() {
             return {
                 visible: false,
+                dragging: false,
                 nextUpload: 0,
                 files: []
             }
         },
         methods: {
-            acceptNewFiles(newFiles) {
-                this.visible = true;
-                [...newFiles].forEach(this.acceptNewFile);
-            },
             acceptNewFile(file) {
-                let obj = {
+                this.files.push({
                     file,
                     name: file.name,
                     failed: false,
                     started: false,
                     finished: false
-                };
-                this.files.push(obj);
+                });
 
                 if (this.nextUpload === this.files.length - 1) {
                     this.startUpload();
@@ -66,7 +82,8 @@
                 }).then(() => {
                     file.finished = true;
                     EventBus.$emit('upload-complete');
-                }).catch(() => {
+                }).catch((e) => {
+                    console.log('Failed to upload file', file, e);
                     file.failed = true;
                 }).finally(() => {
                     this.nextUpload++;
@@ -74,10 +91,43 @@
                         this.startUpload();
                     }
                 });
+            },
+            dropHandler(e) {
+                e.stopPropagation();
+                e.preventDefault();
+
+                this.dragging = false;
+                this.visible = true;
+                [...e.dataTransfer.files].forEach(this.acceptNewFile);
+            },
+            dragOverHandler(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'copy';
+                this.dragging = true;
+            },
+            dragStartHandler(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                this.dragging = true;
+            },
+            dragEndHandler(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                this.dragging = false;
             }
         },
-        created() {
-            EventBus.$on('files-dropped', this.acceptNewFiles);
+        mounted() {
+            document.addEventListener('drop', this.dropHandler);
+            document.addEventListener('dragover', this.dragOverHandler);
+            document.addEventListener('dragenter', this.dragStartHandler);
+            document.addEventListener('dragleave', this.dragEndHandler);
+        },
+        beforeDestroy() {
+            document.removeEventListener('drop', this.dropHandler);
+            document.removeEventListener('dragover', this.dragOverHandler);
+            document.removeEventListener('dragenter', this.dragStartHandler);
+            document.removeEventListener('dragleave', this.dragEndHandler);
         }
     }
 </script>
