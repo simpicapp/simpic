@@ -5,7 +5,7 @@ Simpic is a simple picture hosting service, effectively a slimmed down and self-
 == Feature status
 
 Simpic is currently pre-MVP. Unless you want to help develop it, there's probably not much here for you yet.
-You can see planned features in the https://github.com/csmith/simpic/issues[issue tracker].
+You can see planned features in the https://github.com/simpicapp/simpic/issues[issue tracker].
 
 == Running
 

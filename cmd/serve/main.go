@@ -2,10 +2,10 @@ package main
 
 import (
 	"flag"
-	"github.com/csmith/simpic"
-	"github.com/csmith/simpic/http"
-	"github.com/csmith/simpic/storage"
 	"github.com/jamiealquiza/envy"
+	"github.com/simpicapp/simpic"
+	"github.com/simpicapp/simpic/http"
+	"github.com/simpicapp/simpic/storage"
 	"log"
 	"path"
 )

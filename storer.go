@@ -1,7 +1,7 @@
 package simpic
 
 import (
-	"github.com/csmith/simpic/storage"
+	"github.com/simpicapp/simpic/storage"
 	"io"
 )
 

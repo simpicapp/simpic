@@ -2,10 +2,10 @@ package http
 
 import (
 	"fmt"
-	"github.com/csmith/simpic"
-	"github.com/csmith/simpic/storage"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/simpicapp/simpic"
+	"github.com/simpicapp/simpic/storage"
 	"gopkg.in/square/go-jose.v2"
 	"net/http"
 )

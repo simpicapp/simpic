@@ -1,9 +1,9 @@
 package simpic
 
 import (
-	"github.com/csmith/simpic/storage"
 	"github.com/disintegration/imaging"
 	uuid "github.com/satori/go.uuid"
+	"github.com/simpicapp/simpic/storage"
 	"image"
 	"io"
 )

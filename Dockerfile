@@ -9,7 +9,7 @@ RUN cd /tmp/site && parcel build $(find . -name '*.html' -not -path './dist/*' -
 FROM golang:1.13 AS build
 WORKDIR /go/src/app
 COPY . .
-RUN CGO_ENABLED=0 GO111MODULE=on go install github.com/csmith/simpic/cmd/serve
+RUN CGO_ENABLED=0 GO111MODULE=on go install github.com/simpicapp/simpic/cmd/serve
 
 FROM scratch
 COPY --from=parcel /tmp/site/dist /dist

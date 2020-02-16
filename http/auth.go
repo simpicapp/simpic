@@ -7,7 +7,7 @@ import (
 	"crypto/x509"
 	"database/sql"
 	"flag"
-	"github.com/csmith/simpic"
+	"github.com/simpicapp/simpic"
 	"gopkg.in/square/go-jose.v2"
 	"gopkg.in/square/go-jose.v2/jwt"
 	"io/ioutil"

@@ -1,4 +1,4 @@
-module github.com/csmith/simpic
+module github.com/simpicapp/simpic
 
 go 1.12
 
