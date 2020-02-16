@@ -1,6 +1,7 @@
 <template>
     <main class="timeline">
         <p v-if="loading">Loading...</p>
+        <router-view></router-view>
         <thumbnail v-for="photo in photos" v-bind:photo="photo" v-bind:key="photo.id"></thumbnail>
     </main>
 </template>

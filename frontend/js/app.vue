@@ -1,10 +1,9 @@
 <template>
     <div>
         <toolbar></toolbar>
-        <timeline></timeline>
+        <router-view></router-view>
         <uploader></uploader>
         <login></login>
-        <lightbox></lightbox>
     </div>
 </template>
 
@@ -17,17 +16,13 @@
 </style>
 
 <script>
-    import lightbox from "./lightbox";
-    import timeline from "./timeline";
     import uploader from "./uploader";
     import login from "./login";
     import toolbar from "./toolbar";
 
     export default {
         components: {
-            timeline,
             uploader,
-            lightbox,
             login,
             toolbar
         }

@@ -1,11 +1,12 @@
 <template>
-    <div id="lightbox" v-if="visible" v-on:click="visible = false">
-        <img v-bind:src="'/photo/' + photo.id" v-on:click.stop>
+    <div id="lightbox" v-on:click="close()">
+        <img v-bind:src="'/photo/' + id" v-on:click.stop>
     </div>
 </template>
 
 <style>
     #lightbox {
+        z-index: 900;
         position: fixed;
         top: 0;
         right: 0;
@@ -25,26 +26,12 @@
 </style>
 
 <script>
-    import {EventBus} from "./bus";
-
     export default {
-        data() {
-            return {
-                visible: false,
-                photo: {}
-            }
-        },
+        props: ['id'],
         methods: {
-            showPhoto(photo) {
-                this.visible = true;
-                this.photo = photo;
+            close() {
+                this.$router.push('/');
             }
-        },
-        mounted() {
-            EventBus.$on('show-photo', this.showPhoto)
-        },
-        beforeDestroy() {
-            EventBus.$off('show-photo', this.showPhoto)
         }
     }
 </script>

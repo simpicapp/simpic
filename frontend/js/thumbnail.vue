@@ -1,6 +1,6 @@
 <template>
     <div class="thumbnail">
-        <a v-bind:href="'/photo/' + photo.id" v-on:click="handleClick">
+        <a v-bind:href="'/photo/' + photo.id" v-on:click.prevent="handleClick">
             <img v-bind:src="'/thumbnail/' + photo.id" v-bind:alt="photo.file_name">
             <div class="overlay">
                 <p class="caption">{{ photo.file_name }}</p>
@@ -50,14 +50,11 @@
 </style>
 
 <script>
-    import {EventBus} from "./bus";
-
     export default {
         props: ['photo'],
         methods: {
             handleClick(e) {
-                e.preventDefault();
-                EventBus.$emit('show-photo', this.photo);
+                this.$router.push({name: 'lightbox', params: {'id': this.photo.id}});
             }
         }
     }
