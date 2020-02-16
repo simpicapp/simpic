@@ -3,27 +3,29 @@ package http
 import (
 	"fmt"
 	"github.com/csmith/simpic"
-	"github.com/gorilla/mux"
+	"github.com/csmith/simpic/storage"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"gopkg.in/square/go-jose.v2"
 	"net/http"
 )
 
 type server struct {
 	staticDir   string
-	router      *mux.Router
+	router      *chi.Mux
 	db          *simpic.Database
-	retriever   *simpic.Retriever
 	storer      *simpic.Storer
 	thumbnailer *simpic.Thumbnailer
 	usermanager *simpic.UserManager
+	driver      storage.Driver
 	signer      jose.Signer
 }
 
-func Start(db *simpic.Database, thumbnailer *simpic.Thumbnailer, usermanager *simpic.UserManager, retriever *simpic.Retriever, storer *simpic.Storer, staticDir string, port int) error {
+func Start(db *simpic.Database, thumbnailer *simpic.Thumbnailer, usermanager *simpic.UserManager, driver storage.Driver, storer *simpic.Storer, staticDir string, port int) error {
 	s := server{
-		router:      mux.NewRouter(),
+		router:      createRouter(),
 		db:          db,
-		retriever:   retriever,
+		driver:      driver,
 		storer:      storer,
 		thumbnailer: thumbnailer,
 		staticDir:   staticDir,
@@ -44,4 +46,12 @@ func Start(db *simpic.Database, thumbnailer *simpic.Thumbnailer, usermanager *si
 	}
 
 	return srv.ListenAndServe()
+}
+
+func createRouter() *chi.Mux {
+	r := chi.NewRouter()
+	r.Use(middleware.RealIP)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	return r
 }

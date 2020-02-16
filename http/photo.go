@@ -1,9 +1,8 @@
 package http
 
 import (
+	"fmt"
 	"github.com/csmith/simpic"
-	"github.com/gorilla/mux"
-	uuid "github.com/satori/go.uuid"
 	"io"
 	"log"
 	"net/http"
@@ -11,18 +10,12 @@ import (
 
 func (s *server) handleGetPhoto() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		id, err := uuid.FromString(vars["uuid"])
-		if err != nil {
-			log.Printf("unable to parse UUID '%s': %v\n", vars["uuid"], err)
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
+		photo := r.Context().Value(ctxPhoto).(*simpic.Photo)
 
-		metadata, stream, err := s.retriever.Get(id)
+		stream, err := s.driver.Read(photo.Id)
 		if err != nil {
-			log.Printf("unable to retrieve photo '%s': %v\n", id, err)
-			w.WriteHeader(http.StatusNotFound)
+			log.Printf("unable to retrieve photo '%s': %v\n", photo.Id, err)
+			writeError(w, http.StatusInternalServerError, "No photo found")
 			return
 		}
 
@@ -30,24 +23,18 @@ func (s *server) handleGetPhoto() http.HandlerFunc {
 			_ = stream.Close()
 		}()
 
-		w.Header().Set("Content-Type", mimeTypeFor(metadata.Type))
+		w.Header().Set("Content-Type", mimeTypeFor(photo.Type))
 		_, _ = io.Copy(w, stream)
 	}
 }
 
 func (s *server) handleGetThumbnail() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		id, err := uuid.FromString(vars["uuid"])
-		if err != nil {
-			log.Printf("unable to parse UUID '%s': %v\n", vars["uuid"], err)
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
+		photo := r.Context().Value(ctxPhoto).(*simpic.Photo)
 
-		stream, err := s.thumbnailer.Thumbnail(id)
+		stream, err := s.thumbnailer.Thumbnail(photo.Id)
 		if err != nil {
-			log.Printf("unable to retrieve thumbnail '%s': %v\n", id, err)
+			log.Printf("unable to retrieve thumbnail '%s': %v\n", photo.Id, err)
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
@@ -97,14 +84,7 @@ func (s *server) handleStorePhoto() http.HandlerFunc {
 			return
 		}
 
-		url, err := s.router.Get("get_photo").URL("uuid", photo.Id.String())
-		if err != nil {
-			log.Printf("unable to find URL for '%s': %v\n", headers.Filename, err)
-			w.WriteHeader(http.StatusNoContent)
-			return
-		}
-
-		w.Header().Set("Location", url.Path)
+		w.Header().Set("Location", fmt.Sprintf("/photo/%s", photo.Id.String()))
 		w.WriteHeader(http.StatusSeeOther)
 	}
 }

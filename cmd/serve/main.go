@@ -39,7 +39,7 @@ func main() {
 		db,
 		thumbnailer,
 		userManager,
-		simpic.NewRetriever(db, driver),
+		driver,
 		simpic.NewStorer(db, driver),
 		*frontendDir,
 		*port)

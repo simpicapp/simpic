@@ -1,13 +1,21 @@
 package http
 
-import "net/http"
+import (
+	"github.com/go-chi/chi"
+	"net/http"
+)
 
 func (s *server) routes() {
-	s.router.HandleFunc("/login", s.handleAuthenticate()).Methods("POST")
-	s.router.HandleFunc("/thumbnail/{uuid}", s.handleGetThumbnail())
-	s.router.HandleFunc("/photo/{uuid}", s.handleGetPhoto()).Name("get_photo")
-	s.router.HandleFunc("/photo", s.handleStorePhoto()).Methods("POST")
-	s.router.HandleFunc("/timeline", s.handleTimeline())
+	s.router.Post("/login", s.handleAuthenticate())
 
-	s.router.PathPrefix("/").Handler(http.FileServer(http.Dir(s.staticDir)))
+	s.router.Group(func(r chi.Router) {
+		r.Use(s.photoCtx)
+		r.Get("/thumbnail/{uuid}", s.handleGetThumbnail())
+		r.Get("/photo/{uuid}", s.handleGetPhoto())
+	})
+
+	s.router.Post("/photo", s.handleStorePhoto())
+	s.router.Get("/timeline", s.handleTimeline())
+
+	s.router.Mount("/", http.FileServer(http.Dir(s.staticDir)))
 }
