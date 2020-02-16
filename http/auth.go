@@ -31,7 +31,6 @@ var (
 type claims struct {
 	jwt.Claims
 	UserId     int    `json:"uid,omitempty"`
-	UserName   string `json:"unm,omitempty"`
 	SessionKey []byte `json:"sky,omitempty"`
 }
 
@@ -115,7 +114,6 @@ func (s *server) generateJWT(user *simpic.User) (string, error) {
 		},
 		SessionKey: user.SessionKey,
 		UserId:     user.Id,
-		UserName:   user.Name,
 	}
 
 	return jwt.Signed(s.signer).Claims(claims).CompactSerialize()

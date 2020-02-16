@@ -45,7 +45,7 @@ new Vue({
         },
         username() {
             if (this.token) {
-                return JSON.parse(atob(this.token.split(".")[1]))['unm']
+                return JSON.parse(atob(this.token.split(".")[1]))['sub']
             } else {
                 return null
             }
