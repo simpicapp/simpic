@@ -1,7 +1,7 @@
 <template>
     <div class="thumbnail">
-        <a v-bind:href="'/photo/' + photo.id" v-on:click.prevent="handleClick">
-            <img v-bind:src="'/thumbnail/' + photo.id" v-bind:alt="photo.file_name">
+        <a v-bind:href="photo.url" v-on:click.prevent="handleClick">
+            <img v-bind:src="photo.thumbnail" v-bind:alt="photo.file_name">
             <div class="overlay">
                 <p class="caption">{{ photo.file_name }}</p>
             </div>
@@ -54,7 +54,7 @@
         props: ['photo'],
         methods: {
             handleClick(e) {
-                this.$router.push({name: 'lightbox', params: {'id': this.photo.id}});
+                this.$router.push({name: 'lightbox', params: {'id': this.photo.key}});
             }
         }
     }

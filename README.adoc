@@ -70,6 +70,12 @@ It currently has the following options:
 | SIMPIC_PATH
 | File system path to store image and thumbnail data. Defaults to `data`.
 
+| -picture-key
+| SIMPIC_PICTURE_KEY
+| Key to use to generate private URLs ofr pictures. Must be 32 bytes, provided as a 64-char hexadecimal string.
+If the picture key is not provided or is invalid, a random key will be generated which will mean picture
+URLs will change whenever the service restarts. Use `openssl rand -hex 32` to generate.
+
 | -port
 | SIMPIC_PORT
 | TCP port to listen on for requests. Defaults to 8080.
