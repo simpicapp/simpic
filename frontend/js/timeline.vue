@@ -14,7 +14,7 @@
 
 <script>
     import {EventBus} from './bus';
-    import thumbnail from "../thumbnail";
+    import thumbnail from "./thumbnail";
 
     export default {
         components: {

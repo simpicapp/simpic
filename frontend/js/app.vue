@@ -5,6 +5,7 @@
         </div>
         <timeline></timeline>
         <uploader></uploader>
+        <login></login>
         <lightbox></lightbox>
     </main>
 </template>
@@ -33,13 +34,15 @@
     import lightbox from "./lightbox";
     import timeline from "./timeline";
     import uploader from "./uploader";
+    import login from "./login";
     import { EventBus } from './bus';
 
     export default {
         components: {
             timeline,
             uploader,
-            lightbox
+            lightbox,
+            login
         },
         data() {
             return {

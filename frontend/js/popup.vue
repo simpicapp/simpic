@@ -1,5 +1,5 @@
 <template>
-    <aside class="popup">
+    <aside v-bind:class="'popup ' + position">
         <h2>{{ title }}</h2>
         <a v-if="closeable" class="close" v-on:click="$emit('close')">❌</a>
         <div class="scroller">
@@ -15,8 +15,17 @@
         border: 2px solid black;
         border-radius: 5px;
         box-shadow: lightslategray 10px 10px;
+    }
+
+    .popup.bottom_right {
         bottom: 20px;
         right: 20px;
+    }
+
+    .popup.center {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
 
     .popup h2 {
@@ -50,6 +59,11 @@
             closeable: {
                 type: Boolean,
                 default: true
+            },
+            position: {
+                type: String,
+                default: 'bottom_right',
+                validator: value => ['bottom_right', 'center'].indexOf(value) !== -1
             }
         }
     }

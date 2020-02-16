@@ -50,7 +50,7 @@
 </style>
 
 <script>
-    import {EventBus} from "./js/bus";
+    import {EventBus} from "./bus";
 
     export default {
         props: ['photo'],
