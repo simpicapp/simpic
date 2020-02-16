@@ -27,13 +27,14 @@
 
     .alert {
         margin: 0;
-        padding: 5px 0;
+        padding: 5px 10px;
         grid-column: span 2;
         background-color: darkred;
         color: white;
         font-weight: bold;
         text-align: center;
         border-radius: 15px;
+        white-space: pre-line;
     }
 </style>
 
@@ -75,7 +76,9 @@
                     if (response.ok) {
                         return response.json();
                     } else {
-                        throw new Error(response.status.toString());
+                        return response.json().then((json) => {
+                            throw new Error(json.error)
+                        });
                     }
                 }).then((json) => {
                     this.$root.loggedIn = true;
@@ -83,11 +86,7 @@
                     this.$root.username = this.username;
                     this.visible = false;
                 }).catch((error) => {
-                    if (error.message === "403") {
-                        this.alert = "Invalid username/password";
-                    } else {
-                        this.alert = "Error: " + error.message;
-                    }
+                    this.alert = error.message;
                 }).finally(() => {
                     this.loggingIn = false;
                 })

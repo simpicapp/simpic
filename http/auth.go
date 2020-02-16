@@ -6,7 +6,6 @@ import (
 	"crypto/rand"
 	"crypto/x509"
 	"database/sql"
-	"encoding/json"
 	"flag"
 	"github.com/csmith/simpic"
 	"gopkg.in/square/go-jose.v2"
@@ -37,8 +36,8 @@ type claims struct {
 
 func (s *server) handleAuthenticate() http.HandlerFunc {
 	type LoginData struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
+		Username string `json:"username" validate:"required"`
+		Password string `json:"password" validate:"required"`
 	}
 
 	type LoginResponse struct {
@@ -47,9 +46,7 @@ func (s *server) handleAuthenticate() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		data := &LoginData{}
-		if err := json.NewDecoder(r.Body).Decode(data); err != nil {
-			log.Printf("Failed to parse JSON body: %v\n", err)
-			w.WriteHeader(http.StatusBadRequest)
+		if !bind(w, r, data) {
 			return
 		}
 
@@ -57,10 +54,10 @@ func (s *server) handleAuthenticate() http.HandlerFunc {
 		if err != nil {
 			if err == sql.ErrNoRows {
 				log.Printf("No such user '%s'\n", data.Username)
-				w.WriteHeader(http.StatusForbidden)
+				writeError(w, http.StatusForbidden, "Invalid username/password")
 			} else {
 				log.Printf("Unable to retrieve user '%s': %v\n", data.Username, err)
-				w.WriteHeader(http.StatusBadRequest)
+				writeError(w, http.StatusInternalServerError, "Unexpected error; please try again")
 			}
 
 			return
@@ -68,14 +65,14 @@ func (s *server) handleAuthenticate() http.HandlerFunc {
 
 		if !s.usermanager.CheckPassword(user, data.Password) {
 			log.Printf("Bad password for user '%s'\n", data.Username)
-			w.WriteHeader(http.StatusForbidden)
+			writeError(w, http.StatusForbidden, "Invalid username/password")
 			return
 		}
 
 		token, err := s.generateJWT(user)
 		if err != nil {
 			log.Printf("Unable to create JWT for user '%s': %v\n", data.Username, err)
-			w.WriteHeader(http.StatusBadRequest)
+			writeError(w, http.StatusInternalServerError, "Unexpected error; please try again")
 			return
 		}
 
