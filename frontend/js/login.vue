@@ -39,65 +39,64 @@
 </style>
 
 <script>
-    import {EventBus} from "./bus";
-    import popup from "./popup";
+  import { EventBus } from './bus'
+  import popup from './popup'
 
-    export default {
-        components: {
-            popup
-        },
-        data() {
-            return {
-                visible: false,
-                loggingIn: false,
-                username: "",
-                password: "",
-                alert: ""
-            }
-        },
-        methods: {
-            show() {
-                this.visible = true;
-            },
-            doLogin() {
-                this.alert = "";
-                this.loggingIn = true;
-                fetch('/login', {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        username: this.username,
-                        password: this.password
-                    })
-                }).then((response) => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        return response.json().then((json) => {
-                            throw new Error(json.error)
-                        });
-                    }
-                }).then((json) => {
-                    this.$root.loggedIn = true;
-                    this.$root.token = json.token;
-                    this.$root.username = this.username;
-                    this.visible = false;
-                }).catch((error) => {
-                    this.alert = error.message;
-                }).finally(() => {
-                    this.loggingIn = false;
-                })
-            }
-        },
-        created() {
-            EventBus.$on('login', this.show);
-        }
-        ,
-        beforeDestroy() {
-            EventBus.$off('login', this.show);
-        }
+  export default {
+    components: {
+      popup
+    },
+    data () {
+      return {
+        alert: '',
+        loggingIn: false,
+        password: '',
+        username: '',
+        visible: false
+      }
+    },
+    methods: {
+      doLogin () {
+        this.alert = ''
+        this.loggingIn = true
+        fetch('/login', {
+          body: JSON.stringify({
+            password: this.password,
+            username: this.username
+          }),
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          },
+          method: 'POST'
+        }).then((response) => {
+          if (response.ok) {
+            return response.json()
+          } else {
+            return response.json().then((json) => {
+              throw new Error(json.error)
+            })
+          }
+        }).then((json) => {
+          this.$root.loggedIn = true
+          this.$root.token = json.token
+          this.$root.username = this.username
+          this.visible = false
+        }).catch((error) => {
+          this.alert = error.message
+        }).finally(() => {
+          this.loggingIn = false
+        })
+      },
+      show () {
+        this.visible = true
+      }
+    },
+    created () {
+      EventBus.$on('login', this.show)
+    },
+    beforeDestroy () {
+      EventBus.$off('login', this.show)
     }
+  }
 </script>

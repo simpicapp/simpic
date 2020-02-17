@@ -17,7 +17,7 @@
     }
 
     header h1 {
-        text-transform:  lowercase;
+        text-transform: lowercase;
         flex-grow: 1;
     }
 
@@ -27,13 +27,13 @@
 </style>
 
 <script>
-    import {EventBus} from "./bus";
+  import { EventBus } from './bus'
 
-    export default {
-        methods: {
-            loginClick() {
-                EventBus.$emit('login')
-            }
-        }
+  export default {
+    methods: {
+      loginClick () {
+        EventBus.$emit('login')
+      }
     }
+  }
 </script>

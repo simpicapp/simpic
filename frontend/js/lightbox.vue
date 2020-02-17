@@ -26,12 +26,12 @@
 </style>
 
 <script>
-    export default {
-        props: ['id'],
-        methods: {
-            close() {
-                this.$router.push('/');
-            }
-        }
+  export default {
+    props: ['id'],
+    methods: {
+      close () {
+        this.$router.push('/')
+      }
     }
+  }
 </script>

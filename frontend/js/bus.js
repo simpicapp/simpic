@@ -1,3 +1,3 @@
-import Vue from './vendor/vue';
+import Vue from './vendor/vue'
 
-export const EventBus = new Vue();
+export const EventBus = new Vue()

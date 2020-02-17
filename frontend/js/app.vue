@@ -17,17 +17,17 @@
 </style>
 
 <script>
-    import uploader from "./uploader";
-    import login from "./login";
-    import toolbar from "./toolbar";
-    import bottombar from "./footer";
+  import uploader from './uploader'
+  import login from './login'
+  import toolbar from './toolbar'
+  import bottombar from './footer'
 
-    export default {
-        components: {
-            uploader,
-            login,
-            toolbar,
-            bottombar
-        }
+  export default {
+    components: {
+      bottombar,
+      login,
+      toolbar,
+      uploader
     }
+  }
 </script>

@@ -50,12 +50,12 @@
 </style>
 
 <script>
-    export default {
-        props: ['photo'],
-        methods: {
-            handleClick(e) {
-                this.$router.push({name: 'lightbox', params: {'id': this.photo.key}});
-            }
-        }
+  export default {
+    props: ['photo'],
+    methods: {
+      handleClick () {
+        this.$router.push({ name: 'lightbox', params: { id: this.photo.key } })
+      }
     }
+  }
 </script>

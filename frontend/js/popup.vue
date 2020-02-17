@@ -53,18 +53,18 @@
 </style>
 
 <script>
-    export default {
-        props: {
-            title: String,
-            closeable: {
-                type: Boolean,
-                default: true
-            },
-            position: {
-                type: String,
-                default: 'bottom_right',
-                validator: value => ['bottom_right', 'center'].indexOf(value) !== -1
-            }
-        }
+  export default {
+    props: {
+      closeable: {
+        type: Boolean,
+        default: true
+      },
+      position: {
+        type: String,
+        default: 'bottom_right',
+        validator: value => ['bottom_right', 'center'].indexOf(value) !== -1
+      },
+      title: String
     }
+  }
 </script>
