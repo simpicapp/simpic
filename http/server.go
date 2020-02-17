@@ -1,6 +1,7 @@
 package http
 
 import (
+	"crypto/ecdsa"
 	"fmt"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -19,6 +20,7 @@ type server struct {
 	usermanager *simpic.UserManager
 	driver      storage.Driver
 	signer      jose.Signer
+	jwtKey      *ecdsa.PrivateKey
 	key         [32]byte
 }
 
@@ -33,12 +35,10 @@ func Start(db *simpic.Database, thumbnailer *simpic.Thumbnailer, usermanager *si
 		usermanager: usermanager,
 	}
 
-	signer, err := s.createSigner()
-	if err != nil {
+	if err := s.createSigner(); err != nil {
 		panic(fmt.Sprintf("Unable to create JWT signer: %v", err))
 	}
 
-	s.signer = signer
 	s.key = encryptionKey()
 	s.routes()
 

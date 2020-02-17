@@ -1,12 +1,14 @@
 package http
 
 import (
+	"bytes"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/x509"
 	"database/sql"
 	"flag"
+	"fmt"
 	"github.com/simpicapp/simpic"
 	"gopkg.in/square/go-jose.v2"
 	"gopkg.in/square/go-jose.v2/jwt"
@@ -80,10 +82,10 @@ func (s *server) handleAuthenticate() http.HandlerFunc {
 	}
 }
 
-func (s *server) createSigner() (jose.Signer, error) {
+func (s *server) createSigner() error {
 	key, err := s.loadKey()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	jwk := jose.JSONWebKey{
@@ -93,7 +95,42 @@ func (s *server) createSigner() (jose.Signer, error) {
 		KeyID:     "simpic",
 	}
 
-	return jose.NewSigner(jose.SigningKey{Algorithm: jose.ES256, Key: jwk}, &jose.SignerOptions{})
+	signer, err := jose.NewSigner(jose.SigningKey{Algorithm: jose.ES256, Key: jwk}, &jose.SignerOptions{})
+	if err != nil {
+		return err
+	}
+
+	s.signer = signer
+	s.jwtKey = key
+	return nil
+}
+
+func (s *server) validateToken(signedToken string) (*simpic.User, error) {
+	token, err := jwt.ParseSigned(signedToken)
+	if err != nil {
+		return nil, err
+	}
+
+	claims := &claims{}
+	if err = token.Claims(s.jwtKey.Public(), claims); err != nil {
+		return nil, err
+	}
+
+	expected := jwt.Expected{Time: time.Now()}
+	if err = claims.ValidateWithLeeway(expected, jwt.DefaultLeeway); err != nil {
+		return nil, err
+	}
+
+	user, err := s.db.GetUser(claims.Subject)
+	if err != nil {
+		return nil, err
+	}
+
+	if !bytes.Equal(claims.SessionKey, user.SessionKey) {
+		return nil, fmt.Errorf("invalid session key for user %s", claims.Subject)
+	}
+
+	return user, nil
 }
 
 // generateJWT creates a new JWT for the given user.
