@@ -4,6 +4,7 @@
         <router-view></router-view>
         <uploader></uploader>
         <login></login>
+        <bottombar></bottombar>
     </div>
 </template>
 
@@ -19,12 +20,14 @@
     import uploader from "./uploader";
     import login from "./login";
     import toolbar from "./toolbar";
+    import bottombar from "./footer";
 
     export default {
         components: {
             uploader,
             login,
-            toolbar
+            toolbar,
+            bottombar
         }
     }
 </script>

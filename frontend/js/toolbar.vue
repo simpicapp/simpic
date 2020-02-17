@@ -9,7 +9,7 @@
 <style>
     header {
         display: flex;
-        margin: 0;
+        margin: 0 0 20px 0;
         padding: 10px;
         border-bottom: 1px solid #ccc;
         justify-content: space-between;
