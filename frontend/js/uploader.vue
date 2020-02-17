@@ -1,7 +1,14 @@
 <template>
     <div>
-        <div id="drop-target" v-if="dragging">
-            Drop files here
+        <div class="upload-overlay" v-if="dragging && $root.loggedIn">
+            <div id="drop-target">
+                Drop files here to add to simpic
+            </div>
+        </div>
+        <div class="upload-overlay" v-if="dragging && !$root.loggedIn">
+            <div id="upload-login-prompt">
+                You need to login before uploading files
+            </div>
         </div>
         <popup title="Uploading..." id="uploader" v-if="visible" v-on:close="visible = false">
             <table>
@@ -24,19 +31,37 @@
         padding: 10px;
     }
 
-    #drop-target {
+    .upload-overlay {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
         z-index: 1000;
-        background-color: lightsteelblue;
-        border: 20px dashed midnightblue;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #cccccccc;
+    }
+
+    .upload-overlay > div {
+        width: 50%;
+        height: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: xx-large;
+    }
+
+    #drop-target {
+        background-color: lightsteelblue;
+        border: 10px dashed midnightblue;
+        border-radius: 10px;
+    }
+
+    #upload-login-prompt {
+        background-color: #ffcccc;
+        border: 1px solid red;
     }
 </style>
 
@@ -97,13 +122,23 @@
                 e.preventDefault();
 
                 this.dragging = false;
-                this.visible = true;
-                [...e.dataTransfer.files].forEach(this.acceptNewFile);
+
+                if (this.$root.loggedIn) {
+                    this.visible = true;
+                    [...e.dataTransfer.files].forEach(this.acceptNewFile);
+                }
             },
             dragOverHandler(e) {
                 e.stopPropagation();
                 e.preventDefault();
-                e.dataTransfer.dropEffect = 'copy';
+
+                if (this.$root.loggedIn) {
+                    e.dataTransfer.dropEffect = 'copy';
+                } else {
+                    e.dataTransfer.effectAllowed = 'none';
+                    e.dataTransfer.dropEffect = 'none';
+                }
+
                 this.dragging = true;
             },
             dragStartHandler(e) {
