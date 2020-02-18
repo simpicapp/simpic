@@ -80,8 +80,8 @@ func (s *server) decoratePhoto(photo simpic.Photo) photoData {
 	return photoData{
 		Photo:     photo,
 		Key:       key,
-		Url:       fmt.Sprintf("/photo/%s", key),
-		Thumbnail: fmt.Sprintf("/thumbnail/%s", key),
+		Url:       fmt.Sprintf("/data/image/%s", key),
+		Thumbnail: fmt.Sprintf("/data/thumb/%s", key),
 	}
 }
 

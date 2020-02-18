@@ -19,10 +19,12 @@ func (s *server) routes() {
 		r.Get("/timeline", s.handleTimeline())
 	})
 
-	s.router.Group(func(r chi.Router) {
-		r.Use(s.photoContext)
-		r.Get("/thumbnail/{uuid}", s.handleGetThumbnail())
-		r.Get("/photo/{uuid}", s.handleGetPhoto())
+	s.router.Route("/data", func(r chi.Router) {
+		r.Group(func(r chi.Router) {
+			r.Use(s.photoContext)
+			r.Get("/image/{uuid}", s.handleGetPhoto())
+			r.Get("/thumb/{uuid}", s.handleGetThumbnail())
+		})
 	})
 
 	s.router.Mount("/", http.FileServer(http.Dir(s.staticDir)))

@@ -16,7 +16,7 @@ new Vue({
           {
             component: Lightbox,
             name: 'lightbox',
-            path: 'photo/:id',
+            path: '/photo/:id',
             props: true
           }
         ],

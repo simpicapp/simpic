@@ -1,6 +1,6 @@
 <template>
     <div id="lightbox" v-on:click="close()">
-        <img v-bind:src="'/photo/' + id" v-on:click.stop>
+        <img v-bind:src="'/data/image/' + id" v-on:click.stop>
     </div>
 </template>
 
