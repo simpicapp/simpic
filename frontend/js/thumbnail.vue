@@ -54,7 +54,7 @@
     props: ['photo'],
     methods: {
       handleClick () {
-        this.$router.push({ name: 'lightbox', params: { id: this.photo.key } })
+        this.$router.push({ path: 'photo/' + this.photo.key })
       }
     }
   }

@@ -16,12 +16,16 @@ new Vue({
           {
             component: Lightbox,
             name: 'lightbox',
-            path: '/photo/:id',
+            path: '/timeline/photo/:id',
             props: true
           }
         ],
         component: Timeline,
-        path: '/'
+        path: '/timeline/'
+      },
+      {
+        path: '/',
+        redirect: '/timeline/'
       }
     ]
   }),
