@@ -142,7 +142,8 @@ func (s *server) handleStorePhoto() http.HandlerFunc {
 			_ = file.Close()
 		}()
 
-		photo, writer, err := s.storer.Store(headers.Filename)
+		user := r.Context().Value(ctxUser).(*simpic.User)
+		photo, writer, err := s.storer.Store(headers.Filename, user.Id)
 		if err != nil {
 			log.Printf("unable to create photo '%s': %v\n", headers.Filename, err)
 			w.WriteHeader(http.StatusInternalServerError)

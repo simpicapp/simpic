@@ -17,8 +17,9 @@ func NewStorer(db *Database, driver storage.Driver) *Storer {
 	}
 }
 
-func (s *Storer) Store(fileName string) (*Photo, io.WriteCloser, error) {
+func (s *Storer) Store(fileName string, uploader int) (*Photo, io.WriteCloser, error) {
 	photo := NewPhoto(fileName)
+	photo.Uploader = uploader
 
 	err := s.db.StorePhoto(photo)
 	if err != nil {

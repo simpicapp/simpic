@@ -88,11 +88,11 @@ func (d *Database) GetPhotosByTime(offset, count int) ([]Photo, error) {
 func (d *Database) StorePhoto(photo *Photo) error {
 	_, err := d.db.Exec(
 		`INSERT INTO photos (
-			photo_uuid, photo_filename,
+			photo_uuid, photo_filename, photo_uploader,
 			photo_width, photo_height,
 			photo_uploaded, photo_type
-		) VALUES ($1, $2, $3, $4, $5, $6)`,
-		photo.Id, photo.FileName,
+		) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+		photo.Id, photo.FileName, photo.Uploader,
 		photo.Width, photo.Height,
 		photo.Timestamp, photo.Type)
 	return err

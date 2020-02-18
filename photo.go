@@ -21,14 +21,13 @@ type Photo struct {
 	Height    int       `json:"height" db:"photo_height"`
 	Timestamp time.Time `json:"timestamp" db:"photo_uploaded"`
 	Type      Type      `json:"type" db:"photo_type"`
+	Uploader  int       `db:"photo_uploader"`
 }
 
 func NewPhoto(fileName string) *Photo {
 	return &Photo{
 		Id:        uuid.NewV4(),
 		FileName:  fileName,
-		Width:     0,
-		Height:    0,
 		Timestamp: time.Now(),
 		Type:      typeFromFilename(fileName),
 	}
