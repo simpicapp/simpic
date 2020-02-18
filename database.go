@@ -98,6 +98,11 @@ func (d *Database) StorePhoto(photo *Photo) error {
 	return err
 }
 
+func (d *Database) DeletePhoto(photo *Photo) error {
+	_, err := d.db.Exec(`DELETE FROM photos WHERE photo_uuid = $1`, photo.Id)
+	return err
+}
+
 func (d *Database) AddUser(user *User) error {
 	_, err := d.db.Exec(
 		`INSERT INTO users (

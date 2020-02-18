@@ -27,5 +27,10 @@ func (s *Storer) Store(fileName string, uploader int) (*Photo, io.WriteCloser, e
 	}
 
 	writer, err := s.driver.Write(photo.Id)
+	if err != nil {
+		_ = s.db.DeletePhoto(photo)
+		return nil, nil, err
+	}
+
 	return photo, writer, err
 }
