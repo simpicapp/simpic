@@ -12,6 +12,8 @@ services:
       - ./data:/data
     environment:
       SIMPIC_DSN: host=postgres user=simpic dbname=simpic password=nWK9aY9gkh sslmode=disable
+      SIMPIC_CREATE_ADMIN_USERNAME: admin
+      SIMPIC_CREATE_ADMIN_PASSWORD: s3cr3t
     depends_on:
       - postgres
 

@@ -25,60 +25,59 @@ And then Simpic will be accessible on port 8080.
 
 === Configuration
 
-Simpic is configured using either command line arguments or, preferably, environment variables.
+Simpic is configured using environment variables.
 It currently has the following options:
 
 [%header,cols="m,m,3"]
 |===
-|CLI arg|Env var|Description
+|Env var|Default|Description
 
-| -auth-key-auto-create
 | SIMPIC_AUTH_KEY_AUTO_CREATE
-| Whether to attempt to create a new key to sign authentication tokens if one doesn't exist. Defaults to `true`.
+| true
+| Whether to attempt to create a new key to sign authentication tokens if one doesn't exist.
 
-| -auth-key-file
 | SIMPIC_AUTH_KEY_FILE
-| Path to the X509-marshalled ES256 key to use to sign authentication tokens. Defaults to `data/auth.key`.
+| data/auth.key
+| Path to the X509-marshalled ES256 key to use to sign authentication tokens.
 
-| -auth-token-expiry
 | SIMPIC_AUTH_TOKEN_EXPIRY
+| 774h (31 days)
 | Length of time that authentication tokens are valid for (i.e., how long users stay logged in). Specified in
-  hours/minutes/etc, e.g. "3h30m". Defaults to "744h", i.e. 31 days.
+  hours/minutes/etc, e.g. "3h30m".
 
-| -create-admin-password
 | SIMPIC_CREATE_ADMIN_PASSWORD
+| -
 .2+^.^| If both are specified, a new admin account with those credentials will be created.
 
-| -create-admin-username
 | SIMPIC_CREATE_ADMIN_USERNAME
+| -
 
-
-| -dsn
 | SIMPIC_DNS
+| -
 | The 'data source name' to use to connect to the Postgres database. See:
   https://pkg.go.dev/github.com/lib/pq?tab=doc#hdr-Connection_String_Parameters[list of all valid parameters].
 
-| -frontend
 | SIMPIC_FRONTEND
-| File system path to serve the compiled frontend files from. Defaults to `dist`.
+| dist
+| File system path to serve the compiled frontend files from.
 
-| -migrations
 | SIMPIC_MIGRATIONS
-| File system path to the database migration files. Defaults to `migrations`.
+| migrations
+| File system path to the database migration files.
 
-| -path
 | SIMPIC_PATH
-| File system path to store image and thumbnail data. Defaults to `data`.
+| data
+| File system path to store image and thumbnail data.
 
-| -picture-key
 | SIMPIC_PICTURE_KEY
+| -
 | Key to use to generate private URLs ofr pictures. Must be 32 bytes, provided as a 64-char hexadecimal string.
 If the picture key is not provided or is invalid, a random key will be generated which will mean picture
 URLs will change whenever the service restarts. Use `openssl rand -hex 32` to generate.
 
-| -port
 | SIMPIC_PORT
-| TCP port to listen on for requests. Defaults to 8080.
+| 8080
+| TCP port to listen on for requests.
 |===
 
 == Developing
