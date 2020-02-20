@@ -71,17 +71,13 @@
           method: 'POST'
         }).then((response) => {
           if (response.ok) {
-            return response.json()
+            this.$root.checkUser()
+            this.visible = false
           } else {
             return response.json().then((json) => {
               throw new Error(json.error)
             })
           }
-        }).then((json) => {
-          this.$root.loggedIn = true
-          this.$root.token = json.token
-          this.$root.username = this.username
-          this.visible = false
         }).catch((error) => {
           this.alert = error.message
         }).finally(() => {

@@ -1,49 +1,21 @@
 package http
 
 import (
-	"bytes"
-	"crypto/ecdsa"
-	"crypto/elliptic"
-	"crypto/rand"
-	"crypto/x509"
 	"database/sql"
-	"flag"
-	"fmt"
 	"github.com/simpicapp/simpic"
-	"gopkg.in/square/go-jose.v2"
-	"gopkg.in/square/go-jose.v2/jwt"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"time"
 )
 
 const (
-	audienceUser  = "simpic.user"
-	audienceAdmin = "simpic.admin"
+	cookieName = "SimpicSession"
 )
-
-var (
-	authTokenExpiry   = flag.Duration("auth-token-expiry", time.Hour*24*31, "validity duration of tokens given when a user logs in")
-	authKeyFile       = flag.String("auth-key-file", "data/auth.key", "path to the ES256 key to use to sign JWT tokens")
-	authKeyAutoCreate = flag.Bool("auth-key-create", true, "whether or not the auth key should be created if it doesn't exist")
-)
-
-type claims struct {
-	jwt.Claims
-	UserId     int    `json:"uid,omitempty"`
-	SessionKey []byte `json:"sky,omitempty"`
-}
 
 func (s *server) handleAuthenticate() http.HandlerFunc {
 	type LoginData struct {
 		Username string `json:"username" validate:"required"`
 		Password string `json:"password" validate:"required"`
-	}
-
-	type LoginResponse struct {
-		Token string `json:"token"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -61,7 +33,6 @@ func (s *server) handleAuthenticate() http.HandlerFunc {
 				log.Printf("Unable to retrieve user '%s': %v\n", data.Username, err)
 				writeError(w, http.StatusInternalServerError, "Unexpected error; please try again")
 			}
-
 			return
 		}
 
@@ -71,120 +42,48 @@ func (s *server) handleAuthenticate() http.HandlerFunc {
 			return
 		}
 
-		token, err := s.generateJWT(user)
-		if err != nil {
-			log.Printf("Unable to create JWT for user '%s': %v\n", data.Username, err)
+		session := simpic.NewSession(user, r.RemoteAddr, r.UserAgent())
+		if err := s.db.AddSession(session); err != nil {
+			log.Printf("Unable to save token for user '%s': %v\n", data.Username, err)
 			writeError(w, http.StatusInternalServerError, "Unexpected error; please try again")
 			return
 		}
 
-		writeJSON(w, http.StatusOK, LoginResponse{Token: token})
+		http.SetCookie(w, &http.Cookie{
+			Name:     cookieName,
+			Value:    session.Key,
+			Expires:  session.Expires,
+			Secure:   false, //TODO: Add a debug flag and toggle this appropriately
+			HttpOnly: true,
+			SameSite: http.SameSiteStrictMode,
+		})
+		w.WriteHeader(http.StatusNoContent)
 	}
 }
 
-func (s *server) createSigner() error {
-	key, err := s.loadKey()
-	if err != nil {
-		return err
+func (s *server) handleGetSelf() http.HandlerFunc {
+	type GetSelfResponse struct {
+		Username string    `json:"username"`
+		Admin    bool      `json:"is_admin"`
+		Expires  time.Time `json:"session_expires"`
 	}
 
-	jwk := jose.JSONWebKey{
-		Key:       key,
-		Use:       "sig",
-		Algorithm: "ES256",
-		KeyID:     "simpic",
+	return func(w http.ResponseWriter, r *http.Request) {
+		user := r.Context().Value(ctxUser).(*simpic.User)
+		session := r.Context().Value(ctxSession).(*simpic.Session)
+		writeJSON(w, http.StatusOK, GetSelfResponse{
+			Username: user.Name,
+			Admin:    user.Admin,
+			Expires:  session.Expires,
+		})
 	}
-
-	signer, err := jose.NewSigner(jose.SigningKey{Algorithm: jose.ES256, Key: jwk}, &jose.SignerOptions{})
-	if err != nil {
-		return err
-	}
-
-	s.signer = signer
-	s.jwtKey = key
-	return nil
 }
 
-func (s *server) validateToken(signedToken string) (*simpic.User, error) {
-	token, err := jwt.ParseSigned(signedToken)
-	if err != nil {
-		return nil, err
-	}
-
-	claims := &claims{}
-	if err = token.Claims(s.jwtKey.Public(), claims); err != nil {
-		return nil, err
-	}
-
-	expected := jwt.Expected{Time: time.Now()}
-	if err = claims.ValidateWithLeeway(expected, jwt.DefaultLeeway); err != nil {
-		return nil, err
-	}
-
-	user, err := s.db.GetUser(claims.Subject)
-	if err != nil {
-		return nil, err
-	}
-
-	if !bytes.Equal(claims.SessionKey, user.SessionKey) {
-		return nil, fmt.Errorf("invalid session key for user %s", claims.Subject)
-	}
-
-	return user, nil
-}
-
-// generateJWT creates a new JWT for the given user.
-func (s *server) generateJWT(user *simpic.User) (string, error) {
-	var audience jwt.Audience
-	if user.Admin {
-		audience = jwt.Audience{audienceUser, audienceAdmin}
-	} else {
-		audience = jwt.Audience{audienceUser}
-	}
-
-	claims := claims{
-		Claims: jwt.Claims{
-			Audience: audience,
-			Subject:  user.Name,
-			IssuedAt: jwt.NewNumericDate(time.Now()),
-			Expiry:   jwt.NewNumericDate(time.Now().Add(*authTokenExpiry)),
-		},
-		SessionKey: user.SessionKey,
-		UserId:     user.Id,
-	}
-
-	return jwt.Signed(s.signer).Claims(claims).CompactSerialize()
-}
-
-// loadKey attempts to load an ECDSA key from disk; if the key can't be read and the auto-create flag is enabled,
-// it will attempt to create and write a new key.
-func (s *server) loadKey() (*ecdsa.PrivateKey, error) {
-	data, err := ioutil.ReadFile(*authKeyFile)
-	if err != nil {
-		log.Printf("Unable to load existing key from '%s': %v\n", *authKeyFile, err)
-		if *authKeyAutoCreate {
-			return s.createKey()
-		} else {
-			return nil, err
-		}
-	}
-
-	return x509.ParseECPrivateKey(data)
-}
-
-// createKey attempts to create a new key using the P256 curve, and write it to disk.
-func (s *server) createKey() (*ecdsa.PrivateKey, error) {
-	log.Printf("Creating new authentication key...")
-	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	if err != nil {
-		return nil, err
-	}
-
-	data, err := x509.MarshalECPrivateKey(key)
-	if err != nil {
-		return nil, err
-	}
-
-	err = ioutil.WriteFile(*authKeyFile, data, os.FileMode(0600))
-	return key, err
+func (s *server) clearAuthCookie(w http.ResponseWriter) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     cookieName,
+		Expires:  time.Now().Add(time.Hour * -24),
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
 }

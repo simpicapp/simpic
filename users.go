@@ -1,11 +1,10 @@
 package simpic
 
 import (
-	"crypto/rand"
 	"flag"
-	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"log"
+	"strings"
 )
 
 var (
@@ -18,7 +17,6 @@ type User struct {
 	Name         string `db:"user_name"`
 	PasswordSalt []byte `db:"user_password_salt"`
 	PasswordHash []byte `db:"user_password_hash"`
-	SessionKey   []byte `db:"user_session_key"`
 	Admin        bool   `db:"user_admin"`
 }
 
@@ -42,8 +40,7 @@ func (u *UserManager) CreateAdmin() {
 
 func (u *UserManager) AddUser(username, password string, admin bool) (*User, error) {
 	var (
-		passwordSalt = u.randomBytes(16)
-		sessionKey   = u.randomBytes(32)
+		passwordSalt = randomBytes(16)
 		passwordHash []byte
 		err          error
 	)
@@ -53,10 +50,9 @@ func (u *UserManager) AddUser(username, password string, admin bool) (*User, err
 	}
 
 	user := &User{
-		Name:         username,
+		Name:         strings.ToLower(username),
 		PasswordSalt: passwordSalt,
 		PasswordHash: passwordHash,
-		SessionKey:   sessionKey,
 		Admin:        admin,
 	}
 
@@ -71,17 +67,6 @@ func (u *UserManager) CheckPassword(user *User, password string) bool {
 	salted := u.salted(password, user.PasswordSalt)
 	err := bcrypt.CompareHashAndPassword(user.PasswordHash, salted)
 	return err == nil
-}
-
-func (u *UserManager) randomBytes(len int) []byte {
-	res := make([]byte, len)
-	n, err := rand.Read(res)
-
-	if n < len || err != nil {
-		panic(fmt.Sprintf("Unable to generate random bytes. Wanted: %d, got: %d, err: %s", len, n, err))
-	}
-
-	return res
 }
 
 func (u *UserManager) salted(password string, salt []byte) []byte {

@@ -32,19 +32,6 @@ It currently has the following options:
 |===
 |Env var|Default|Description
 
-| SIMPIC_AUTH_KEY_AUTO_CREATE
-| true
-| Whether to attempt to create a new key to sign authentication tokens if one doesn't exist.
-
-| SIMPIC_AUTH_KEY_FILE
-| data/auth.key
-| Path to the X509-marshalled ES256 key to use to sign authentication tokens.
-
-| SIMPIC_AUTH_TOKEN_EXPIRY
-| 774h (31 days)
-| Length of time that authentication tokens are valid for (i.e., how long users stay logged in). Specified in
-  hours/minutes/etc, e.g. "3h30m".
-
 | SIMPIC_CREATE_ADMIN_PASSWORD
 | -
 .2+^.^| If both are specified, a new admin account with those credentials will be created.
@@ -78,6 +65,10 @@ URLs will change whenever the service restarts. Use `openssl rand -hex 32` to ge
 | SIMPIC_PORT
 | 8080
 | TCP port to listen on for requests.
+
+| SIMPIC_SESSION_EXPIRY
+| 774h (31 days)
+| Length of time that users stay logged in for. Specified in hours/minutes/etc, e.g. "3h30m".
 |===
 
 == Developing

@@ -16,6 +16,7 @@ func (s *server) routes() {
 	s.router.Group(func(r chi.Router) {
 		r.Use(s.authenticatedContext, s.requireAnyUser)
 		r.Post("/photo", s.handleStorePhoto())
+		r.Get("/users/me", s.handleGetSelf())
 	})
 
 	s.router.Route("/data", func(r chi.Router) {

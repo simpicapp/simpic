@@ -3,13 +3,14 @@ package http
 import (
 	"context"
 	"github.com/go-chi/chi"
-	"log"
 	"net/http"
-	"strings"
 )
 
-const ctxPhoto = "photo"
-const ctxUser = "user"
+const (
+	ctxPhoto   = "photo"
+	ctxSession = "session"
+	ctxUser    = "user"
+)
 
 func (s *server) photoContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -32,21 +33,22 @@ func (s *server) photoContext(next http.Handler) http.Handler {
 
 func (s *server) authenticatedContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		header := r.Header.Get("Authorization")
-		if strings.HasPrefix(header, "Bearer ") {
-			signedToken := strings.TrimPrefix(header, "Bearer ")
-			user, err := s.validateToken(signedToken)
-			if err != nil {
-				log.Printf("client supplied JWT but it was invalid: %v\n", err)
-				writeError(w, http.StatusUnauthorized, "Invalid bearer token supplied")
-				return
-			}
-
-			ctx := context.WithValue(r.Context(), ctxUser, user)
-			next.ServeHTTP(w, r.WithContext(ctx))
-		} else {
+		cookie, err := r.Cookie(cookieName)
+		if err != nil {
+			s.clearAuthCookie(w)
 			next.ServeHTTP(w, r)
+			return
 		}
+
+		session, err := s.db.GetSession(cookie.Value)
+		if err != nil {
+			s.clearAuthCookie(w)
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		ctx := context.WithValue(context.WithValue(r.Context(), ctxUser, &session.User), ctxSession, &session.Session)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 

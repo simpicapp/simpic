@@ -46,8 +46,7 @@
         fetch('/timeline?offset=' + this.offset, {
           headers: {
             Accept: 'application/json',
-            'Content-Type': 'application/json',
-            ...this.$root.authHeaders()
+            'Content-Type': 'application/json'
           }
         }).then((response) => response.json())
           .then((json) => {
