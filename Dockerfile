@@ -2,8 +2,8 @@ FROM node:12-stretch AS parcel
 
 RUN npm install -g parcel-bundler
 RUN mkdir /tmp/site
-ADD frontend /tmp/site
-RUN cd /tmp/site && parcel build $(find . -name '*.html' -not -path './dist/*' -not -path './node_modules/*')
+ADD . /tmp/site
+RUN cd /tmp/site && parcel build frontend/index.html
 
 
 FROM golang:1.13 AS build
