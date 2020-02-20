@@ -6,7 +6,6 @@ import (
 )
 
 type Album struct {
-	Id      int        `json:"-" db:"album_id"`
 	Uuid    uuid.UUID  `json:"id" db:"album_uuid"`
 	Name    string     `json:"name" db:"album_name"`
 	Cover   *uuid.UUID `json:"cover_photo,omitempty" db:"photo_uuid,omitempty"`
