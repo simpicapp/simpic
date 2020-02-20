@@ -137,7 +137,6 @@
 
         fetch('/photo', {
           body: formData,
-          headers: this.$root.authHeaders(),
           method: 'POST'
         }).then(() => {
           file.finished = true
