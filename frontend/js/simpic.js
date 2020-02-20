@@ -1,5 +1,5 @@
-import Vue from './vendor/vue'
-import VueRouter from './vendor/vue-router'
+import Vue from 'vue'
+import VueRouter from 'vue-router'
 
 import App from './app'
 import Lightbox from './lightbox'
@@ -33,7 +33,6 @@ new Vue({
     token: localStorage.getItem('simpicAuthToken')
   },
   el: '#main',
-  template: '<App></App>',
   components: { App },
   methods: {
     authHeaders () {
@@ -56,6 +55,7 @@ new Vue({
       }
     }
   },
+  render: (h) => h(App),
   watch: {
     token (newValue) {
       localStorage.setItem('simpicAuthToken', newValue)
