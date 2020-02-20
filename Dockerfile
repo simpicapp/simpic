@@ -3,7 +3,7 @@ FROM node:12-stretch AS parcel
 RUN npm install -g parcel-bundler
 RUN mkdir /tmp/site
 ADD . /tmp/site
-RUN cd /tmp/site && parcel build frontend/index.html
+RUN cd /tmp/site && npm install && parcel build frontend/index.html
 
 
 FROM golang:1.13 AS build
