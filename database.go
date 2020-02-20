@@ -84,6 +84,11 @@ func (d *Database) AddAlbum(album *Album) (err error) {
 	return
 }
 
+func (d *Database) GetAlbum(id uuid.UUID) (album *Album, err error) {
+	err = d.db.Collection("albums").Find("album_uuid", id).One(&album)
+	return
+}
+
 func (d *Database) GetAlbums(offset, count int) (albums []Album, err error) {
 	err = d.db.Collection("albums").Find().OrderBy("album_name").Offset(offset).Limit(count).All(&albums)
 	return

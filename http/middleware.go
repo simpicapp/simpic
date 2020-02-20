@@ -8,10 +8,30 @@ import (
 )
 
 const (
+	ctxAlbum   = "album"
 	ctxPhoto   = "photo"
 	ctxSession = "session"
 	ctxUser    = "user"
 )
+
+func (s *server) albumContext(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		id, err := uuid.FromString(chi.URLParam(r, "uuid"))
+		if err != nil {
+			writeError(w, http.StatusNotFound, "No such album")
+			return
+		}
+
+		album, err := s.db.GetAlbum(id)
+		if err != nil {
+			writeError(w, http.StatusNotFound, "No such album")
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), ctxAlbum, album)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
 
 func (s *server) photoContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

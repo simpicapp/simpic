@@ -28,7 +28,7 @@ func (s *server) handleAddAlbum() http.HandlerFunc {
 			return
 		}
 
-		http.Redirect(w, r, fmt.Sprintf("/album/%s", album.Uuid), http.StatusSeeOther)
+		http.Redirect(w, r, fmt.Sprintf("/albums/%s", album.Uuid), http.StatusSeeOther)
 	}
 }
 
@@ -51,5 +51,12 @@ func (s *server) handleGetAlbums() http.HandlerFunc {
 		}
 
 		writeJSON(w, http.StatusOK, albums)
+	}
+}
+
+func (s *server) handleGetAlbum() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		album := r.Context().Value(ctxAlbum).(*simpic.Album)
+		writeJSON(w, http.StatusOK, album)
 	}
 }
