@@ -21,7 +21,7 @@ func (s *Storer) Store(fileName string, uploader int) (*Photo, io.WriteCloser, e
 	photo := NewPhoto(fileName)
 	photo.Uploader = uploader
 
-	err := s.db.StorePhoto(photo)
+	err := s.db.Add(photo)
 	if err != nil {
 		return nil, nil, err
 	}

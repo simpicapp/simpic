@@ -8,6 +8,16 @@ import (
 func (s *server) routes() {
 	s.router.Post("/login", s.handleAuthenticate())
 
+	s.router.Route("/albums", func(r chi.Router) {
+		r.Use(s.authenticatedContext)
+		r.Get("/", s.handleGetAlbums())
+
+		r.Group(func(r chi.Router) {
+			r.Use(s.requireAnyUser)
+			r.Post("/", s.handleAddAlbum())
+		})
+	})
+
 	s.router.Group(func(r chi.Router) {
 		r.Use(s.authenticatedContext)
 		r.Get("/timeline", s.handleTimeline())

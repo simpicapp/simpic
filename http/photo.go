@@ -108,8 +108,7 @@ func (s *server) handleStorePhoto() http.HandlerFunc {
 			return
 		}
 
-		w.Header().Set("Location", fmt.Sprintf("/photo/%s", photo.Id.String()))
-		w.WriteHeader(http.StatusSeeOther)
+		http.Redirect(w, r, fmt.Sprintf("/photo/%s", photo.Id.String()), http.StatusSeeOther)
 	}
 }
 
