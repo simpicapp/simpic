@@ -54,7 +54,7 @@
     props: ['photo'],
     methods: {
       handleClick () {
-        this.$router.push({ path: 'photo/' + this.photo.key })
+        this.$router.push({ path: 'photo/' + this.photo.id })
       }
     }
   }

@@ -17,7 +17,6 @@ type server struct {
 	thumbnailer *simpic.Thumbnailer
 	usermanager *simpic.UserManager
 	driver      storage.Driver
-	key         [32]byte
 }
 
 func Start(db *simpic.Database, thumbnailer *simpic.Thumbnailer, usermanager *simpic.UserManager, driver storage.Driver, storer *simpic.Storer, staticDir string, port int) error {
@@ -31,7 +30,6 @@ func Start(db *simpic.Database, thumbnailer *simpic.Thumbnailer, usermanager *si
 		usermanager: usermanager,
 	}
 
-	s.key = encryptionKey()
 	s.routes()
 
 	srv := &http.Server{

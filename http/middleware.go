@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"github.com/go-chi/chi"
+	uuid "github.com/satori/go.uuid"
 	"net/http"
 )
 
@@ -14,7 +15,7 @@ const (
 
 func (s *server) photoContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id, err := s.idForKey(chi.URLParam(r, "uuid"))
+		id, err := uuid.FromString(chi.URLParam(r, "uuid"))
 		if err != nil {
 			writeError(w, http.StatusNotFound, "No such photo")
 			return
