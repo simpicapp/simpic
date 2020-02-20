@@ -14,6 +14,13 @@ type Album struct {
 	Created time.Time  `json:"created" db:"album_created"`
 }
 
+type AlbumPhoto struct {
+	Photo
+	Creator int       `json:"creator_id" db:"content_creator"`
+	Order   int       `json:"order" db:"content_order"`
+	Added   time.Time `json:"added" db:"content_added"`
+}
+
 func NewAlbum(name string, owner int) *Album {
 	return &Album{
 		Uuid:    uuid.NewV4(),
