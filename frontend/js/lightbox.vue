@@ -30,7 +30,7 @@
     props: ['id'],
     methods: {
       close () {
-        this.$router.push('/')
+        this.$router.push('../')
       }
     }
   }

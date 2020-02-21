@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
+import Album from './album'
+import Albums from './albums'
 import App from './app'
 import Lightbox from './lightbox'
 import Timeline from './timeline'
@@ -22,6 +24,23 @@ new Vue({
         ],
         component: Timeline,
         path: '/timeline/'
+      },
+      {
+        component: Albums,
+        path: '/albums/'
+      },
+      {
+        children: [
+          {
+            component: Lightbox,
+            name: 'lightbox',
+            path: '/albums/:album/photo/:id',
+            props: true
+          }
+        ],
+        component: Album,
+        path: '/albums/:id',
+        props: true
       },
       {
         path: '/',
