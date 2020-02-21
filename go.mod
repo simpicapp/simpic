@@ -6,7 +6,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/go-chi/chi v4.0.3+incompatible
 	github.com/go-playground/validator/v10 v10.2.0
-	github.com/golang-migrate/migrate/v4 v4.8.0
+	github.com/golang-migrate/migrate/v4 v4.9.1
 	github.com/gorilla/mux v1.7.4 // indirect
 	github.com/jamiealquiza/envy v1.1.0
 	github.com/lib/pq v1.3.0 // indirect
