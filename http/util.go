@@ -2,7 +2,9 @@ package http
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/go-playground/validator/v10"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -53,16 +55,19 @@ func buildError(errors validator.ValidationErrors) string {
 		}
 		str.WriteString(err.Field())
 		str.WriteRune(' ')
-		str.WriteString(describeTag(err.Tag()))
+		str.WriteString(describeTag(err.Tag(), err.Param()))
 	}
 	return str.String()
 }
 
 // describeTag converts a validation tag to a user-friendly description of the failure mode.
-func describeTag(tag string) string {
+func describeTag(tag string, value string) string {
 	if tag == "required" {
 		return "is required"
+	} else if tag == "min" {
+		return fmt.Sprintf("must have a length of at least %s", value)
 	} else {
+		log.Printf("Don't know how to describe validation tag %s\n", tag)
 		return "is invalid"
 	}
 }

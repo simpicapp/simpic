@@ -21,6 +21,15 @@ func (s *server) routes() {
 			r.Use(s.albumContext)
 			r.Get("/{uuid}", s.handleGetAlbum())
 		})
+
+		r.Route("/{uuid}/photos", func(r chi.Router) {
+			r.Use(s.albumContext)
+			r.Get("/", s.handleGetPhotosForAlbum())
+			r.Group(func(r chi.Router) {
+				r.Use(s.requireAnyUser)
+				r.Post("/", s.handleAddPhotosToAlbum())
+			})
+		})
 	})
 
 	s.router.Group(func(r chi.Router) {
