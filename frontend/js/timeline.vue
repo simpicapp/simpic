@@ -1,70 +1,25 @@
 <template>
-    <main class="timeline">
-        <p v-if="loading">Loading...</p>
-        <router-view></router-view>
-        <thumbnail v-for="photo in photos" v-bind:photo="photo" v-bind:key="photo.id"></thumbnail>
-    </main>
+    <gallery endpoint="/timeline"></gallery>
 </template>
-
-<style>
-    .timeline {
-        display: flex;
-        flex-wrap: wrap;
-    }
-</style>
 
 <script>
   import { EventBus } from './bus'
-  import thumbnail from './thumbnail'
+  import Gallery from './gallery'
 
   export default {
     components: {
-      thumbnail
-    },
-    data: function () {
-      return {
-        hasMore: true,
-        loading: true,
-        offset: 0,
-        photos: []
-      }
+      Gallery
     },
     methods: {
-      infiniteScroll () {
-        if (!this.loading && this.hasMore) {
-          this.update()
-        }
-      },
       refresh () {
-        this.offset = 0
-        this.hasMore = true
-        this.update()
-      },
-      update () {
-        this.loading = true
-
-        fetch('/timeline?offset=' + this.offset, {
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json'
-          }
-        }).then((response) => response.json())
-          .then((json) => {
-            if (this.offset === 0) {
-              this.photos = json
-            } else {
-              this.photos = this.photos.concat(json)
-            }
-            this.offset = this.offset + json.length
-            this.hasMore = json.length > 0
-          })
-          .then(() => (this.loading = false))
+        EventBus.$emit('refresh-gallery')
       }
     },
-    mounted: function () {
-      this.update()
+    beforeDestroy () {
+      EventBus.$off('upload-complete', this.refresh)
+    },
+    mounted () {
       EventBus.$on('upload-complete', this.refresh)
-      EventBus.$on('bottom', this.infiniteScroll)
     }
   }
 </script>

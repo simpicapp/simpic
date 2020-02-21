@@ -1,9 +1,9 @@
 <template>
     <div class="thumbnail">
-        <a v-bind:href="photo.url" v-on:click.prevent="handleClick">
-            <img v-bind:src="photo.thumbnail" v-bind:alt="photo.file_name">
+        <a v-bind:href="'/data/photo/' + id" v-on:click.prevent="handleClick">
+            <img v-bind:src="'/data/thumb/' + id" v-bind:alt="caption">
             <div class="overlay">
-                <p class="caption">{{ photo.file_name }}</p>
+                <p class="caption">{{ caption }}</p>
             </div>
         </a>
     </div>
@@ -51,10 +51,10 @@
 
 <script>
   export default {
-    props: ['photo'],
+    props: ['id', 'caption'],
     methods: {
       handleClick () {
-        this.$router.push({ path: 'photo/' + this.photo.id })
+        this.$router.push({ path: 'photo/' + this.id })
       }
     }
   }
