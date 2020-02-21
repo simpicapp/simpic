@@ -15,11 +15,6 @@ repos:
       - id: go-fmt
       - id: go-vet
       - id: go-build
-  - repo: https://github.com/syntaqx/git-hooks
-    rev: v0.0.16
-    hooks:
-      - id: go-mod-tidy
-      - id: go-generate
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v7.0.0-alpha.1
     hooks:
