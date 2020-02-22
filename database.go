@@ -91,6 +91,10 @@ func (d *Database) UpdateAlbum(album *Album) error {
 	return d.db.Collection("albums").Find("album_uuid", album.Id).Update(album)
 }
 
+func (d *Database) DeleteAlbum(album *Album) error {
+	return d.db.Collection("albums").Find("album_uuid", album.Id).Delete()
+}
+
 func (d *Database) GetAlbum(id uuid.UUID) (album *Album, err error) {
 	err = d.db.Collection("albums").Find("album_uuid", id).One(&album)
 	return

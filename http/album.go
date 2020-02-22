@@ -25,12 +25,26 @@ func (s *server) handleAddAlbum() http.HandlerFunc {
 		album := simpic.NewAlbum(data.Name, user.Id)
 
 		if err := s.db.AddAlbum(album); err != nil {
-			log.Printf("Unable to add album '%s': %v\n", album.Name, err)
+			log.Printf("Unable to add album '%s': %v\n", album.Id, err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
 		http.Redirect(w, r, fmt.Sprintf("/albums/%s", album.Id), http.StatusSeeOther)
+	}
+}
+
+func (s *server) handleDeleteAlbum() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		album := r.Context().Value(ctxAlbum).(*simpic.Album)
+
+		if err := s.db.DeleteAlbum(album); err != nil {
+			log.Printf("Unable to delete album '%s': %v\n", album.Id, err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
 	}
 }
 
