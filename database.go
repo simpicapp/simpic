@@ -2,6 +2,7 @@ package simpic
 
 import (
 	"database/sql"
+	"flag"
 	"fmt"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -12,12 +13,18 @@ import (
 	"upper.io/db.v3/postgresql"
 )
 
+var (
+	dsn           = flag.String("dsn", "", "the DSN to use to connect to the database")
+	migrationPath = flag.String("migrations", "migrations", "file system path for the DB migration files")
+	databaseDebug = flag.Bool("database-debug", false, "enable verbose debug logging for SQL queries")
+)
+
 type Database struct {
 	db sqlbuilder.Database
 }
 
-func OpenDatabase(dsn, migrationPath string) (*Database, error) {
-	url, err := postgresql.ParseURL(dsn)
+func OpenDatabase() (*Database, error) {
+	url, err := postgresql.ParseURL(*dsn)
 	if err != nil {
 		return nil, err
 	}
@@ -32,9 +39,11 @@ func OpenDatabase(dsn, migrationPath string) (*Database, error) {
 	}
 
 	database := &Database{db: conn}
-	if err := database.migrate(migrationPath); err != nil {
+	if err := database.migrate(*migrationPath); err != nil {
 		return nil, err
 	}
+
+	conn.SetLogging(*databaseDebug)
 
 	return database, nil
 }

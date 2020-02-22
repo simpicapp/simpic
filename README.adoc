@@ -39,7 +39,11 @@ It currently has the following options:
 | SIMPIC_CREATE_ADMIN_USERNAME
 | -
 
-| SIMPIC_DNS
+| SIMPIC_DATABASE_DEBUG
+| false
+| Enables verbose logging of SQL queries.
+
+| SIMPIC_DSN
 | -
 | The 'data source name' to use to connect to the Postgres database. See:
   https://pkg.go.dev/github.com/lib/pq?tab=doc#hdr-Connection_String_Parameters[list of all valid parameters].
