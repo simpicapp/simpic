@@ -76,49 +76,34 @@ func (s *server) handleGetPhotosForAlbum() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleAddPhotosToAlbum() http.HandlerFunc {
-	type AddPhotosData struct {
-		AddedPhotos []uuid.UUID `json:"add_photos"`
+func (s *server) handleAlterPhotosInAlbum() http.HandlerFunc {
+	type AlterPhotosData struct {
+		AddedPhotos   []uuid.UUID `json:"add_photos"`
+		RemovedPhotos []uuid.UUID `json:"remove_photos"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		data := &AddPhotosData{}
+		data := &AlterPhotosData{}
 		if !bind(w, r, data) {
 			return
 		}
 
 		user := r.Context().Value(ctxUser).(*simpic.User)
 		album := r.Context().Value(ctxAlbum).(*simpic.Album)
-		count, err := s.db.GetAlbumOrderMax(album.Id)
-		if err != nil {
-			log.Printf("unable to retrieve max order for album %s: %v\n", album.Id, err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
+
+		if len(data.AddedPhotos) > 0 {
+			if err := s.addToAlbum(user, album, data.AddedPhotos); err != nil {
+				log.Printf("unable to add photos for album %s: %v\n", album.Id, err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
 		}
 
-		var photos []simpic.AlbumEntry
-		for i, photo := range data.AddedPhotos {
-			photos = append(photos, simpic.AlbumEntry{
-				Photo:   photo,
-				Album:   album.Id,
-				Creator: user.Id,
-				Order:   count + 1 + i,
-				Added:   time.Now(),
-			})
-		}
-
-		err = s.db.AddAlbumPhotos(photos)
-		if err != nil {
-			log.Printf("unable to add photos to album %s: %v\n", album.Id, err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		if album.Cover == nil {
-			album.Cover = &data.AddedPhotos[0]
-			err = s.db.UpdateAlbum(album)
-			if err != nil {
-				log.Printf("unable to update cover for album %s: %v\n", album.Id, err)
+		if len(data.RemovedPhotos) > 0 {
+			if err := s.db.RemoveAlbumPhotos(album.Id, data.RemovedPhotos); err != nil {
+				log.Printf("unable to remove photos for album %s: %v\n", album.Id, err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
 			}
 		}
 
@@ -131,4 +116,37 @@ func (s *server) handleGetAlbum() http.HandlerFunc {
 		album := r.Context().Value(ctxAlbum).(*simpic.Album)
 		writeJSON(w, http.StatusOK, album)
 	}
+}
+
+func (s *server) addToAlbum(user *simpic.User, album *simpic.Album, ids []uuid.UUID) error {
+	count, err := s.db.GetAlbumOrderMax(album.Id)
+	if err != nil {
+		return fmt.Errorf("unable to retrieve max order: %v", err)
+	}
+
+	var photos []simpic.AlbumEntry
+	for i, photo := range ids {
+		photos = append(photos, simpic.AlbumEntry{
+			Photo:   photo,
+			Album:   album.Id,
+			Creator: user.Id,
+			Order:   count + 1 + i,
+			Added:   time.Now(),
+		})
+	}
+
+	err = s.db.AddAlbumPhotos(photos)
+	if err != nil {
+		return fmt.Errorf("unable to add photos: %v", err)
+	}
+
+	if album.Cover == nil {
+		album.Cover = &ids[0]
+		err = s.db.UpdateAlbum(album)
+		if err != nil {
+			log.Printf("unable to update cover for album %s: %v\n", album.Id, err)
+		}
+	}
+
+	return nil
 }

@@ -27,7 +27,7 @@ func (s *server) routes() {
 			r.Get("/", s.handleGetPhotosForAlbum())
 			r.Group(func(r chi.Router) {
 				r.Use(s.requireAnyUser)
-				r.Post("/", s.handleAddPhotosToAlbum())
+				r.Post("/", s.handleAlterPhotosInAlbum())
 			})
 		})
 	})

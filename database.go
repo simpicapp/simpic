@@ -133,6 +133,12 @@ func (d *Database) AddAlbumPhotos(photos []AlbumEntry) error {
 	return batch.Wait()
 }
 
+func (d *Database) RemoveAlbumPhotos(album uuid.UUID, photos []uuid.UUID) error {
+	return d.db.Collection("album_contents").
+		Find(db.And(db.Cond{"album_uuid": album}, db.Cond{"photo_uuid": photos})).
+		Delete()
+}
+
 //endregion
 
 //region Users
