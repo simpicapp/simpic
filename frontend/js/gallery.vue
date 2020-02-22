@@ -3,6 +3,7 @@
         <aside v-if="selecting" class="selectionbar">
             {{ selection.length }} selected
             <button v-on:click="handleAddToAlbum">Add to album</button>
+            <button v-on:click="handleRemoveFromAlbum" v-if="!!album">Remove from album</button>
             <button v-on:click="clearSelection">Clear selection</button>
         </aside>
         <p v-if="loading">Loading...</p>
@@ -54,7 +55,7 @@
     components: {
       thumbnail
     },
-    props: ['endpoint'],
+    props: ['album', 'endpoint'],
     data: function () {
       return {
         hasMore: true,
@@ -115,6 +116,21 @@
       handleLightboxPrevious () {
         this.showing = (this.showing - 1 + this.photos.length) % this.photos.length
         this.$router.push({ path: this.photos[this.showing].id })
+      },
+      handleRemoveFromAlbum () {
+        fetch(this.endpoint, {
+          body: JSON.stringify({
+            remove_photos: this.selection
+          }),
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          },
+          method: 'POST'
+        }).then(() => {
+          EventBus.$emit('album-updated', this.album)
+          this.selection = []
+        })
       },
       infiniteScroll () {
         if (!this.loading && this.hasMore) {

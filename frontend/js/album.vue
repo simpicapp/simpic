@@ -1,7 +1,7 @@
 <template>
     <div class="album">
         <h2>{{ name }}</h2>
-        <gallery v-bind:endpoint="'/albums/' + id + '/photos'"></gallery>
+        <gallery v-bind:endpoint="'/albums/' + id + '/photos'" v-bind:album="id"></gallery>
     </div>
 </template>
 
@@ -13,6 +13,7 @@
 
 <script>
   import Gallery from './gallery'
+  import { EventBus } from './bus'
 
   export default {
     components: {
@@ -23,11 +24,22 @@
         name: ''
       }
     },
+    methods: {
+      handleAlbumUpdated (album) {
+        if (album === this.id) {
+          EventBus.$emit('refresh-gallery')
+        }
+      }
+    },
     props: ['id'],
     mounted () {
       fetch('/albums/' + this.id)
         .then(res => res.json())
         .then(res => (this.name = res.name))
+      EventBus.$on('album-updated', this.handleAlbumUpdated)
+    },
+    destroyed () {
+      EventBus.$off('album-updated', this.handleAlbumUpdated)
     }
   }
 </script>
