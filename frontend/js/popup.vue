@@ -14,7 +14,6 @@
         background: white;
         border: 2px solid black;
         border-radius: 5px;
-        box-shadow: lightslategray 10px 10px;
     }
 
     .popup.bottom_right {

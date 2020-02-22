@@ -15,7 +15,7 @@
 <style>
     .thumbnail {
         position: relative;
-        margin: 10px 5px;
+        margin: 3px 5px;
     }
 
     .thumbnail img {
