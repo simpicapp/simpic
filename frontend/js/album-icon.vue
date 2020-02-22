@@ -5,7 +5,7 @@
     </a>
 </template>
 
-<style>
+<style scoped>
     .album {
         position: relative;
         margin: 10px 15px;
