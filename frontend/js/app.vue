@@ -4,6 +4,7 @@
         <router-view></router-view>
         <uploader></uploader>
         <login></login>
+        <album-picker></album-picker>
         <bottombar></bottombar>
     </div>
 </template>
@@ -23,9 +24,11 @@
   import toolbar from './toolbar'
   import bottombar from './footer'
   import { EventBus } from './bus'
+  import AlbumPicker from './album-picker'
 
   export default {
     components: {
+      AlbumPicker,
       bottombar,
       login,
       toolbar,
