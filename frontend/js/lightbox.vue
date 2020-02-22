@@ -31,7 +31,18 @@
     methods: {
       close () {
         this.$router.push('../')
+      },
+      handleKey (event) {
+        if (event.code === 'Escape') {
+          this.close()
+        }
       }
+    },
+    mounted () {
+      window.addEventListener('keyup', this.handleKey)
+    },
+    destroyed () {
+      window.removeEventListener('keyup', this.handleKey)
     }
   }
 </script>
