@@ -1,4 +1,4 @@
-= Simpic
+image::resources/banner.png[Simpic]
 
 Simpic is a simple picture hosting service, effectively a slimmed down and self-hosted alternative to Google Photos.
 
