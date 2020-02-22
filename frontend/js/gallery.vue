@@ -6,14 +6,19 @@
             <button v-on:click="clearSelection">Clear selection</button>
         </aside>
         <p v-if="loading">Loading...</p>
-        <router-view></router-view>
+
+        <router-view v-on:go-to-previous-image="handleLightboxPrevious"
+                     v-on:go-to-next-image="handleLightboxNext"
+        ></router-view>
+
         <thumbnail v-for="photo in photos"
                    v-bind:id="photo.id"
                    v-bind:caption="photo.file_name"
                    v-bind:key="photo.id"
                    v-bind:selecting="selecting"
-                   v-on:selected="handleSelected"
-                   v-on:deselected="handleDeselected"
+                   v-on:selected="handleItemSelected"
+                   v-on:deselected="handleItemDeselected"
+                   v-on:showing-photo="handleLightboxDisplayed"
         ></thumbnail>
     </main>
 </template>
@@ -56,7 +61,8 @@
         loading: true,
         offset: 0,
         photos: [],
-        selection: []
+        selection: [],
+        showing: null
       }
     },
     computed: {
@@ -88,11 +94,27 @@
           })
         }
       },
-      handleDeselected (id) {
+      handleItemDeselected (id) {
         this.selection.splice(this.selection.indexOf(id), 1)
       },
-      handleSelected (id) {
+      handleItemSelected (id) {
         this.selection.push(id)
+      },
+      handleLightboxDisplayed (id) {
+        const comp = this
+        this.photos.forEach(function (photo, index) {
+          if (photo.id === id) {
+            comp.showing = index
+          }
+        })
+      },
+      handleLightboxNext () {
+        this.showing = (this.showing + 1) % this.photos.length
+        this.$router.push({ path: this.photos[this.showing].id })
+      },
+      handleLightboxPrevious () {
+        this.showing = (this.showing - 1 + this.photos.length) % this.photos.length
+        this.$router.push({ path: this.photos[this.showing].id })
       },
       infiniteScroll () {
         if (!this.loading && this.hasMore) {

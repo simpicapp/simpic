@@ -86,6 +86,7 @@
     methods: {
       handleClick () {
         this.$router.push({ path: 'photo/' + this.id })
+        this.$emit('showing-photo', this.id)
       },
       handleToggle () {
         this.selected = !this.selected
