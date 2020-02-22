@@ -17,7 +17,6 @@ new Vue({
         children: [
           {
             component: Lightbox,
-            name: 'lightbox',
             path: '/timeline/photo/:id',
             props: true
           }
@@ -33,7 +32,6 @@ new Vue({
         children: [
           {
             component: Lightbox,
-            name: 'lightbox',
             path: '/albums/:album/photo/:id',
             props: true
           }
