@@ -8,29 +8,6 @@ import (
 	"net/http"
 )
 
-type photoData struct {
-	simpic.Photo
-
-	Url       string `json:"url"`
-	Thumbnail string `json:"thumbnail"`
-}
-
-func (s *server) decoratePhotos(photos []simpic.Photo) []photoData {
-	res := make([]photoData, 0, len(photos))
-	for _, photo := range photos {
-		res = append(res, s.decoratePhoto(photo))
-	}
-	return res
-}
-
-func (s *server) decoratePhoto(photo simpic.Photo) photoData {
-	return photoData{
-		Photo:     photo,
-		Url:       fmt.Sprintf("/data/image/%s", photo.Id),
-		Thumbnail: fmt.Sprintf("/data/thumb/%s", photo.Id),
-	}
-}
-
 func (s *server) handleGetPhoto() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		photo := r.Context().Value(ctxPhoto).(*simpic.Photo)

@@ -24,6 +24,6 @@ func (s *server) handleTimeline() http.HandlerFunc {
 			return
 		}
 
-		writeJSON(w, http.StatusOK, s.decoratePhotos(photos))
+		writeJSON(w, http.StatusOK, photos)
 	}
 }
