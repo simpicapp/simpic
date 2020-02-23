@@ -6,10 +6,11 @@ import (
 )
 
 func (s *server) routes() {
+	s.router.Use(s.authenticatedContext)
 	s.router.Post("/login", s.handleAuthenticate())
+	s.router.Get("/timeline", s.handleTimeline())
 
 	s.router.Route("/albums", func(r chi.Router) {
-		r.Use(s.authenticatedContext)
 		r.Get("/", s.handleGetAlbums())
 
 		r.Group(func(r chi.Router) {
@@ -38,12 +39,7 @@ func (s *server) routes() {
 	})
 
 	s.router.Group(func(r chi.Router) {
-		r.Use(s.authenticatedContext)
-		r.Get("/timeline", s.handleTimeline())
-	})
-
-	s.router.Group(func(r chi.Router) {
-		r.Use(s.authenticatedContext, s.requireAnyUser)
+		r.Use(s.requireAnyUser)
 		r.Post("/photo", s.handleStorePhoto())
 		r.Get("/users/me", s.handleGetSelf())
 	})
