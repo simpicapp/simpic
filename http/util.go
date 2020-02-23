@@ -6,6 +6,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -26,6 +27,23 @@ func writeError(w http.ResponseWriter, code int, error string) {
 	}
 
 	writeJSON(w, code, Error{Error: error})
+}
+
+func paginate(w http.ResponseWriter, r *http.Request, generator func(offset, count int) (interface{}, error)) {
+	offset := 0
+	param, ok := r.URL.Query()["offset"]
+	if ok && len(param) > 0 {
+		offset, _ = strconv.Atoi(param[0])
+	}
+
+	res, err := generator(offset, 100)
+	if err != nil {
+		log.Printf("unable to paginate: %v\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, res)
 }
 
 // bind attempts to decode the request body as JSON and bind it to the given struct.
