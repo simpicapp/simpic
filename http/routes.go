@@ -2,15 +2,17 @@ package http
 
 import (
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"net/http"
 )
 
-func (s *server) routes() {
-	s.router.Use(s.authenticatedContext)
-	s.router.Post("/login", s.handleAuthenticate())
-	s.router.Get("/timeline", s.handleTimeline())
+func (s *server) routes() http.Handler {
+	r := createRouter()
+	r.Use(s.authenticatedContext)
+	r.Post("/login", s.handleAuthenticate())
+	r.Get("/timeline", s.handleTimeline())
 
-	s.router.Route("/albums", func(r chi.Router) {
+	r.Route("/albums", func(r chi.Router) {
 		r.Get("/", s.handleGetAlbums())
 
 		r.Group(func(r chi.Router) {
@@ -38,13 +40,13 @@ func (s *server) routes() {
 		})
 	})
 
-	s.router.Group(func(r chi.Router) {
+	r.Group(func(r chi.Router) {
 		r.Use(s.requireAnyUser)
 		r.Post("/photo", s.handleStorePhoto())
 		r.Get("/users/me", s.handleGetSelf())
 	})
 
-	s.router.Route("/data", func(r chi.Router) {
+	r.Route("/data", func(r chi.Router) {
 		r.Group(func(r chi.Router) {
 			r.Use(s.photoContext)
 			r.Get("/image/{uuid}", s.handleGetPhoto())
@@ -52,5 +54,14 @@ func (s *server) routes() {
 		})
 	})
 
-	s.router.Mount("/", http.FileServer(http.Dir(s.staticDir)))
+	r.Mount("/", http.FileServer(http.Dir(*frontendDir)))
+	return r
+}
+
+func createRouter() *chi.Mux {
+	r := chi.NewRouter()
+	r.Use(middleware.RealIP)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	return r
 }
