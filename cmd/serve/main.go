@@ -18,6 +18,11 @@ import (
 
 var (
 	dataDir = flag.String("path", "data", "the path to store data in")
+
+	db  *simpic.Database
+	sm  *simpic.SessionManager
+	srv http.Server
+	wg  = &sync.WaitGroup{}
 )
 
 func main() {
@@ -28,28 +33,34 @@ func main() {
 	signal.Notify(c, os.Interrupt)
 	signal.Notify(c, syscall.SIGTERM)
 
-	server := makeServer()
+	makeDatabase()
+	makeSessionManager()
+	makeServer()
 
-	go func() {
-		if err := server.Start(); err != nil {
-			log.Panicf("Unable to start http server: %v\n", err)
-		}
-	}()
+	startServer()
+	startPruningSessions()
 
 	log.Println("Simpic has started")
 
 	<-c
 
 	log.Println("Signal received, stopping")
-	shutdown(server)
+	shutdown()
 }
 
-func makeServer() http.Server {
-	db, err := simpic.OpenDatabase()
+func makeDatabase() {
+	var err error
+	db, err = simpic.OpenDatabase()
 	if err != nil {
 		log.Panicf("unable to connect to database: %v\n", err)
 	}
+}
 
+func makeSessionManager() {
+	sm = simpic.NewSessionManager(db)
+}
+
+func makeServer() {
 	userManager := simpic.NewUserManager(db)
 	userManager.CreateAdmin()
 
@@ -57,7 +68,7 @@ func makeServer() http.Server {
 
 	thumbnailer := simpic.NewThumbnailer(driver, storage.DiskDriver{Path: path.Join(*dataDir, "thumbnails")}, 220)
 
-	return http.NewServer(
+	srv = http.NewServer(
 		db,
 		thumbnailer,
 		userManager,
@@ -65,19 +76,35 @@ func makeServer() http.Server {
 		simpic.NewStorer(db, driver))
 }
 
-func shutdown(srv http.Server) {
-	wg := &sync.WaitGroup{}
+func startServer() {
+	wg.Add(1)
+	go func() {
+		if err := srv.Start(); err != nil {
+			log.Panicf("Unable to start http server: %v\n", err)
+		}
+		wg.Done()
+	}()
+}
 
+func startPruningSessions() {
+	wg.Add(1)
+	go func() {
+		sm.PeriodicallyPruneInactiveSessions()
+		wg.Done()
+	}()
+}
+
+func shutdown() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	wg.Add(1)
 	go func() {
 		if err := srv.Stop(ctx); err != nil {
 			log.Printf("Error shutting down http server: %v\n", err)
 		}
-		wg.Done()
 	}()
+
+	go sm.Stop()
 
 	wg.Wait()
 	log.Println("Simpic is stopping")

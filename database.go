@@ -182,6 +182,10 @@ func (d *Database) GetSession(sessionKey string) (session *SessionUser, err erro
 	return
 }
 
+func (d *Database) DeleteExpiredSessions() error {
+	return d.db.Collection("sessions").Find("session_expires < NOW()").Delete()
+}
+
 //endregion
 
 func onConflictDoNothing(queryIn string) (queryOut string) {
