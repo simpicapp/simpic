@@ -84,6 +84,8 @@ func describeTag(tag string, value string) string {
 		return "is required"
 	} else if tag == "min" {
 		return fmt.Sprintf("must have a length of at least %s", value)
+	} else if tag == "max" {
+		return fmt.Sprintf("must have a length of at most %s", value)
 	} else {
 		log.Printf("Don't know how to describe validation tag %s\n", tag)
 		return "is invalid"

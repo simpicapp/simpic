@@ -11,7 +11,7 @@ import (
 
 func (s *server) handleAddAlbum() http.HandlerFunc {
 	type AlbumData struct {
-		Name string `json:"name" validate:"required,max=128"`
+		Name string `json:"name" validate:"required,min=1,max=128"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {

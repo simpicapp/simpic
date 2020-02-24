@@ -5,6 +5,7 @@
         <uploader></uploader>
         <login></login>
         <album-picker></album-picker>
+        <album-creator></album-creator>
         <bottombar></bottombar>
     </div>
 </template>
@@ -46,6 +47,7 @@
   import bottombar from './footer'
   import { EventBus } from './bus'
   import AlbumPicker from './album-picker'
+  import AlbumCreator from './album-creator'
 
   Vue.directive('focus', {
     inserted: function (el) {
@@ -55,6 +57,7 @@
 
   export default {
     components: {
+      AlbumCreator,
       AlbumPicker,
       bottombar,
       login,

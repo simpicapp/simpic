@@ -1,5 +1,5 @@
 <template>
-    <popup title="Select an Album" position="center" v-if="visible" v-on:close="handleClosed">
+    <popup title="Select an Album" position="center" v-bind:modal="true" v-if="visible" v-on:close="handleClosed">
         <div class="album-picker">
             <template v-for="album in albums">
                 <img v-bind:key="album.id"
@@ -23,14 +23,13 @@
         display: grid;
         grid-template-columns: 50px 200px;
         grid-auto-rows: 2em;
-        padding: 20px;
-        grid-gap: 10px 10px;
+        grid-gap: 20px 20px;
         align-items: center;
     }
 
     img {
         max-height: 2em;
-        max-width: 5em;
+        max-width: 50px;
         margin-right: 10px;
         border: 1px solid black;
         overflow: hidden;
