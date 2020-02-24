@@ -20,7 +20,10 @@ services:
     ports:
       - 127.0.0.1:5432:5432/tcp
     volumes:
-      - ./data/pg:/var/lib/postgresql/data
+      - pg-data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: nWK9aY9gkh
       POSTGRES_USER: simpic
+
+volumes:
+  pg-data:

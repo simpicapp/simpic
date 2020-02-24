@@ -135,7 +135,7 @@
         formData.append('file', file.file)
         file.started = true
 
-        fetch('/photo', {
+        fetch('/photos', {
           body: formData,
           method: 'POST'
         }).then(() => {

@@ -99,7 +99,7 @@ func (s *server) handleAlterPhotosInAlbum() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleGetAlbum() http.HandlerFunc {
+func (s *server) handleGetAlbumInfo() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		album := r.Context().Value(ctxAlbum).(*simpic.Album)
 		writeJSON(w, http.StatusOK, album)

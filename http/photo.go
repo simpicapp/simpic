@@ -8,6 +8,13 @@ import (
 	"net/http"
 )
 
+func (s *server) handleGetPhotoInfo() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		photo := r.Context().Value(ctxPhoto).(*simpic.Photo)
+		writeJSON(w, http.StatusOK, photo)
+	}
+}
+
 func (s *server) handleGetPhoto() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		photo := r.Context().Value(ctxPhoto).(*simpic.Photo)
@@ -85,7 +92,7 @@ func (s *server) handleStorePhoto() http.HandlerFunc {
 			return
 		}
 
-		http.Redirect(w, r, fmt.Sprintf("/photo/%s", photo.Id.String()), http.StatusSeeOther)
+		http.Redirect(w, r, fmt.Sprintf("/photos/%s", photo.Id.String()), http.StatusSeeOther)
 	}
 }
 
