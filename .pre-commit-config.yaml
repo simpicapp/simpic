@@ -30,4 +30,4 @@ repos:
         args: [--fix]
         files: \.(js|vue)$
 
-exclude: vendor
+exclude: vendor|go\.(sum|mod)
