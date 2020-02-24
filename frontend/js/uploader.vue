@@ -27,8 +27,8 @@
 </template>
 
 <style scoped>
-    td {
-        padding: 10px;
+    td:first-child {
+        padding-right: 10px;
     }
 
     .upload-overlay {

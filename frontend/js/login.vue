@@ -1,9 +1,9 @@
 <template>
-    <popup title="Login" position="center" v-if="visible" v-on:close="visible = false">
+    <popup title="Login" position="center" v-bind:modal="true" v-if="visible" v-on:close="visible = false">
         <form v-on:submit="doLogin">
             <p class="alert" v-if="alert.length > 0">{{ alert }}</p>
             <label for="username">Username</label>
-            <input type="text" id="username" v-model="username" v-bind:disabled="loggingIn">
+            <input type="text" id="username" v-model="username" v-bind:disabled="loggingIn" v-focus>
             <label for="password">Password</label>
             <input type="password" id="password" v-model="password" v-bind:disabled="loggingIn">
             <input type="submit" value="Login" v-bind:disabled="loggingIn">
@@ -15,13 +15,11 @@
     form {
         display: grid;
         grid-template-columns: auto auto;
-        grid-gap: 20px 20px;
-        padding: 20px;
+        grid-gap: 30px 20px;
         align-items: center;
     }
 
     input[type=submit] {
-        padding: 5px 0;
         grid-column: span 2;
     }
 
@@ -67,6 +65,8 @@
         }).then(() => {
           this.$root.checkUser()
           this.visible = false
+          this.username = ''
+          this.password = ''
         }).catch((error) => {
           if (error.response) {
             this.alert = error.response.data.error
@@ -78,6 +78,7 @@
         })
       },
       show () {
+        this.alert = ''
         this.visible = true
       }
     },
