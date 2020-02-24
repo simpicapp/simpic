@@ -71,8 +71,7 @@
         const scrollY = window.scrollY
         const visible = document.documentElement.clientHeight
         const pageHeight = document.documentElement.scrollHeight
-        const bottomOfPage = visible + scrollY >= pageHeight
-        return bottomOfPage || pageHeight < visible
+        return visible + scrollY >= pageHeight - 400
       },
       emitBottom: _.throttle(() => EventBus.$emit('bottom'), 250),
       handleScroll () {
