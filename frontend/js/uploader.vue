@@ -96,34 +96,40 @@
           started: false
         })
 
+        this.visible = true
+
         if (this.nextUpload === this.files.length - 1) {
           this.startUpload()
         }
       },
-      dragEndHandler (e) {
+      dragEnterHandler (e) {
+        if (e.dataTransfer.types.includes('Files')) {
+          e.stopPropagation()
+          e.preventDefault()
+          this.dragging = true
+          this.stopDragging.cancel()
+        }
+      },
+      dragLeaveHandler (e) {
         e.stopPropagation()
         e.preventDefault()
         this.stopDragging()
       },
       dragOverHandler (e) {
-        e.stopPropagation()
-        e.preventDefault()
+        if (e.dataTransfer.types.includes('Files')) {
+          e.stopPropagation()
+          e.preventDefault()
 
-        if (this.$root.loggedIn) {
-          e.dataTransfer.dropEffect = 'copy'
-        } else {
-          e.dataTransfer.effectAllowed = 'none'
-          e.dataTransfer.dropEffect = 'none'
+          if (this.$root.loggedIn) {
+            e.dataTransfer.dropEffect = 'copy'
+          } else {
+            e.dataTransfer.effectAllowed = 'none'
+            e.dataTransfer.dropEffect = 'none'
+          }
+
+          this.dragging = true
+          this.stopDragging.cancel()
         }
-
-        this.dragging = true
-        this.stopDragging.cancel()
-      },
-      dragStartHandler (e) {
-        e.stopPropagation()
-        e.preventDefault()
-        this.dragging = true
-        this.stopDragging.cancel()
       },
       dropHandler (e) {
         e.stopPropagation()
@@ -133,7 +139,6 @@
         this.dragging = false
 
         if (this.$root.loggedIn) {
-          this.visible = true;
           [...e.dataTransfer.files].forEach(this.acceptNewFile)
         }
       },
@@ -160,14 +165,14 @@
     mounted () {
       document.addEventListener('drop', this.dropHandler)
       document.addEventListener('dragover', this.dragOverHandler)
-      document.addEventListener('dragenter', this.dragStartHandler)
-      document.addEventListener('dragleave', this.dragEndHandler)
+      document.addEventListener('dragenter', this.dragEnterHandler)
+      document.addEventListener('dragleave', this.dragLeaveHandler)
     },
     beforeDestroy () {
       document.removeEventListener('drop', this.dropHandler)
       document.removeEventListener('dragover', this.dragOverHandler)
-      document.removeEventListener('dragenter', this.dragStartHandler)
-      document.removeEventListener('dragleave', this.dragEndHandler)
+      document.removeEventListener('dragenter', this.dragEnterHandler)
+      document.removeEventListener('dragleave', this.dragLeaveHandler)
     }
   }
 </script>
