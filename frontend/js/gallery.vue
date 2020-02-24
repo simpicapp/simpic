@@ -74,7 +74,7 @@
     },
     computed: {
       selecting () {
-        return !_.isEmpty(this.selection)
+        return this.selectionCount > 0
       },
       selectionCount () {
         return Object.keys(this.selection).length
@@ -89,7 +89,7 @@
         new Promise((resolve, reject) => {
           EventBus.$emit('pick-album', resolve, reject)
         }).then(album => Axios.post('/albums/' + album + '/photos', {
-          add_photos: this.selection
+          add_photos: Object.keys(this.selection)
         }).then(() => {
           EventBus.$emit('toast', this.selectionCount + ' photo' + (this.selectionCount === 1 ? '' : 's') + ' added to album')
           EventBus.$emit('album-updated', album)
@@ -121,8 +121,8 @@
         this.$router.push({ path: this.photos[this.showing].id })
       },
       handleRemoveFromAlbum () {
-        Axios.post(this.endpoint, { remove_photos: this.selection }).then(() => {
-          EventBus.$emit('toast', this.selection.length + ' photo' + (this.selection.length === 1 ? '' : 's') + ' removed from album')
+        Axios.post(this.endpoint, { remove_photos: Object.keys(this.selection) }).then(() => {
+          EventBus.$emit('toast', this.selectionCount + ' photo' + (this.selectionCount === 1 ? '' : 's') + ' removed from album')
           EventBus.$emit('album-updated', this.album)
           this.selection = {}
         })

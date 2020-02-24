@@ -1,5 +1,5 @@
 <template>
-    <popup title="Select an Album" position="center" :modal="true" v-if="visible" @:close="handleClosed">
+    <popup title="Select an Album" position="center" :modal="true" v-if="visible" @close="handleClosed">
         <div class="album-picker">
             <template v-for="album in albums">
                 <img :key="album.id"
@@ -8,7 +8,7 @@
                      :alt="album.name"
                      @click="handleAlbumSelected(album.id)">
                 <span :key="album.id" v-else></span>
-                <div :key="album.id + '.name'" @:click="handleAlbumSelected(album.id)">
+                <div :key="album.id + '.name'" @click="handleAlbumSelected(album.id)">
                     <span>{{ album.name }}</span>
                 </div>
             </template>

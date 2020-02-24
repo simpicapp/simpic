@@ -1,5 +1,5 @@
 <template>
-    <a :href="'/data/photo/' + id" @:click.prevent="handleClick">
+    <a :href="'/data/image/' + cover" @click.prevent="handleClick">
         <img :src="'/data/thumb/' + cover" :alt="caption" v-if="cover != null">
         <p class="caption">{{ caption }}</p>
     </a>

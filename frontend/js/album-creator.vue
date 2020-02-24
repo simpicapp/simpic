@@ -1,6 +1,6 @@
 <template>
     <popup title="Create new album" :modal="true" position="center" v-if="visible" @close="handleClosed">
-        <form @:submit="doCreate">
+        <form @submit="doCreate">
             <p class="alert" v-if="alert.length > 0">{{ alert }}</p>
             <label for="name">Name</label>
             <input type="text" id="name" v-model="name" placeholder="My Holiday" v-focus>
