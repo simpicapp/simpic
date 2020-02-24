@@ -1,6 +1,6 @@
 <template>
     <div class="thumbnail" v-bind:class="{ selecting }" v-bind:style="styles">
-        <a v-bind:href="'/data/photo/' + id" v-on:click.prevent="handleClick">
+        <a v-bind:href="'/data/image/' + id" v-on:click.prevent="handleClick">
             <div class="overlay">
                 <p class="caption">{{ caption }}</p>
             </div>
