@@ -1,11 +1,11 @@
 package http
 
 import (
-	"database/sql"
 	"github.com/simpicapp/simpic"
 	"log"
 	"net/http"
 	"time"
+	"upper.io/db.v3"
 )
 
 const (
@@ -26,7 +26,7 @@ func (s *server) handleAuthenticate() http.HandlerFunc {
 
 		user, err := s.db.GetUser(data.Username)
 		if err != nil {
-			if err == sql.ErrNoRows {
+			if err == db.ErrNoMoreRows {
 				log.Printf("No such user '%s'\n", data.Username)
 				writeError(w, http.StatusForbidden, "Invalid username/password")
 			} else {
