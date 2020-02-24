@@ -7,12 +7,14 @@
 </template>
 
 <style lang="scss" scoped>
+    @use '../css/vars';
+
     aside {
         position: fixed;
         bottom: 100px;
         left: 30%;
         right: 30%;
-        background-color: var(--smaragdine);
+        background-color: vars.$primary;
         color: white;
         font-size: large;
         text-align: center;

@@ -18,7 +18,7 @@
     header {
         display: flex;
         margin: 0 0 20px 0;
-        background-color: var(--smaragdine);
+        background-color: vars.$primary;
         justify-content: space-between;
         align-items: center;
         box-shadow: 0 1px 2px black;
@@ -52,13 +52,13 @@
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            border-left: 1px solid darken(vars.$smaragdine, 10%);
-            border-right: 1px solid darken(vars.$smaragdine, 10%);
+            border-left: 1px solid darken(vars.$primary, 10%);
+            border-right: 1px solid darken(vars.$primary, 10%);
 
             &.router-link-active, &:hover {
                 text-decoration: none;
                 color: white;
-                background: lighten(vars.$smaragdine, 5%);
+                background: lighten(vars.$primary, 5%);
             }
         }
 
@@ -76,7 +76,7 @@
             margin-right: 20px;
 
             &:hover, &:active {
-                background: lighten(vars.$smaragdine, 5%);
+                background: lighten(vars.$primary, 5%);
             }
         }
 

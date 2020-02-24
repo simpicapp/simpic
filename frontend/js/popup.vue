@@ -9,6 +9,8 @@
 </template>
 
 <style lang="scss" scoped>
+    @use '../css/vars';
+
     aside {
         padding: 30px;
         position: fixed;
@@ -33,7 +35,7 @@
     }
 
     h2 {
-        color: var(--smaragdine);
+        color: vars.$primary;
         padding: 0;
         font-size: large;
         margin: 0 0 30px 0;
