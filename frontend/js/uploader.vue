@@ -66,6 +66,7 @@
 </style>
 
 <script>
+  import _ from 'lodash'
   import Axios from 'axios'
   import { EventBus } from './bus'
   import popup from './popup'
@@ -79,6 +80,9 @@
         dragging: false,
         files: [],
         nextUpload: 0,
+        stopDragging: _.debounce(function () {
+          this.dragging = false
+        }, 100),
         visible: false
       }
     },
@@ -99,7 +103,7 @@
       dragEndHandler (e) {
         e.stopPropagation()
         e.preventDefault()
-        this.dragging = false
+        this.stopDragging()
       },
       dragOverHandler (e) {
         e.stopPropagation()
@@ -113,16 +117,19 @@
         }
 
         this.dragging = true
+        this.stopDragging.cancel()
       },
       dragStartHandler (e) {
         e.stopPropagation()
         e.preventDefault()
         this.dragging = true
+        this.stopDragging.cancel()
       },
       dropHandler (e) {
         e.stopPropagation()
         e.preventDefault()
 
+        this.stopDragging.cancel()
         this.dragging = false
 
         if (this.$root.loggedIn) {
