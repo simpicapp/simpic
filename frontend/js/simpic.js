@@ -1,3 +1,4 @@
+import Axios from 'axios'
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
@@ -55,17 +56,12 @@ new Vue({
   render: (h) => h(App),
   methods: {
     checkUser () {
-      fetch('/users/me')
-        .then(res => {
-          if (res.ok) {
-            res.json().then(json => {
-              this.username = json.username
-              this.loggedIn = true
-            })
-          } else {
-            this.loggedIn = false
-          }
-        })
+      Axios.get('/users/me').then(({ data: { username } }) => {
+        this.username = username
+        this.loggedIn = true
+      }).catch(() => {
+        this.loggedIn = false
+      })
     }
   },
   created () {

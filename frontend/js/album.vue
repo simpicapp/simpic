@@ -12,6 +12,7 @@
 </style>
 
 <script>
+  import Axios from 'axios'
   import Gallery from './gallery'
   import { EventBus } from './bus'
 
@@ -33,9 +34,10 @@
     },
     props: ['id'],
     mounted () {
-      fetch('/albums/' + this.id)
-        .then(res => res.json())
-        .then(res => (this.name = res.name))
+      Axios.get('/albums/' + this.id).then(({ data: { name } }) => {
+        this.name = name
+      })
+
       EventBus.$on('album-updated', this.handleAlbumUpdated)
     },
     destroyed () {

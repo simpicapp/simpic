@@ -48,6 +48,7 @@
 </style>
 
 <script>
+  import Axios from 'axios'
   import { EventBus } from './bus'
   import thumbnail from './thumbnail'
 
@@ -78,17 +79,12 @@
       handleAddToAlbum () {
         new Promise((resolve, reject) => {
           EventBus.$emit('pick-album', resolve, reject)
-        }).then(album => fetch('/albums/' + album + '/photos', {
-          body: JSON.stringify({
-            add_photos: this.selection
-          }),
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json'
-          },
-          method: 'POST'
-        }).then(() => EventBus.$emit('album-updated', album)))
-          .then(() => (this.selection = []))
+        }).then(album => Axios.post('/albums/' + album + '/photos', {
+          add_photos: this.selection
+        }).then(() => {
+          EventBus.$emit('album-updated', album)
+          this.selection = []
+        }))
       },
       handleItemDeselected (id) {
         this.selection.splice(this.selection.indexOf(id), 1)
@@ -113,16 +109,7 @@
         this.$router.push({ path: this.photos[this.showing].id })
       },
       handleRemoveFromAlbum () {
-        fetch(this.endpoint, {
-          body: JSON.stringify({
-            remove_photos: this.selection
-          }),
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json'
-          },
-          method: 'POST'
-        }).then(() => {
+        Axios.post(this.endpoint, { remove_photos: this.selection }).then(() => {
           EventBus.$emit('album-updated', this.album)
           this.selection = []
         })
@@ -140,22 +127,16 @@
       update () {
         this.loading = true
 
-        fetch(this.endpoint + '?offset=' + this.offset, {
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json'
+        Axios.get(this.endpoint + '?offset=' + this.offset).then(({ data }) => {
+          if (this.offset === 0) {
+            this.photos = data
+          } else {
+            this.photos = this.photos.concat(data)
           }
-        }).then((response) => response.json())
-          .then((json) => {
-            if (this.offset === 0) {
-              this.photos = json
-            } else {
-              this.photos = this.photos.concat(json)
-            }
-            this.offset = this.offset + json.length
-            this.hasMore = json.length > 0
-          })
-          .then(() => (this.loading = false))
+          this.offset = this.offset + data.length
+          this.hasMore = data.length > 0
+          this.loading = false
+        })
       }
     },
     beforeDestroy () {

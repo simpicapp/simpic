@@ -39,6 +39,7 @@
 </style>
 
 <script>
+  import Axios from 'axios'
   import { EventBus } from './bus'
   import popup from './popup'
 
@@ -59,27 +60,19 @@
       doLogin () {
         this.alert = ''
         this.loggingIn = true
-        fetch('/login', {
-          body: JSON.stringify({
-            password: this.password,
-            username: this.username
-          }),
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json'
-          },
-          method: 'POST'
-        }).then((response) => {
-          if (response.ok) {
-            this.$root.checkUser()
-            this.visible = false
-          } else {
-            return response.json().then((json) => {
-              throw new Error(json.error)
-            })
-          }
+
+        Axios.post('/login', {
+          password: this.password,
+          username: this.username
+        }).then(() => {
+          this.$root.checkUser()
+          this.visible = false
         }).catch((error) => {
-          this.alert = error.message
+          if (error.response) {
+            this.alert = error.response.data.error
+          } else {
+            this.alert = error.message
+          }
         }).finally(() => {
           this.loggingIn = false
         })

@@ -50,6 +50,7 @@
 </style>
 
 <script>
+  import Axios from 'axios'
   import Popup from './popup'
   import { EventBus } from './bus'
 
@@ -82,13 +83,9 @@
         this.reject = reject
         this.visible = true
 
-        fetch('/albums', {
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json'
-          }
-        }).then(res => res.json())
-          .then(albums => (this.albums = albums))
+        Axios.get('/albums').then(({ data }) => {
+          this.albums = data
+        })
       }
     },
     created () {

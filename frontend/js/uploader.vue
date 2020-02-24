@@ -66,6 +66,7 @@
 </style>
 
 <script>
+  import Axios from 'axios'
   import { EventBus } from './bus'
   import popup from './popup'
 
@@ -135,10 +136,7 @@
         formData.append('file', file.file)
         file.started = true
 
-        fetch('/photos', {
-          body: formData,
-          method: 'POST'
-        }).then(() => {
+        Axios.post('/photos', formData).then(() => {
           file.finished = true
           EventBus.$emit('upload-complete')
         }).catch((e) => {

@@ -14,6 +14,7 @@
 
 <script>
   import Album from './album-icon'
+  import Axios from 'axios'
 
   export default {
     components: { Album },
@@ -23,13 +24,9 @@
       }
     },
     mounted () {
-      fetch('/albums', {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        }
-      }).then(res => res.json())
-        .then(albums => (this.albums = albums))
+      Axios.get('albums').then(({ data }) => {
+        this.albums = data
+      })
     }
   }
 </script>
