@@ -68,6 +68,7 @@
       logoutClick () {
         Axios.get('/logout').then(() => {
           this.$root.loggedIn = false
+          EventBus.$emit('toast', 'You have been logged out')
         })
       }
     }

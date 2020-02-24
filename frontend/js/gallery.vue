@@ -1,6 +1,6 @@
 <template>
     <main>
-        <aside v-if="selecting" class="selectionbar">
+        <aside v-if="$root.loggedIn && selecting" class="selectionbar">
             {{ selection.length }} selected
             <button v-on:click="handleAddToAlbum">Add to album</button>
             <button v-on:click="handleRemoveFromAlbum" v-if="!!album">Remove from album</button>
@@ -83,6 +83,7 @@
         }).then(album => Axios.post('/albums/' + album + '/photos', {
           add_photos: this.selection
         }).then(() => {
+          EventBus.$emit('toast', this.selection.length + ' photo' + (this.selection.length === 1 ? '' : 's') + ' added to album')
           EventBus.$emit('album-updated', album)
           this.selection = []
         }))
@@ -111,6 +112,7 @@
       },
       handleRemoveFromAlbum () {
         Axios.post(this.endpoint, { remove_photos: this.selection }).then(() => {
+          EventBus.$emit('toast', this.selection.length + ' photo' + (this.selection.length === 1 ? '' : 's') + ' removed from album')
           EventBus.$emit('album-updated', this.album)
           this.selection = []
         })

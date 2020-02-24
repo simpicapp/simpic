@@ -67,6 +67,7 @@
           this.visible = false
           this.username = ''
           this.password = ''
+          EventBus.$emit('toast', 'You are now logged in')
         }).catch((error) => {
           if (error.response) {
             this.alert = error.response.data.error

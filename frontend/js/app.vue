@@ -6,7 +6,8 @@
         <login></login>
         <album-picker></album-picker>
         <album-creator></album-creator>
-        <bottombar></bottombar>
+        <toaster></toaster>
+        <bottom-bar></bottom-bar>
     </div>
 </template>
 
@@ -21,6 +22,7 @@
         --smaragdine: #4a9976;
         --ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
         --ease-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+        --ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     input {
@@ -41,13 +43,14 @@
   import _ from 'lodash'
   import Vue from 'vue'
 
-  import uploader from './uploader'
-  import login from './login'
-  import toolbar from './toolbar'
-  import bottombar from './footer'
+  import Uploader from './uploader'
+  import Login from './login'
+  import Toolbar from './toolbar'
+  import BottomBar from './footer'
   import { EventBus } from './bus'
   import AlbumPicker from './album-picker'
   import AlbumCreator from './album-creator'
+  import Toaster from './toaster'
 
   Vue.directive('focus', {
     inserted: function (el) {
@@ -59,10 +62,11 @@
     components: {
       AlbumCreator,
       AlbumPicker,
-      bottombar,
-      login,
-      toolbar,
-      uploader
+      BottomBar,
+      Login,
+      Toaster,
+      Toolbar,
+      Uploader
     },
     data () {
       return {
