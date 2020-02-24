@@ -1,12 +1,12 @@
 <template>
-    <popup title="Login" position="center" v-bind:modal="true" v-if="visible" v-on:close="visible = false">
-        <form v-on:submit="doLogin">
+    <popup title="Login" position="center" :modal="true" v-if="visible" @close="visible = false">
+        <form @submit="doLogin">
             <p class="alert" v-if="alert.length > 0">{{ alert }}</p>
             <label for="username">Username</label>
-            <input type="text" id="username" v-model="username" v-bind:disabled="loggingIn" v-focus>
+            <input type="text" id="username" v-model="username" :disabled="loggingIn" v-focus>
             <label for="password">Password</label>
-            <input type="password" id="password" v-model="password" v-bind:disabled="loggingIn">
-            <input type="submit" value="Login" v-bind:disabled="loggingIn">
+            <input type="password" id="password" v-model="password" :disabled="loggingIn">
+            <input type="submit" value="Login" :disabled="loggingIn">
         </form>
     </popup>
 </template>

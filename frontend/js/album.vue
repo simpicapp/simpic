@@ -1,7 +1,7 @@
 <template>
     <div>
         <h2>{{ name }}</h2>
-        <gallery v-bind:endpoint="'/albums/' + id + '/photos'" v-bind:album="id"></gallery>
+        <gallery :endpoint="'/albums/' + id + '/photos'" :album="id"></gallery>
     </div>
 </template>
 

@@ -10,10 +10,10 @@
                 You need to login before uploading files
             </div>
         </div>
-        <popup title="Uploading..." id="uploader" v-if="visible" v-on:close="visible = false">
+        <popup title="Uploading..." id="uploader" v-if="visible" @close="visible = false">
             <table>
                 <tbody>
-                <tr v-for="file in files" v-bind:key="file.name">
+                <tr v-for="file in files" :key="file.name">
                     <td>{{ file.name }}</td>
                     <td v-if="file.failed">Error</td>
                     <td v-else-if="file.finished">Done</td>

@@ -1,7 +1,11 @@
 <template>
     <main>
-        <Album v-for="album in albums" v-bind:key="album.id" v-bind:id="album.id" v-bind:caption="album.name"
-               v-bind:cover="album.cover_photo"></Album>
+        <Album v-for="album in albums"
+               :key="album.id"
+               :id="album.id"
+               :caption="album.name"
+               :cover="album.cover_photo">
+        </Album>
     </main>
 </template>
 

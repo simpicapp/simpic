@@ -1,10 +1,10 @@
 <template>
-    <div id="lightbox" v-on:click="close()">
-        <div id="prev-overlay" v-on:click.stop.prevent="$emit('go-to-previous-image')">
+    <div id="lightbox" @click="close()">
+        <div id="prev-overlay" @click.stop.prevent="$emit('go-to-previous-image')">
             <span>←</span>
         </div>
-        <img v-bind:src="'/data/image/' + id" v-on:click.stop>
-        <div id="next-overlay" v-on:click.stop.prevent="$emit('go-to-next-image')">
+        <img :src="'/data/image/' + id" @click.stop>
+        <div id="next-overlay" @click.stop.prevent="$emit('go-to-next-image')">
             <span>→</span>
         </div>
     </div>

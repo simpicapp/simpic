@@ -1,19 +1,19 @@
 <template>
-    <popup title="Select an Album" position="center" v-bind:modal="true" v-if="visible" v-on:close="handleClosed">
+    <popup title="Select an Album" position="center" :modal="true" v-if="visible" @:close="handleClosed">
         <div class="album-picker">
             <template v-for="album in albums">
-                <img v-bind:key="album.id"
+                <img :key="album.id"
                      v-if="album.cover_photo"
-                     v-bind:src="'/data/thumb/' + album.cover_photo"
-                     v-bind:alt="album.name"
-                     v-on:click="handleAlbumSelected(album.id)">
-                <span v-bind:key="album.id" v-else></span>
-                <div v-bind:key="album.id + '.name'" v-on:click="handleAlbumSelected(album.id)">
+                     :src="'/data/thumb/' + album.cover_photo"
+                     :alt="album.name"
+                     @click="handleAlbumSelected(album.id)">
+                <span :key="album.id" v-else></span>
+                <div :key="album.id + '.name'" @:click="handleAlbumSelected(album.id)">
                     <span>{{ album.name }}</span>
                 </div>
             </template>
-            <div class="icon" v-on:click="handleNewAlbumSelected()"><span>⊕</span></div>
-            <div v-on:click="handleNewAlbumSelected()"><span>Create new album...</span></div>
+            <div class="icon" @click="handleNewAlbumSelected"><span>⊕</span></div>
+            <div @click="handleNewAlbumSelected"><span>Create new album...</span></div>
         </div>
     </popup>
 </template>

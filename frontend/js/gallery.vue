@@ -2,26 +2,26 @@
     <main>
         <aside v-if="$root.loggedIn && selecting" class="selectionbar">
             {{ selectionCount }} selected
-            <button v-on:click="handleAddToAlbum">Add to album</button>
-            <button v-on:click="handleRemoveFromAlbum" v-if="!!album">Remove from album</button>
-            <button v-on:click="clearSelection">Clear selection</button>
+            <button @click="handleAddToAlbum">Add to album</button>
+            <button @click="handleRemoveFromAlbum" v-if="!!album">Remove from album</button>
+            <button @click="clearSelection">Clear selection</button>
         </aside>
         <p v-if="loading">Loading...</p>
 
-        <router-view v-on:go-to-previous-image="handleLightboxPrevious"
-                     v-on:go-to-next-image="handleLightboxNext"
+        <router-view @go-to-previous-image="handleLightboxPrevious"
+                     @go-to-next-image="handleLightboxNext"
         ></router-view>
 
         <thumbnail v-for="photo in photos"
-                   v-bind:id="photo.id"
-                   v-bind:caption="photo.file_name"
-                   v-bind:key="photo.id"
-                   v-bind:selected="selection[photo.id]"
-                   v-bind:selecting="selecting"
-                   v-on:selected="handleItemSelected"
-                   v-on:deselected="handleItemDeselected"
-                   v-on:showing-photo="handleLightboxDisplayed"
-                   v-on:select-range="handleSelectRange"
+                   :id="photo.id"
+                   :caption="photo.file_name"
+                   :key="photo.id"
+                   :selected="selection[photo.id]"
+                   :selecting="selecting"
+                   @selected="handleItemSelected"
+                   @deselected="handleItemDeselected"
+                   @showing-photo="handleLightboxDisplayed"
+                   @select-range="handleSelectRange"
         ></thumbnail>
     </main>
 </template>

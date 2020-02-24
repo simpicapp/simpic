@@ -1,6 +1,6 @@
 <template>
     <transition name="boing" appear>
-        <aside v-if="visible" v-on:click="hide">
+        <aside v-if="visible" @click="hide">
             {{message}}
         </aside>
     </transition>

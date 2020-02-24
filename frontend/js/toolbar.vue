@@ -4,10 +4,10 @@
         <router-link to="/timeline/">Timeline</router-link>
         <router-link to="/albums/">Albums</router-link>
         <span class="grow"></span>
-        <button v-on:click="loginClick" v-if="!$root.loggedIn">Login</button>
+        <button @click="loginClick" v-if="!$root.loggedIn">Login</button>
         <template v-else>
             <div>Logged in as {{$root.username}}</div>
-            <button v-on:click="logoutClick">Logout</button>
+            <button @click="logoutClick">Logout</button>
         </template>
     </header>
 </template>

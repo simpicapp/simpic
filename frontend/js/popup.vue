@@ -1,14 +1,14 @@
 <template>
     <div>
-        <aside v-bind:class="'popup ' + position">
+        <aside :class="'popup ' + position">
             <h2>{{ title }}</h2>
-            <a v-if="closeable" class="close" v-on:click="$emit('close')">&times;</a>
+            <a v-if="closeable" class="close" @click="$emit('close')">&times;</a>
             <div class="scroller">
                 <slot></slot>
             </div>
         </aside>
         <transition name="background" appear>
-            <div class="background" v-if="modal" v-on:click="handleBackgroundClick"></div>
+            <div class="background" v-if="modal" @click="handleBackgroundClick"></div>
         </transition>
     </div>
 </template>

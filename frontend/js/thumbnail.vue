@@ -1,12 +1,12 @@
 <template>
-    <div class="thumbnail" v-bind:class="{ selecting }" v-bind:style="styles">
-        <a v-bind:href="'/data/image/' + id" v-on:click.prevent="handleClick">
+    <div class="thumbnail" :class="{ selecting }" :style="styles">
+        <a :href="'/data/image/' + id" @click.prevent="handleClick">
             <div class="overlay">
                 <p class="caption">{{ caption }}</p>
             </div>
             <span role="button" class="tickbox"
-                  v-bind:class="{ selected }"
-                  v-on:click.prevent.stop="handleToggle"
+                  :class="{ selected }"
+                  @click.prevent.stop="handleToggle"
                   v-if="$root.loggedIn">
                 {{ selected ? '☑' : '☐'}}
             </span>

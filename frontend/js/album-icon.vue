@@ -1,6 +1,6 @@
 <template>
-    <a v-bind:href="'/data/photo/' + id" v-on:click.prevent="handleClick">
-        <img v-bind:src="'/data/thumb/' + cover" v-bind:alt="caption" v-if="cover != null">
+    <a :href="'/data/photo/' + id" @:click.prevent="handleClick">
+        <img :src="'/data/thumb/' + cover" :alt="caption" v-if="cover != null">
         <p class="caption">{{ caption }}</p>
     </a>
 </template>
