@@ -139,10 +139,14 @@ func (d *Database) GetAlbumPhotos(album uuid.UUID, offset, count int) (photos []
 
 func (d *Database) AddAlbumPhotos(photos []AlbumEntry) error {
 	batch := d.db.InsertInto("album_contents").Amend(onConflictDoNothing).Batch(20)
-	for _, photo := range photos {
-		batch.Values(photo)
-	}
-	batch.Done()
+
+	go func() {
+		defer batch.Done()
+		for _, photo := range photos {
+			batch.Values(photo)
+		}
+	}()
+
 	return batch.Wait()
 }
 
