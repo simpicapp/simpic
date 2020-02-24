@@ -26,7 +26,12 @@
         background-size: cover;
     }
 
-    .thumbnail img {
+    a {
+        display: block;
+        height: 200px;
+    }
+
+    img {
         max-width: 800px;
     }
 
