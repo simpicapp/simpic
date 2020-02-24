@@ -19,7 +19,7 @@
         align-items: center;
     }
 
-    h1 {
+    header h1 {
         text-transform: lowercase;
         margin-right: 20px;
     }
@@ -43,8 +43,9 @@
 
     /*noinspection CssUnusedSymbol*/
     a.router-link-active {
-        color: gray;
+        font-weight: bold;
         text-decoration: none;
+        color: black;
     }
 
     header * {
