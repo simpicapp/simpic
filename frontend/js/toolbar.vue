@@ -5,7 +5,10 @@
         <router-link to="/albums/">Albums</router-link>
         <span class="grow"></span>
         <button v-on:click="loginClick" v-if="!$root.loggedIn">Login</button>
-        <div v-else>Logged in as {{$root.username}}</div>
+        <template v-else>
+            <div>Logged in as {{$root.username}}</div>
+            <button v-on:click="logoutClick">Logout</button>
+        </template>
     </header>
 </template>
 
@@ -49,17 +52,23 @@
     }
 
     header * {
-        margin: 0;
+        margin: 0 10px;
     }
 </style>
 
 <script>
+  import Axios from 'axios'
   import { EventBus } from './bus'
 
   export default {
     methods: {
       loginClick () {
         EventBus.$emit('login')
+      },
+      logoutClick () {
+        Axios.get('/logout').then(() => {
+          this.$root.loggedIn = false
+        })
       }
     }
   }

@@ -18,6 +18,7 @@ func (s *server) routes() http.Handler {
 	r.Group(func(r chi.Router) {
 		r.Use(s.requireAnyUser)
 		r.Get("/users/me", s.handleGetSelf())
+		r.Get("/logout", s.handleLogout())
 	})
 
 	r.Route("/data", func(r chi.Router) {

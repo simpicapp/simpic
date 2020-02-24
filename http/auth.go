@@ -61,6 +61,18 @@ func (s *server) handleAuthenticate() http.HandlerFunc {
 	}
 }
 
+func (s *server) handleLogout() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		session := r.Context().Value(ctxSession).(*simpic.Session)
+		if err := s.db.DeleteSession(session.Key); err != nil {
+			log.Printf("Unable to delete session %s: %v\n", session.Key, err)
+		}
+
+		s.clearAuthCookie(w)
+		w.WriteHeader(http.StatusNoContent)
+	}
+}
+
 func (s *server) handleGetSelf() http.HandlerFunc {
 	type GetSelfResponse struct {
 		Username string    `json:"username"`
