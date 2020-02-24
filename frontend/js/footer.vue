@@ -5,7 +5,7 @@
     </footer>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
     footer {
         border-top: 1px solid #ccc;
         background-color: #eee;
@@ -15,10 +15,9 @@
 
     a {
         color: black;
-    }
-
-    a:hover {
-        color: blue;
+        &:hover {
+            color: blue;
+        }
     }
 
     .version {

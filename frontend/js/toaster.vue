@@ -6,7 +6,7 @@
     </transition>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
     aside {
         position: fixed;
         bottom: 100px;

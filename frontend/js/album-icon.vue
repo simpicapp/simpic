@@ -5,7 +5,7 @@
     </a>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
     a {
         position: relative;
         margin: 10px 15px;
@@ -19,10 +19,10 @@
         justify-content: space-evenly;
         align-items: center;
         background-color: #E6D1AD;
-    }
 
-    a:hover {
-        background-color: #f6e1bb;
+        &:hover {
+            background-color: #f6e1bb;
+        }
     }
 
     img {

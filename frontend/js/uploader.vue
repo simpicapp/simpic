@@ -26,7 +26,7 @@
     </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
     td:first-child {
         padding-right: 10px;
     }

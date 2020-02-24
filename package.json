@@ -25,7 +25,8 @@
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
-    "eslint-plugin-vue": "^6.2.1"
+    "eslint-plugin-vue": "^6.2.1",
+    "sass": "^1.25.0"
   },
   "dependencies": {
     "axios": "^0.19.2",

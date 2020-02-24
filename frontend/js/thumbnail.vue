@@ -14,7 +14,7 @@
     </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
     .thumbnail {
         flex-grow: 1;
         flex-shrink: 1;
@@ -61,24 +61,22 @@
         align-items: center;
         justify-content: center;
         border-bottom-right-radius: 5px;
-        color: #00000066;
         opacity: 0;
         transition: opacity 300ms var(--ease-in-cubic);
+
+        color: #00000066;
+
+        &.selected {
+            color: black;
+        }
     }
 
-    .thumbnail:hover .overlay, .thumbnail:hover .tickbox, .thumbnail.selecting .tickbox  {
+    .thumbnail:hover .overlay, .thumbnail:hover .tickbox, .thumbnail.selecting .tickbox {
         opacity: 1;
         transition: opacity 300ms var(--ease-out-cubic);
     }
 
-    /*noinspection CssUnusedSymbol*/
-    .tickbox.selected {
-        color: black;
-    }
-
     .caption {
-        backdrop-filter: blur(10px);
-        background-color: #00000099;
         grid-area: 3 / 1 / 4 / 4;
         text-align: center;
         align-self: end;
@@ -87,10 +85,13 @@
         color: white;
         overflow: hidden;
         min-width: 0;
-    }
 
-    @supports not (backdrop-filter: blur()) {
-        .caption {
+        @supports (backdrop-filter: blur()) {
+            backdrop-filter: blur(10px);
+            background-color: #00000099;
+        }
+
+        @supports not (backdrop-filter: blur()) {
             background-color: #000000cc;
         }
     }

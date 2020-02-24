@@ -5,7 +5,7 @@
     </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
     h2 {
         margin-left: 20px;
     }

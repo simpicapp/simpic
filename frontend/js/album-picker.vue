@@ -18,13 +18,24 @@
     </popup>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
     .album-picker {
         display: grid;
         grid-template-columns: 50px 200px;
         grid-auto-rows: 2em;
         grid-gap: 20px 20px;
         align-items: center;
+
+        div {
+            align-self: stretch;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+
+            &.icon {
+                justify-content: center;
+            }
+        }
     }
 
     img {
@@ -34,17 +45,6 @@
         border: 1px solid black;
         overflow: hidden;
         cursor: pointer;
-    }
-
-    .album-picker div {
-        align-self: stretch;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-    }
-
-    div.icon {
-        justify-content: center;
     }
 </style>
 

@@ -13,7 +13,7 @@
     </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
     .background {
         position: fixed;
         top: 0;

@@ -10,7 +10,7 @@
     </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
     #lightbox {
         z-index: 900;
         position: fixed;
@@ -41,10 +41,10 @@
         font-size: xx-large;
         color: #eeeeee;
         cursor: pointer;
-    }
 
-    #next-overlay:hover, #prev-overlay:hover {
-        background: #ffffff33;
+        &:hover {
+            background: #ffffff33;
+        }
     }
 
     #next-overlay {

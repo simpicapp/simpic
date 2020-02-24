@@ -12,7 +12,7 @@
     </header>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
     header {
         display: flex;
         margin: 0 0 20px 0;
@@ -20,39 +20,39 @@
         border-bottom: 1px solid #ccc;
         justify-content: space-between;
         align-items: center;
-    }
 
-    header h1 {
-        text-transform: lowercase;
-        margin-right: 20px;
-    }
+        h1 {
+            text-transform: lowercase;
+            margin-right: 20px;
+        }
 
-    span {
-        flex-grow: 1;
-    }
+        span {
+            flex-grow: 1;
+        }
 
-    header a {
-        margin: 0 10px;
-        padding: 5px;
-        align-self: end;
-        color: black;
-        text-decoration: none;
-    }
+        a {
+            margin: 0 10px;
+            padding: 5px;
+            align-self: end;
+            color: black;
+            text-decoration: none;
 
-    a:hover {
-        color: blue;
-        text-decoration: underline;
-    }
+            &:hover {
+                color: blue;
+                text-decoration: underline;
+            }
 
-    /*noinspection CssUnusedSymbol*/
-    a.router-link-active {
-        font-weight: bold;
-        text-decoration: none;
-        color: black;
-    }
+            /*noinspection CssUnusedSymbol*/
+            &.router-link-active {
+                font-weight: bold;
+                text-decoration: none;
+                color: black;
+            }
+        }
 
-    header * {
-        margin: 0 10px;
+        * {
+            margin: 0 10px;
+        }
     }
 </style>
 

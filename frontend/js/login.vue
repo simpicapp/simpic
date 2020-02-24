@@ -11,7 +11,7 @@
     </popup>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
     form {
         display: grid;
         grid-template-columns: auto auto;
