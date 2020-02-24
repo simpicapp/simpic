@@ -1,5 +1,5 @@
 <template>
-    <popup title="Select an Album" position="center" v-if="visible" v-on:close="handleAlbumSelected(null)">
+    <popup title="Select an Album" position="center" v-if="visible" v-on:close="handleClosed">
         <div class="album-picker">
             <template v-for="album in albums">
                 <img v-bind:key="album.id"
@@ -58,21 +58,30 @@
     data () {
       return {
         albums: [],
+        reject () {},
+        resolve () {},
         visible: false
       }
     },
     methods: {
       handleAlbumSelected (albumId) {
         this.visible = false
-        EventBus.$emit('album-selected', albumId)
+        this.resolve(albumId)
+      },
+      handleClosed () {
+        this.visible = false
+        this.reject()
       },
       handleNewAlbumSelected () {
         this.visible = false
-        EventBus.$emit('create-album')
+        EventBus.$emit('create-album', this.resolve, this.reject)
       },
-      show () {
+      show (resolve, reject) {
         this.albums = []
+        this.resolve = resolve
+        this.reject = reject
         this.visible = true
+
         fetch('/albums', {
           headers: {
             Accept: 'application/json',

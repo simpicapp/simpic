@@ -76,24 +76,19 @@
         this.selection = []
       },
       handleAddToAlbum () {
-        EventBus.$emit('pick-album')
-      },
-      handleAlbumSelected (album) {
-        if (!!album && this.selection.length > 0) {
-          fetch('/albums/' + album + '/photos', {
-            body: JSON.stringify({
-              add_photos: this.selection
-            }),
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json'
-            },
-            method: 'POST'
-          }).then(() => {
-            EventBus.$emit('album-updated', album)
-            this.selection = []
-          })
-        }
+        new Promise((resolve, reject) => {
+          EventBus.$emit('pick-album', resolve, reject)
+        }).then(album => fetch('/albums/' + album + '/photos', {
+          body: JSON.stringify({
+            add_photos: this.selection
+          }),
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          },
+          method: 'POST'
+        }).then(() => EventBus.$emit('album-updated', album)))
+          .then(() => (this.selection = []))
       },
       handleItemDeselected (id) {
         this.selection.splice(this.selection.indexOf(id), 1)
@@ -166,13 +161,11 @@
     beforeDestroy () {
       EventBus.$off('bottom', this.infiniteScroll)
       EventBus.$off('refresh-gallery', this.refresh)
-      EventBus.$off('album-selected', this.handleAlbumSelected)
     },
     mounted () {
       this.update()
       EventBus.$on('bottom', this.infiniteScroll)
       EventBus.$on('refresh-gallery', this.refresh)
-      EventBus.$on('album-selected', this.handleAlbumSelected)
     }
   }
 </script>
