@@ -1,7 +1,7 @@
 <template>
     <main>
         <aside v-if="$root.loggedIn && selecting" class="selectionbar">
-            {{ selection.length }} selected
+            {{ selectionCount }} selected
             <button v-on:click="handleAddToAlbum">Add to album</button>
             <button v-on:click="handleRemoveFromAlbum" v-if="!!album">Remove from album</button>
             <button v-on:click="clearSelection">Clear selection</button>
@@ -16,10 +16,12 @@
                    v-bind:id="photo.id"
                    v-bind:caption="photo.file_name"
                    v-bind:key="photo.id"
+                   v-bind:selected="selection[photo.id]"
                    v-bind:selecting="selecting"
                    v-on:selected="handleItemSelected"
                    v-on:deselected="handleItemDeselected"
                    v-on:showing-photo="handleLightboxDisplayed"
+                   v-on:select-range="handleSelectRange"
         ></thumbnail>
     </main>
 </template>
@@ -49,6 +51,7 @@
 </style>
 
 <script>
+  import _ from 'lodash'
   import Axios from 'axios'
   import { EventBus } from './bus'
   import thumbnail from './thumbnail'
@@ -61,21 +64,26 @@
     data: function () {
       return {
         hasMore: true,
+        lastSelection: null,
         loading: true,
         offset: 0,
         photos: [],
-        selection: [],
+        selection: {},
         showing: null
       }
     },
     computed: {
       selecting () {
-        return this.selection.length > 0
+        return !_.isEmpty(this.selection)
+      },
+      selectionCount () {
+        return Object.keys(this.selection).length
       }
     },
     methods: {
       clearSelection () {
-        this.selection = []
+        this.selection = {}
+        this.lastSelection = null
       },
       handleAddToAlbum () {
         new Promise((resolve, reject) => {
@@ -83,16 +91,18 @@
         }).then(album => Axios.post('/albums/' + album + '/photos', {
           add_photos: this.selection
         }).then(() => {
-          EventBus.$emit('toast', this.selection.length + ' photo' + (this.selection.length === 1 ? '' : 's') + ' added to album')
+          EventBus.$emit('toast', this.selectionCount + ' photo' + (this.selectionCount === 1 ? '' : 's') + ' added to album')
           EventBus.$emit('album-updated', album)
-          this.selection = []
+          this.clearSelection()
         }))
       },
       handleItemDeselected (id) {
-        this.selection.splice(this.selection.indexOf(id), 1)
+        this.$delete(this.selection, id)
+        this.lastSelection = null
       },
       handleItemSelected (id) {
-        this.selection.push(id)
+        this.$set(this.selection, id, true)
+        this.lastSelection = id
       },
       handleLightboxDisplayed (id) {
         const comp = this
@@ -114,8 +124,29 @@
         Axios.post(this.endpoint, { remove_photos: this.selection }).then(() => {
           EventBus.$emit('toast', this.selection.length + ' photo' + (this.selection.length === 1 ? '' : 's') + ' removed from album')
           EventBus.$emit('album-updated', this.album)
-          this.selection = []
+          this.selection = {}
         })
+      },
+      handleSelectRange (id) {
+        if (this.selection.length === 0 || this.lastSelection === null) {
+          this.handleItemSelected(id)
+        } else {
+          const lastIndex = _.findIndex(this.photos, { id: this.lastSelection })
+          const ourIndex = _.findIndex(this.photos, { id: id })
+
+          let slice = []
+          if (lastIndex < ourIndex) {
+            slice = this.photos.slice(lastIndex + 1, ourIndex + 1)
+          } else if (ourIndex < lastIndex) {
+            slice = this.photos.slice(ourIndex, lastIndex)
+          }
+
+          slice.map((p) => p.id).forEach((id) => {
+            this.$set(this.selection, id, true)
+          })
+
+          this.lastSelection = id
+        }
       },
       infiniteScroll () {
         if (!this.loading && this.hasMore) {

@@ -93,10 +93,9 @@
 
 <script>
   export default {
-    props: ['id', 'caption', 'selecting'],
+    props: ['id', 'caption', 'selecting', 'selected'],
     data () {
       return {
-        selected: false,
         styles: {
           backgroundImage: '',
           flexBasis: 0,
@@ -105,26 +104,26 @@
       }
     },
     methods: {
-      handleClick () {
-        this.$router.push({ path: 'photo/' + this.id })
-        this.$emit('showing-photo', this.id)
+      handleClick (e) {
+        if (this.selecting && e.ctrlKey) {
+          // Ctrl+click during selection is a shortcut for toggling
+          this.handleToggle()
+        } else if (this.selecting && e.shiftKey) {
+          // Shift+click is a shortcut for range selection
+          this.$emit('select-range', this.id)
+        } else {
+          this.$router.push({ path: 'photo/' + this.id })
+          this.$emit('showing-photo', this.id)
+        }
       },
       handleImageLoaded (e) {
         console.log(e)
       },
       handleToggle () {
-        this.selected = !this.selected
         if (this.selected) {
-          this.$emit('selected', this.id)
-        } else {
           this.$emit('deselected', this.id)
-        }
-      }
-    },
-    watch: {
-      selecting (newVal) {
-        if (!newVal) {
-          this.selected = false
+        } else {
+          this.$emit('selected', this.id)
         }
       }
     },
