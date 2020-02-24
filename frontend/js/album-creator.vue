@@ -1,5 +1,5 @@
 <template>
-    <popup title="Create new album" :modal="true" position="center" v-if="visible" @close="handleClosed">
+    <popup title="Create new album" position="center" @close="handleClosed">
         <form @submit="doCreate">
             <p class="alert" v-if="alert.length > 0">{{ alert }}</p>
             <label for="name">Name</label>
@@ -37,24 +37,20 @@
 <script>
   import Axios from 'axios'
   import Popup from './popup'
-  import { EventBus } from './bus'
 
   export default {
     components: { Popup },
     data () {
       return {
         alert: '',
-        name: '',
-        reject () {},
-        resolve () {},
-        visible: false
+        name: ''
       }
     },
     methods: {
       doCreate () {
         Axios.post('/albums', { name: this.name }).then(({ data: { id } }) => {
-          this.visible = false
-          this.resolve(id)
+          this.$emit('created', id)
+          this.name = ''
         }).catch((error) => {
           if (error.response) {
             this.alert = error.response.data.error
@@ -64,21 +60,9 @@
         })
       },
       handleClosed () {
-        this.visible = false
-        this.reject()
-      },
-      show (resolve, reject) {
+        this.$emit('close')
         this.name = ''
-        this.resolve = resolve
-        this.reject = reject
-        this.visible = true
       }
-    },
-    created () {
-      EventBus.$on('create-album', this.show)
-    },
-    beforeDestroy () {
-      EventBus.$off('create-album', this.show)
     }
   }
 </script>

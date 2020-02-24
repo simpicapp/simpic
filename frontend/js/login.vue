@@ -1,14 +1,16 @@
 <template>
-    <popup title="Login" position="center" :modal="true" v-if="visible" @close="visible = false">
-        <form @submit="doLogin">
-            <p class="alert" v-if="alert.length > 0">{{ alert }}</p>
-            <label for="username">Username</label>
-            <input type="text" id="username" v-model="username" :disabled="loggingIn" v-focus>
-            <label for="password">Password</label>
-            <input type="password" id="password" v-model="password" :disabled="loggingIn">
-            <input type="submit" value="Login" :disabled="loggingIn">
-        </form>
-    </popup>
+    <modal v-if="visible" @close="visible = false" :should-close="close">
+        <popup title="Login" position="center" @close="close = true">
+            <form @submit="doLogin">
+                <p class="alert" v-if="alert.length > 0">{{ alert }}</p>
+                <label for="username">Username</label>
+                <input type="text" id="username" v-model="username" :disabled="loggingIn" v-focus>
+                <label for="password">Password</label>
+                <input type="password" id="password" v-model="password" :disabled="loggingIn">
+                <input type="submit" value="Login" :disabled="loggingIn">
+            </form>
+        </popup>
+    </modal>
 </template>
 
 <style lang="scss" scoped>
@@ -39,15 +41,18 @@
 <script>
   import Axios from 'axios'
   import { EventBus } from './bus'
-  import popup from './popup'
+  import Popup from './popup'
+  import Modal from './modal'
 
   export default {
     components: {
-      popup
+      Modal,
+      Popup
     },
     data () {
       return {
         alert: '',
+        close: false,
         loggingIn: false,
         password: '',
         username: '',
@@ -64,7 +69,7 @@
           username: this.username
         }).then(() => {
           this.$root.checkUser()
-          this.visible = false
+          this.close = true
           this.username = ''
           this.password = ''
           EventBus.$emit('toast', 'You are now logged in')
@@ -79,6 +84,7 @@
         })
       },
       show () {
+        this.close = false
         this.alert = ''
         this.visible = true
       }

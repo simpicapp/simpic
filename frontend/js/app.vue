@@ -5,7 +5,6 @@
         <uploader></uploader>
         <login></login>
         <album-picker></album-picker>
-        <album-creator></album-creator>
         <toaster></toaster>
         <bottom-bar></bottom-bar>
     </div>
@@ -49,7 +48,6 @@
   import BottomBar from './footer'
   import { EventBus } from './bus'
   import AlbumPicker from './album-picker'
-  import AlbumCreator from './album-creator'
   import Toaster from './toaster'
 
   Vue.directive('focus', {
@@ -60,7 +58,6 @@
 
   export default {
     components: {
-      AlbumCreator,
       AlbumPicker,
       BottomBar,
       Login,
