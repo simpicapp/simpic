@@ -18,6 +18,8 @@
 
     :root {
         --smaragdine: #4a9976;
+        --ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+        --ease-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
     }
 
     input {

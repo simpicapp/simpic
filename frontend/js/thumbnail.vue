@@ -30,12 +30,8 @@
         max-width: 800px;
     }
 
-    .thumbnail:hover .overlay {
-        display: grid;
-    }
-
     .overlay {
-        display: none;
+        display: grid;
         position: absolute;
         top: 0;
         bottom: 0;
@@ -44,6 +40,8 @@
         grid-template-rows: 25% auto 25%;
         grid-template-columns: 25% auto 25%;
         overflow: hidden;
+        opacity: 0;
+        transition: opacity 300ms var(--ease-in-cubic);
     }
 
     .tickbox {
@@ -52,17 +50,20 @@
         left: 0;
         width: 50px;
         height: 50px;
-        display: none;
+        display: flex;
         background-color: #ffffffdd;
         font-size: xx-large;
         align-items: center;
         justify-content: center;
-        border-bottom-right-radius: 2px;
+        border-bottom-right-radius: 5px;
         color: #00000066;
+        opacity: 0;
+        transition: opacity 300ms var(--ease-in-cubic);
     }
 
-    .thumbnail:hover .tickbox, .thumbnail.selecting .tickbox {
-        display: flex;
+    .thumbnail:hover .overlay, .thumbnail:hover .tickbox, .thumbnail.selecting .tickbox  {
+        opacity: 1;
+        transition: opacity 300ms var(--ease-out-cubic);
     }
 
     /*noinspection CssUnusedSymbol*/
@@ -71,16 +72,22 @@
     }
 
     .caption {
-        background-color: #000000cc;
+        backdrop-filter: blur(10px);
+        background-color: #00000099;
         grid-area: 3 / 1 / 4 / 4;
         text-align: center;
         align-self: end;
         margin: 0;
-        padding: 5px;
+        padding: 10px 0;
         color: white;
-        font-weight: bold;
         overflow: hidden;
         min-width: 0;
+    }
+
+    @supports not (backdrop-filter: blur()) {
+        .caption {
+            background-color: #000000cc;
+        }
     }
 </style>
 
