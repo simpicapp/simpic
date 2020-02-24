@@ -8,26 +8,28 @@
     </aside>
 </template>
 
-<style>
-    .popup {
+<style scoped>
+    aside {
         position: fixed;
         background: white;
         border: 2px solid black;
         border-radius: 5px;
     }
 
-    .popup.bottom_right {
+    /*noinspection CssUnusedSymbol*/
+    .bottom_right {
         bottom: 20px;
         right: 20px;
     }
 
-    .popup.center {
+    /*noinspection CssUnusedSymbol*/
+    .center {
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
     }
 
-    .popup h2 {
+    h2 {
         text-align: center;
         background-color: black;
         color: white;
@@ -36,7 +38,7 @@
         margin: 0;
     }
 
-    .popup .close {
+    .close {
         cursor: pointer;
         position: absolute;
         top: 0;
@@ -45,7 +47,7 @@
         display: inline-block;
     }
 
-    .popup .scroller {
+    .scroller {
         max-height: 400px;
         overflow-y: auto;
     }

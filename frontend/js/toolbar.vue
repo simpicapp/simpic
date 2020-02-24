@@ -9,7 +9,7 @@
     </header>
 </template>
 
-<style>
+<style scoped>
     header {
         display: flex;
         margin: 0 0 20px 0;
@@ -19,12 +19,12 @@
         align-items: center;
     }
 
-    header h1 {
+    h1 {
         text-transform: lowercase;
         margin-right: 20px;
     }
 
-    header span {
+    span {
         flex-grow: 1;
     }
 
@@ -36,12 +36,13 @@
         text-decoration: none;
     }
 
-    header a:hover {
+    a:hover {
         color: blue;
         text-decoration: underline;
     }
 
-    header a.router-link-active {
+    /*noinspection CssUnusedSymbol*/
+    a.router-link-active {
         color: gray;
         text-decoration: none;
     }

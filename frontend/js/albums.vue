@@ -1,12 +1,12 @@
 <template>
-    <main class="albums">
+    <main>
         <Album v-for="album in albums" v-bind:key="album.id" v-bind:id="album.id" v-bind:caption="album.name"
                v-bind:cover="album.cover_photo"></Album>
     </main>
 </template>
 
-<style>
-    .albums {
+<style scoped>
+    main {
         display: flex;
         flex-wrap: wrap;
     }

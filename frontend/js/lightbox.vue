@@ -10,7 +10,7 @@
     </div>
 </template>
 
-<style>
+<style scoped>
     #lightbox {
         z-index: 900;
         position: fixed;
@@ -25,7 +25,7 @@
         overscroll-behavior: contain;
     }
 
-    #lightbox img {
+    img {
         max-width: 95%;
         max-height: 95%;
     }

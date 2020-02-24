@@ -1,12 +1,12 @@
 <template>
-    <a v-bind:href="'/data/photo/' + id" v-on:click.prevent="handleClick" class="album">
+    <a v-bind:href="'/data/photo/' + id" v-on:click.prevent="handleClick">
         <img v-bind:src="'/data/thumb/' + cover" v-bind:alt="caption" v-if="cover != null">
         <p class="caption">{{ caption }}</p>
     </a>
 </template>
 
 <style scoped>
-    .album {
+    a {
         position: relative;
         margin: 10px 15px;
         border: 1px solid #333333;
@@ -21,17 +21,17 @@
         background-color: #E6D1AD;
     }
 
-    .album:hover {
+    a:hover {
         background-color: #f6e1bb;
     }
 
-    .album img {
+    img {
         max-width: 200px;
         max-height: 200px;
         border: 1px solid black;
     }
 
-    .album p {
+    p {
         margin: 0;
         color: black;
         font-size: large;

@@ -1,5 +1,5 @@
 <template>
-    <main class="gallery">
+    <main>
         <aside v-if="selecting" class="selectionbar">
             {{ selection.length }} selected
             <button v-on:click="handleAddToAlbum">Add to album</button>
@@ -24,8 +24,8 @@
     </main>
 </template>
 
-<style>
-    .gallery {
+<style scoped>
+    main {
         display: flex;
         flex-wrap: wrap;
     }

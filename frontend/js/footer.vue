@@ -5,7 +5,7 @@
     </footer>
 </template>
 
-<style>
+<style scoped>
     footer {
         border-top: 1px solid #ccc;
         background-color: #eee;
@@ -13,15 +13,15 @@
         padding: 20px;
     }
 
-    footer a {
+    a {
         color: black;
     }
 
-    footer a:hover {
+    a:hover {
         color: blue;
     }
 
-    span.version {
+    .version {
         color: #333;
     }
 </style>

@@ -18,7 +18,7 @@
     </popup>
 </template>
 
-<style>
+<style scoped>
     .album-picker {
         display: grid;
         grid-template-columns: 50px 200px;
@@ -28,7 +28,7 @@
         align-items: center;
     }
 
-    .album-picker img {
+    img {
         max-height: 2em;
         max-width: 5em;
         margin-right: 10px;
@@ -44,7 +44,7 @@
         cursor: pointer;
     }
 
-    .album-picker div.icon {
+    div.icon {
         justify-content: center;
     }
 </style>

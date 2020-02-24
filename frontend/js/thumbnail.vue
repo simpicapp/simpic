@@ -12,7 +12,7 @@
     </div>
 </template>
 
-<style>
+<style scoped>
     .thumbnail {
         position: relative;
         margin: 3px 5px;
@@ -26,7 +26,7 @@
         display: grid;
     }
 
-    .thumbnail .overlay {
+    .overlay {
         display: none;
         position: absolute;
         top: 0;
@@ -38,7 +38,7 @@
         overflow: hidden;
     }
 
-    .thumbnail .tickbox {
+    .tickbox {
         position: absolute;
         top: 0;
         left: 0;
@@ -57,11 +57,12 @@
         display: flex;
     }
 
-    .thumbnail .tickbox.selected {
+    /*noinspection CssUnusedSymbol*/
+    .tickbox.selected {
         color: black;
     }
 
-    .thumbnail .caption {
+    .caption {
         background-color: #000000cc;
         grid-area: 3 / 1 / 4 / 4;
         text-align: center;
