@@ -1,11 +1,13 @@
 <template>
-    <div class="thumbnail" v-bind:class="{ selecting }">
+    <div class="thumbnail" v-bind:class="{ selecting }" v-bind:style="styles">
         <a v-bind:href="'/data/photo/' + id" v-on:click.prevent="handleClick">
-            <img v-bind:src="'/data/thumb/' + id" v-bind:alt="caption">
             <div class="overlay">
                 <p class="caption">{{ caption }}</p>
             </div>
-            <span role="button" class="tickbox" v-bind:class="{ selected }" v-on:click.prevent.stop="handleToggle" v-if="$root.loggedIn">
+            <span role="button" class="tickbox"
+                  v-bind:class="{ selected }"
+                  v-on:click.prevent.stop="handleToggle"
+                  v-if="$root.loggedIn">
                 {{ selected ? '☑' : '☐'}}
             </span>
         </a>
@@ -14,8 +16,14 @@
 
 <style scoped>
     .thumbnail {
+        flex-grow: 1;
+        flex-shrink: 1;
         position: relative;
-        margin: 3px 5px;
+        height: 200px;
+        margin: 3px 3px;
+        background-repeat: no-repeat;
+        background-position: 50%;
+        background-size: cover;
     }
 
     .thumbnail img {
@@ -81,13 +89,21 @@
     props: ['id', 'caption', 'selecting'],
     data () {
       return {
-        selected: false
+        selected: false,
+        styles: {
+          backgroundImage: '',
+          flexBasis: 0,
+          maxWidth: 0
+        }
       }
     },
     methods: {
       handleClick () {
         this.$router.push({ path: 'photo/' + this.id })
         this.$emit('showing-photo', this.id)
+      },
+      handleImageLoaded (e) {
+        console.log(e)
       },
       handleToggle () {
         this.selected = !this.selected
@@ -104,6 +120,20 @@
           this.selected = false
         }
       }
+    },
+    mounted () {
+      const image = new Image()
+      image.onload = () => {
+        const canvas = document.createElement('canvas')
+        canvas.width = image.naturalWidth
+        canvas.height = image.naturalHeight
+        canvas.getContext('2d').drawImage(image, 0, 0)
+
+        this.styles.maxWidth = (image.naturalWidth * 1.5) + 'px'
+        this.styles.flexBasis = image.naturalWidth + 'px'
+        this.styles.backgroundImage = 'url(' + canvas.toDataURL('image/jpeg') + ')'
+      }
+      image.src = '/data/thumb/' + this.id
     }
   }
 </script>

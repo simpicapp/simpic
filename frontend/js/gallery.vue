@@ -28,6 +28,7 @@
     main {
         display: flex;
         flex-wrap: wrap;
+        align-content: stretch;
     }
 
     .selectionbar {
