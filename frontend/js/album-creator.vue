@@ -53,7 +53,7 @@
           this.name = ''
         }).catch((error) => {
           if (error.response) {
-            this.alert = error.response.data.error
+            this.alert = error.response.data.error || error.message
           } else {
             this.alert = error.message
           }

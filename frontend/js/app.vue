@@ -25,7 +25,6 @@
     }
 
     input {
-        border: 1px solid #ccc;
         padding: 5px;
     }
 

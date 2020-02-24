@@ -56,7 +56,6 @@ func bind(w http.ResponseWriter, r *http.Request, v interface{}) bool {
 	}
 
 	if err := validate.StructCtx(r.Context(), v); err != nil {
-		// TODO: Nicer user-facing messages for the various types of validation failure
 		writeError(w, http.StatusUnprocessableEntity, buildError(err.(validator.ValidationErrors)))
 		return false
 	}

@@ -6,6 +6,7 @@ import (
 	"github.com/simpicapp/simpic"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -24,8 +25,12 @@ func (s *server) handleAddAlbum() http.HandlerFunc {
 		album := simpic.NewAlbum(data.Name, user.Id)
 
 		if err := s.db.AddAlbum(album); err != nil {
-			log.Printf("Unable to add album '%s': %v\n", album.Id, err)
-			w.WriteHeader(http.StatusInternalServerError)
+			if strings.Contains(err.Error(), "albums_album_name_unique") {
+				writeError(w, http.StatusUnprocessableEntity, "An album with that name already exists")
+			} else {
+				log.Printf("Unable to add album '%s': %v\n", album.Id, err)
+				w.WriteHeader(http.StatusInternalServerError)
+			}
 			return
 		}
 
