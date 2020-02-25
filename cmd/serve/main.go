@@ -5,7 +5,7 @@ import (
 	"flag"
 	"github.com/jamiealquiza/envy"
 	"github.com/simpicapp/simpic/internal"
-	"github.com/simpicapp/simpic/internal/http"
+	"github.com/simpicapp/simpic/internal/api"
 	"github.com/simpicapp/simpic/internal/storage"
 	"log"
 	"os"
@@ -21,7 +21,7 @@ var (
 
 	db  *internal.Database
 	sm  *internal.SessionManager
-	srv http.Server
+	srv api.Server
 	wg  = &sync.WaitGroup{}
 )
 
@@ -68,7 +68,7 @@ func makeServer() {
 
 	thumbnailer := internal.NewThumbnailer(driver, storage.DiskDriver{Path: path.Join(*dataDir, "thumbnails")}, 220)
 
-	srv = http.NewServer(
+	srv = api.NewServer(
 		db,
 		thumbnailer,
 		userManager,
