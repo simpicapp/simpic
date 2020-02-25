@@ -11,8 +11,8 @@ button {
   transition: background-color 100ms linear, border-color 100ms linear, color 100ms linear;
 
   &:hover {
-    background-color: _vars.$primary;
-    border-color: darken(_vars.$primary, 10%);
+    background-color: vars.$primary;
+    border-color: darken(vars.$primary, 10%);
     color: white;
 
     &.danger-button {
