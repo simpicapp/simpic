@@ -1,0 +1,23 @@
+@use '_vars';
+
+button {
+  box-sizing: border-box;
+  border: 1px solid #cccccc;
+  border-radius: 2px;
+  background-color: white;
+  color: black;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background-color 100ms linear, border-color 100ms linear, color 100ms linear;
+
+  &:hover {
+    background-color: _vars.$primary;
+    border-color: darken(_vars.$primary, 10%);
+    color: white;
+
+    &.danger-button {
+      background-color: red;
+      border-color: darken(red, 10%);
+    }
+  }
+}

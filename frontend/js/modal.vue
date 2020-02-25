@@ -1,6 +1,6 @@
 <template>
     <transition name="fade" appear @after-enter="transitionFinished = true">
-        <div class="background" :class="{darker}" @click="closing = true">
+        <div class="background" :class="{darker}" @click="handleBackgroundClick">
             <transition name="fade" @after-leave="$emit('close')">
                 <div @click.stop v-if="showContent">
                     <slot></slot>
@@ -15,7 +15,7 @@
         opacity: 0;
     }
 
-    .fade-enter-active, .fade-leave-active  {
+    .fade-enter-active, .fade-leave-active {
         transition: 200ms opacity ease-out;
     }
 
@@ -49,6 +49,10 @@
   //  and the outer transition has finished.
   export default {
     props: {
+      closeable: {
+        type: Boolean,
+        default: true
+      },
       darker: {
         type: Boolean,
         default: false
@@ -65,6 +69,11 @@
       }
     },
     methods: {
+      handleBackgroundClick () {
+        if (this.closeable) {
+          this.closing = true
+        }
+      },
       handleKey (event) {
         if (event.code === 'Escape') {
           this.closing = false

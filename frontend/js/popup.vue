@@ -53,6 +53,9 @@
     .scroller {
         max-height: 400px;
         overflow-y: auto;
+
+        /* Edges of buttons and form fields sometimes get cut off without this... */
+        margin-right: 1px;
     }
 </style>
 

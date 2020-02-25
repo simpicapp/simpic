@@ -12,6 +12,8 @@
 
 <style lang="scss">
     @use '../css/vars';
+    @import '../css/global';
+    @import '../css/reset';
 
     body {
         font-family: sans-serif;

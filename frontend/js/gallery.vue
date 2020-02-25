@@ -1,11 +1,11 @@
 <template>
     <main>
-        <aside v-if="$root.loggedIn && selecting" class="selectionbar">
-            {{ selectionCount }} selected
-            <button @click="handleAddToAlbum">Add to album</button>
-            <button @click="handleRemoveFromAlbum" v-if="!!album">Remove from album</button>
-            <button @click="clearSelection">Clear selection</button>
-        </aside>
+        <gallery-toolbar v-if="$root.loggedIn && selecting"
+                         :album="album"
+                         :selection="selection"
+                         :selection-count="selectionCount"
+                         @clear-selection="clearSelection">
+        </gallery-toolbar>
 
         <p v-if="loading">Loading...</p>
 
@@ -33,22 +33,6 @@
         flex-wrap: wrap;
         align-content: stretch;
     }
-
-    .selectionbar {
-        position: fixed;
-        z-index: 800;
-        top: 0;
-        left: 25%;
-        right: 25%;
-        border: 2px solid black;
-        border-top: 0;
-        padding: 25px;
-        border-bottom-right-radius: 10px;
-        border-bottom-left-radius: 10px;
-        background: #ffffff;
-        display: flex;
-        justify-content: space-between;
-    }
 </style>
 
 <script>
@@ -56,9 +40,11 @@
   import Axios from 'axios'
   import { EventBus } from './bus'
   import thumbnail from './thumbnail'
+  import GalleryToolbar from './gallery-toolbar'
 
   export default {
     components: {
+      GalleryToolbar,
       thumbnail
     },
     props: ['album', 'endpoint'],
@@ -86,17 +72,6 @@
         this.selection = {}
         this.lastSelection = null
       },
-      handleAddToAlbum () {
-        new Promise((resolve, reject) => {
-          EventBus.$emit('pick-album', resolve, reject)
-        }).then(album => Axios.post('/albums/' + album + '/photos', {
-          add_photos: Object.keys(this.selection)
-        }).then(() => {
-          EventBus.$emit('toast', this.selectionCount + ' photo' + (this.selectionCount === 1 ? '' : 's') + ' added to album')
-          EventBus.$emit('album-updated', album)
-          this.clearSelection()
-        }))
-      },
       handleItemDeselected (id) {
         this.$delete(this.selection, id)
         this.lastSelection = null
@@ -120,13 +95,6 @@
       handleLightboxPrevious () {
         this.showing = (this.showing - 1 + this.photos.length) % this.photos.length
         this.$router.push({ path: this.photos[this.showing].id })
-      },
-      handleRemoveFromAlbum () {
-        Axios.post(this.endpoint, { remove_photos: Object.keys(this.selection) }).then(() => {
-          EventBus.$emit('toast', this.selectionCount + ' photo' + (this.selectionCount === 1 ? '' : 's') + ' removed from album')
-          EventBus.$emit('album-updated', this.album)
-          this.selection = {}
-        })
       },
       handleSelectRange (id) {
         if (this.selection.length === 0 || this.lastSelection === null) {
