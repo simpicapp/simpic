@@ -4,6 +4,7 @@ import (
 	"fmt"
 	uuid "github.com/satori/go.uuid"
 	"github.com/simpicapp/simpic/internal"
+	"github.com/simpicapp/simpic/internal/storage"
 	"io"
 	"log"
 	"net/http"
@@ -40,7 +41,7 @@ func (s *server) handleGetPhoto() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		photo := r.Context().Value(ctxPhoto).(*internal.Photo)
 
-		stream, err := s.driver.Read(photo.Id)
+		stream, err := s.photoReader.Read(photo.Id, storage.KindPhoto)
 		if err != nil {
 			log.Printf("unable to retrieve photo '%s': %v\n", photo.Id, err)
 			writeError(w, http.StatusInternalServerError, "No photo found")

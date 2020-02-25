@@ -4,8 +4,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	uuid "github.com/satori/go.uuid"
 	"github.com/simpicapp/simpic/internal"
 	"github.com/simpicapp/simpic/internal/storage"
+	"io"
 	"net/http"
 )
 
@@ -13,6 +15,10 @@ var (
 	port        = flag.Int("port", 8080, "the port to listen on")
 	frontendDir = flag.String("frontend", "dist", "the path to serve frontend files from")
 )
+
+type PhotoReader interface {
+	Read(id uuid.UUID, kind storage.StoreKind) (io.ReadCloser, error)
+}
 
 type Server interface {
 	Start() error
@@ -24,14 +30,14 @@ type server struct {
 	storer      *internal.Storer
 	thumbnailer *internal.Thumbnailer
 	usermanager *internal.UserManager
-	driver      storage.Driver
+	photoReader PhotoReader
 	srv         *http.Server
 }
 
-func NewServer(db *internal.Database, thumbnailer *internal.Thumbnailer, usermanager *internal.UserManager, driver storage.Driver, storer *internal.Storer) Server {
+func NewServer(db *internal.Database, thumbnailer *internal.Thumbnailer, usermanager *internal.UserManager, photoReader PhotoReader, storer *internal.Storer) Server {
 	s := server{
 		db:          db,
-		driver:      driver,
+		photoReader: photoReader,
 		storer:      storer,
 		thumbnailer: thumbnailer,
 		usermanager: usermanager,

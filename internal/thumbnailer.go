@@ -8,16 +8,20 @@ import (
 	"io"
 )
 
+type PhotoStore interface {
+	Write(id uuid.UUID, kind storage.StoreKind) (io.WriteCloser, error)
+	Read(id uuid.UUID, kind storage.StoreKind) (io.ReadCloser, error)
+	Exists(id uuid.UUID, kind storage.StoreKind) bool
+}
+
 type Thumbnailer struct {
-	driver storage.Driver
-	cache  storage.Driver
+	store  PhotoStore
 	height int
 }
 
-func NewThumbnailer(driver, cache storage.Driver, height int) *Thumbnailer {
+func NewThumbnailer(store PhotoStore, height int) *Thumbnailer {
 	return &Thumbnailer{
-		driver: driver,
-		cache:  cache,
+		store:  store,
 		height: height,
 	}
 }
@@ -25,13 +29,13 @@ func NewThumbnailer(driver, cache storage.Driver, height int) *Thumbnailer {
 // Thumbnail provides a reader for a JPEG-encoded thumbnail version of the picture with the given ID.
 // If the thumbnail is not cached, it will be generated.
 func (t Thumbnailer) Thumbnail(id uuid.UUID) (io.ReadCloser, error) {
-	if !t.cache.Exists(id) {
+	if !t.store.Exists(id, storage.KindThumbnail) {
 		if err := t.Generate(id); err != nil {
 			return nil, err
 		}
 	}
 
-	return t.cache.Read(id)
+	return t.store.Read(id, storage.KindThumbnail)
 }
 
 // Generate creates a new JPEG-encoded thumbnail for the picture with the given ID.
@@ -46,7 +50,7 @@ func (t Thumbnailer) Generate(id uuid.UUID) error {
 }
 
 func (t Thumbnailer) load(id uuid.UUID) (image.Image, error) {
-	reader, err := t.driver.Read(id)
+	reader, err := t.store.Read(id, storage.KindPhoto)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +63,7 @@ func (t Thumbnailer) load(id uuid.UUID) (image.Image, error) {
 }
 
 func (t Thumbnailer) save(id uuid.UUID, img image.Image) error {
-	writer, err := t.cache.Write(id)
+	writer, err := t.store.Write(id, storage.KindThumbnail)
 	if err != nil {
 		return err
 	}

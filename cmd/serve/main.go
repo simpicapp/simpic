@@ -10,7 +10,6 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"path"
 	"sync"
 	"syscall"
 	"time"
@@ -64,9 +63,9 @@ func makeServer() {
 	userManager := internal.NewUserManager(db)
 	userManager.CreateAdmin()
 
-	driver := storage.DiskDriver{Path: *dataDir}
+	driver := storage.DiskStore{Path: *dataDir}
 
-	thumbnailer := internal.NewThumbnailer(driver, storage.DiskDriver{Path: path.Join(*dataDir, "thumbnails")}, 220)
+	thumbnailer := internal.NewThumbnailer(driver, 220)
 
 	srv = api.NewServer(
 		db,

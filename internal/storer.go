@@ -1,19 +1,24 @@
 package internal
 
 import (
+	uuid "github.com/satori/go.uuid"
 	"github.com/simpicapp/simpic/internal/storage"
 	"io"
 )
 
-type Storer struct {
-	db     *Database
-	driver storage.Driver
+type PhotoWriter interface {
+	Write(id uuid.UUID, kind storage.StoreKind) (io.WriteCloser, error)
 }
 
-func NewStorer(db *Database, driver storage.Driver) *Storer {
+type Storer struct {
+	db     *Database
+	writer PhotoWriter
+}
+
+func NewStorer(db *Database, driver PhotoWriter) *Storer {
 	return &Storer{
 		db:     db,
-		driver: driver,
+		writer: driver,
 	}
 }
 
@@ -26,7 +31,7 @@ func (s *Storer) Store(fileName string, uploader int) (*Photo, io.WriteCloser, e
 		return nil, nil, err
 	}
 
-	writer, err := s.driver.Write(photo.Id)
+	writer, err := s.writer.Write(photo.Id, storage.KindPhoto)
 	if err != nil {
 		_ = s.db.DeletePhoto(photo)
 		return nil, nil, err
