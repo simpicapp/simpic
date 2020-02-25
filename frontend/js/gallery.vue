@@ -24,10 +24,28 @@
                    @showing-photo="handleLightboxDisplayed"
                    @select-range="handleSelectRange"
         ></thumbnail>
+
+        <div class="nothing-here" v-if="!loading && photos.length === 0">
+            <div>
+                <p>There's nothing here</p>
+                <p v-if="!$root.loggedIn">
+                    You might need to login to see this content.
+                </p>
+                <p v-else-if="!!album">
+                    You can upload pictures to Simpic simply by dragging and dropping them into your browser.
+                    Give it a try!
+                </p>
+                <p v-else>
+                    You can add pictures to albums by selecting them from the timeline.
+                </p>
+            </div>
+        </div>
     </main>
 </template>
 
 <style lang="scss" scoped>
+    @import "../css/nothing-here";
+
     main {
         display: flex;
         flex-wrap: wrap;

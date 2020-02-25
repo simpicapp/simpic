@@ -1,0 +1,29 @@
+.nothing-here {
+  width: 100%;
+  min-height: 400px;
+  margin: 50px 25% 50px;
+
+  div {
+    border: 1px dashed #8c8c8c;
+    border-radius: 50px;
+    height: 100%;
+    text-align: center;
+    padding: 50px;
+    color: #8c8c8c;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+
+    p:first-child {
+      color: #cccccc;
+      font-size: 3em;
+      font-weight: bold;
+      //text-shadow: -1px -1px 0px rgba(0, 0, 0, 0.8);
+      text-shadow:
+              0 1px 2px #fff,
+              0 -1px 1px #666,
+              0 -1px 1px rgba(0,0,0,0.5),
+              0 1px 1px rgba(255,255,255,0.8);
+    }
+  }
+}
