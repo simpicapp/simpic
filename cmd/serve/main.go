@@ -4,9 +4,9 @@ import (
 	"context"
 	"flag"
 	"github.com/jamiealquiza/envy"
-	"github.com/simpicapp/simpic"
-	"github.com/simpicapp/simpic/http"
-	"github.com/simpicapp/simpic/storage"
+	"github.com/simpicapp/simpic/internal"
+	"github.com/simpicapp/simpic/internal/http"
+	"github.com/simpicapp/simpic/internal/storage"
 	"log"
 	"os"
 	"os/signal"
@@ -19,8 +19,8 @@ import (
 var (
 	dataDir = flag.String("path", "data", "the path to store data in")
 
-	db  *simpic.Database
-	sm  *simpic.SessionManager
+	db  *internal.Database
+	sm  *internal.SessionManager
 	srv http.Server
 	wg  = &sync.WaitGroup{}
 )
@@ -50,30 +50,30 @@ func main() {
 
 func makeDatabase() {
 	var err error
-	db, err = simpic.OpenDatabase()
+	db, err = internal.OpenDatabase()
 	if err != nil {
 		log.Panicf("unable to connect to database: %v\n", err)
 	}
 }
 
 func makeSessionManager() {
-	sm = simpic.NewSessionManager(db)
+	sm = internal.NewSessionManager(db)
 }
 
 func makeServer() {
-	userManager := simpic.NewUserManager(db)
+	userManager := internal.NewUserManager(db)
 	userManager.CreateAdmin()
 
 	driver := storage.DiskDriver{Path: *dataDir}
 
-	thumbnailer := simpic.NewThumbnailer(driver, storage.DiskDriver{Path: path.Join(*dataDir, "thumbnails")}, 220)
+	thumbnailer := internal.NewThumbnailer(driver, storage.DiskDriver{Path: path.Join(*dataDir, "thumbnails")}, 220)
 
 	srv = http.NewServer(
 		db,
 		thumbnailer,
 		userManager,
 		driver,
-		simpic.NewStorer(db, driver))
+		internal.NewStorer(db, driver))
 }
 
 func startServer() {

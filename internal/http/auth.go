@@ -2,7 +2,7 @@ package http
 
 import (
 	"flag"
-	"github.com/simpicapp/simpic"
+	"github.com/simpicapp/simpic/internal"
 	"log"
 	"net/http"
 	"time"
@@ -47,7 +47,7 @@ func (s *server) handleAuthenticate() http.HandlerFunc {
 			return
 		}
 
-		session := simpic.NewSession(user, r.RemoteAddr, r.UserAgent())
+		session := internal.NewSession(user, r.RemoteAddr, r.UserAgent())
 		if err := s.db.AddSession(session); err != nil {
 			log.Printf("Unable to save token for user '%s': %v\n", data.Username, err)
 			writeError(w, http.StatusInternalServerError, "Unexpected error; please try again")
@@ -68,7 +68,7 @@ func (s *server) handleAuthenticate() http.HandlerFunc {
 
 func (s *server) handleLogout() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		session := r.Context().Value(ctxSession).(*simpic.Session)
+		session := r.Context().Value(ctxSession).(*internal.Session)
 		if err := s.db.DeleteSession(session.Key); err != nil {
 			log.Printf("Unable to delete session %s: %v\n", session.Key, err)
 		}
@@ -86,8 +86,8 @@ func (s *server) handleGetSelf() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		user := r.Context().Value(ctxUser).(*simpic.User)
-		session := r.Context().Value(ctxSession).(*simpic.Session)
+		user := r.Context().Value(ctxUser).(*internal.User)
+		session := r.Context().Value(ctxSession).(*internal.Session)
 		writeJSON(w, http.StatusOK, GetSelfResponse{
 			Username: user.Name,
 			Admin:    user.Admin,

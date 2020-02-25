@@ -1,4 +1,4 @@
-package simpic
+package internal
 
 import (
 	"database/sql"

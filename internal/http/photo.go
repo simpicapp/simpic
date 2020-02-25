@@ -3,7 +3,7 @@ package http
 import (
 	"fmt"
 	uuid "github.com/satori/go.uuid"
-	"github.com/simpicapp/simpic"
+	"github.com/simpicapp/simpic/internal"
 	"io"
 	"log"
 	"net/http"
@@ -11,7 +11,7 @@ import (
 
 func (s *server) handleGetPhotoInfo() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		photo := r.Context().Value(ctxPhoto).(*simpic.Photo)
+		photo := r.Context().Value(ctxPhoto).(*internal.Photo)
 		writeJSON(w, http.StatusOK, photo)
 	}
 }
@@ -38,7 +38,7 @@ func (s *server) handleDeletePhotos() http.HandlerFunc {
 
 func (s *server) handleGetPhoto() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		photo := r.Context().Value(ctxPhoto).(*simpic.Photo)
+		photo := r.Context().Value(ctxPhoto).(*internal.Photo)
 
 		stream, err := s.driver.Read(photo.Id)
 		if err != nil {
@@ -58,7 +58,7 @@ func (s *server) handleGetPhoto() http.HandlerFunc {
 
 func (s *server) handleGetThumbnail() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		photo := r.Context().Value(ctxPhoto).(*simpic.Photo)
+		photo := r.Context().Value(ctxPhoto).(*internal.Photo)
 
 		stream, err := s.thumbnailer.Thumbnail(photo.Id)
 		if err != nil {
@@ -95,7 +95,7 @@ func (s *server) handleStorePhoto() http.HandlerFunc {
 			_ = file.Close()
 		}()
 
-		user := r.Context().Value(ctxUser).(*simpic.User)
+		user := r.Context().Value(ctxUser).(*internal.User)
 		photo, writer, err := s.storer.Store(headers.Filename, user.Id)
 		if err != nil {
 			log.Printf("unable to create photo '%s': %v\n", headers.Filename, err)
@@ -125,11 +125,11 @@ func (s *server) handleStorePhoto() http.HandlerFunc {
 	}
 }
 
-func mimeTypeFor(t simpic.Type) string {
+func mimeTypeFor(t internal.Type) string {
 	switch t {
-	case simpic.Jpeg:
+	case internal.Jpeg:
 		return "image/jpeg"
-	case simpic.Png:
+	case internal.Png:
 		return "image/png"
 	default:
 		log.Printf("No known content type for type %d\n", t)

@@ -1,7 +1,7 @@
-package simpic
+package internal
 
 import (
-	"github.com/simpicapp/simpic/storage"
+	"github.com/simpicapp/simpic/internal/storage"
 	"io"
 )
 

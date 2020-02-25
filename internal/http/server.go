@@ -4,8 +4,8 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/simpicapp/simpic"
-	"github.com/simpicapp/simpic/storage"
+	"github.com/simpicapp/simpic/internal"
+	"github.com/simpicapp/simpic/internal/storage"
 	"net/http"
 )
 
@@ -20,15 +20,15 @@ type Server interface {
 }
 
 type server struct {
-	db          *simpic.Database
-	storer      *simpic.Storer
-	thumbnailer *simpic.Thumbnailer
-	usermanager *simpic.UserManager
+	db          *internal.Database
+	storer      *internal.Storer
+	thumbnailer *internal.Thumbnailer
+	usermanager *internal.UserManager
 	driver      storage.Driver
 	srv         *http.Server
 }
 
-func NewServer(db *simpic.Database, thumbnailer *simpic.Thumbnailer, usermanager *simpic.UserManager, driver storage.Driver, storer *simpic.Storer) Server {
+func NewServer(db *internal.Database, thumbnailer *internal.Thumbnailer, usermanager *internal.UserManager, driver storage.Driver, storer *internal.Storer) Server {
 	s := server{
 		db:          db,
 		driver:      driver,

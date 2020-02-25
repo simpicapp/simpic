@@ -1,9 +1,9 @@
-package simpic
+package internal
 
 import (
 	"github.com/disintegration/imaging"
 	uuid "github.com/satori/go.uuid"
-	"github.com/simpicapp/simpic/storage"
+	"github.com/simpicapp/simpic/internal/storage"
 	"image"
 	"io"
 )

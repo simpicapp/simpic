@@ -3,7 +3,7 @@ package http
 import (
 	"fmt"
 	uuid "github.com/satori/go.uuid"
-	"github.com/simpicapp/simpic"
+	"github.com/simpicapp/simpic/internal"
 	"log"
 	"net/http"
 	"strings"
@@ -21,8 +21,8 @@ func (s *server) handleAddAlbum() http.HandlerFunc {
 			return
 		}
 
-		user := r.Context().Value(ctxUser).(*simpic.User)
-		album := simpic.NewAlbum(data.Name, user.Id)
+		user := r.Context().Value(ctxUser).(*internal.User)
+		album := internal.NewAlbum(data.Name, user.Id)
 
 		if err := s.db.AddAlbum(album); err != nil {
 			if strings.Contains(err.Error(), "albums_album_name_unique") {
@@ -40,7 +40,7 @@ func (s *server) handleAddAlbum() http.HandlerFunc {
 
 func (s *server) handleDeleteAlbum() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		album := r.Context().Value(ctxAlbum).(*simpic.Album)
+		album := r.Context().Value(ctxAlbum).(*internal.Album)
 
 		if err := s.db.DeleteAlbum(album); err != nil {
 			log.Printf("Unable to delete album '%s': %v\n", album.Id, err)
@@ -62,7 +62,7 @@ func (s *server) handleGetAlbums() http.HandlerFunc {
 
 func (s *server) handleGetPhotosForAlbum() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		album := r.Context().Value(ctxAlbum).(*simpic.Album)
+		album := r.Context().Value(ctxAlbum).(*internal.Album)
 		paginate(w, r, func(offset, count int) (i interface{}, err error) {
 			return s.db.GetAlbumPhotos(album.Id, offset, count)
 		})
@@ -81,8 +81,8 @@ func (s *server) handleAlterPhotosInAlbum() http.HandlerFunc {
 			return
 		}
 
-		user := r.Context().Value(ctxUser).(*simpic.User)
-		album := r.Context().Value(ctxAlbum).(*simpic.Album)
+		user := r.Context().Value(ctxUser).(*internal.User)
+		album := r.Context().Value(ctxAlbum).(*internal.Album)
 
 		if len(data.AddedPhotos) > 0 {
 			if err := s.addToAlbum(user, album, data.AddedPhotos); err != nil {
@@ -106,20 +106,20 @@ func (s *server) handleAlterPhotosInAlbum() http.HandlerFunc {
 
 func (s *server) handleGetAlbumInfo() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		album := r.Context().Value(ctxAlbum).(*simpic.Album)
+		album := r.Context().Value(ctxAlbum).(*internal.Album)
 		writeJSON(w, http.StatusOK, album)
 	}
 }
 
-func (s *server) addToAlbum(user *simpic.User, album *simpic.Album, ids []uuid.UUID) error {
+func (s *server) addToAlbum(user *internal.User, album *internal.Album, ids []uuid.UUID) error {
 	count, err := s.db.GetAlbumOrderMax(album.Id)
 	if err != nil {
 		return fmt.Errorf("unable to retrieve max order: %v", err)
 	}
 
-	var photos []simpic.AlbumEntry
+	var photos []internal.AlbumEntry
 	for i, photo := range ids {
-		photos = append(photos, simpic.AlbumEntry{
+		photos = append(photos, internal.AlbumEntry{
 			Photo:   photo,
 			Album:   album.Id,
 			Creator: user.Id,
