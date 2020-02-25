@@ -79,12 +79,14 @@ func (s *server) handleGetThumbnail() http.HandlerFunc {
 func (s *server) handleStorePhoto() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := r.ParseMultipartForm(32 << 20); err != nil {
+			log.Printf("Failed to parse multipart form: %v\n", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
 		file, headers, err := r.FormFile("file")
 		if err != nil {
+			log.Printf("No file present with key 'file'\n")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}

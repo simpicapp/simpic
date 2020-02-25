@@ -3,6 +3,7 @@ module github.com/simpicapp/simpic
 go 1.12
 
 require (
+	github.com/cheggaaa/pb/v3 v3.0.4
 	github.com/disintegration/imaging v1.6.2
 	github.com/go-chi/chi v4.0.3+incompatible
 	github.com/go-playground/validator/v10 v10.2.0
