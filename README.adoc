@@ -64,6 +64,10 @@ It currently has the following options:
 | 8080
 | TCP port to listen on for requests.
 
+| SIMPIC_SECURE_COOKIES
+| true
+| Whether to mark cookies as HTTPS-only or not.
+
 | SIMPIC_SESSION_EXPIRY
 | 774h (31 days)
 | Length of time that users stay logged in for. Specified in hours/minutes/etc, e.g. "3h30m".

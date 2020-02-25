@@ -1,6 +1,7 @@
 package http
 
 import (
+	"flag"
 	"github.com/simpicapp/simpic"
 	"log"
 	"net/http"
@@ -10,6 +11,10 @@ import (
 
 const (
 	cookieName = "SimpicSession"
+)
+
+var (
+	secureCookies = flag.Bool("SECURE_COOKIES", true, "Whether to set cookies to be HTTPS-only")
 )
 
 func (s *server) handleAuthenticate() http.HandlerFunc {
@@ -53,7 +58,7 @@ func (s *server) handleAuthenticate() http.HandlerFunc {
 			Name:     cookieName,
 			Value:    session.Key,
 			Expires:  session.Expires,
-			Secure:   false, //TODO: Add a debug flag and toggle this appropriately
+			Secure:   *secureCookies,
 			HttpOnly: true,
 			SameSite: http.SameSiteStrictMode,
 		})
@@ -95,6 +100,7 @@ func (s *server) clearAuthCookie(w http.ResponseWriter) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     cookieName,
 		Expires:  time.Now().Add(time.Hour * -24),
+		Secure:   *secureCookies,
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 	})
