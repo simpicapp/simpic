@@ -33,6 +33,12 @@ func (s *server) handleDeletePhotos() http.HandlerFunc {
 			return
 		}
 
+		for _, id := range data.Ids {
+			if err := s.storer.Delete(id); err != nil {
+				log.Printf("Failed to delete stored photo %s: %v\n", id, err)
+			}
+		}
+
 		w.WriteHeader(http.StatusNoContent)
 	}
 }

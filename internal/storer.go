@@ -91,6 +91,10 @@ func (s *Storer) storeThumbnail(photo *Photo, img image.Image) error {
 	return thumbOut.Close()
 }
 
+func (s *Storer) Delete(id uuid.UUID) error {
+	return s.writer.DeleteAll(id)
+}
+
 func imageTypeForFormat(format string) PhotoType {
 	switch format {
 	case "jpeg":
