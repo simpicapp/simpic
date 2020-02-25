@@ -115,6 +115,12 @@ func (s *server) handleStorePhoto() http.HandlerFunc {
 			return
 		}
 
+		go func() {
+			if err := s.thumbnailer.Generate(photo.Id); err != nil {
+				log.Printf("Failed to generate thumbnail for uploaded image %s: %v\n", photo.Id, err)
+			}
+		}()
+
 		http.Redirect(w, r, fmt.Sprintf("/photos/%s", photo.Id.String()), http.StatusSeeOther)
 	}
 }
