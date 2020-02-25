@@ -1,6 +1,6 @@
 <template>
     <div>
-        <aside class="selectionbar">
+        <aside class="selectionbar" v-if="selectionCount > 0">
             {{ selectionCount }} selected
             <button @click="handleAddToAlbum">Add to album</button>
             <button @click="handleRemoveFromAlbum" v-if="!!album">Remove from album</button>
@@ -75,10 +75,9 @@
         this.closeConfirmation = true
       },
       doDelete () {
-        this.closeConfirmation = true
         Axios.post('/photos/delete', { photos: Object.keys(this.selection) }).then(() => {
+          this.closeConfirmation = true
           EventBus.$emit('toast', this.selectionCount + ' photo' + (this.selectionCount === 1 ? '' : 's') + ' deleted')
-          this.$emit('clear-selection')
           EventBus.$emit('refresh-gallery')
         })
       },

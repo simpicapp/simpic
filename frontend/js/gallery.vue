@@ -1,6 +1,6 @@
 <template>
     <main>
-        <gallery-toolbar v-if="$root.loggedIn && selecting"
+        <gallery-toolbar v-if="$root.loggedIn"
                          :album="album"
                          :selection="selection"
                          :selection-count="selectionCount"
@@ -123,6 +123,7 @@
         }
       },
       refresh () {
+        this.selection = {}
         this.offset = 0
         this.hasMore = true
         this.update()
