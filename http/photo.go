@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+	uuid "github.com/satori/go.uuid"
 	"github.com/simpicapp/simpic"
 	"io"
 	"log"
@@ -12,6 +13,26 @@ func (s *server) handleGetPhotoInfo() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		photo := r.Context().Value(ctxPhoto).(*simpic.Photo)
 		writeJSON(w, http.StatusOK, photo)
+	}
+}
+
+func (s *server) handleDeletePhotos() http.HandlerFunc {
+	type DeletePhotosData struct {
+		Ids []uuid.UUID `json:"photos"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		data := &DeletePhotosData{}
+		if !bind(w, r, data) {
+			return
+		}
+
+		if err := s.db.DeletePhotos(data.Ids); err != nil {
+			log.Printf("Failed to delete photo batch: %v\n", err)
+			writeError(w, http.StatusInternalServerError, "Unexpected error")
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
 	}
 }
 

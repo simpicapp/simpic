@@ -66,7 +66,7 @@ func (d *Database) migrate(migrationPath string) error {
 	return nil
 }
 
-//region AddedPhotos
+//region Photos
 
 func (d *Database) Add(photo *Photo) (err error) {
 	_, err = d.db.Collection("photos").Insert(photo)
@@ -85,6 +85,10 @@ func (d *Database) GetPhotosByTime(offset, count int) (photos []Photo, err error
 
 func (d *Database) DeletePhoto(photo *Photo) error {
 	return d.db.Collection("photos").Find("photo_uuid", photo.Id).Delete()
+}
+
+func (d *Database) DeletePhotos(uuids []uuid.UUID) error {
+	return d.db.Collection("photos").Find("photo_uuid", uuids).Delete()
 }
 
 //endregion

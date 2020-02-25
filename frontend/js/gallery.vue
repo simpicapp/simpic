@@ -6,6 +6,7 @@
             <button @click="handleRemoveFromAlbum" v-if="!!album">Remove from album</button>
             <button @click="clearSelection">Clear selection</button>
         </aside>
+
         <p v-if="loading">Loading...</p>
 
         <router-view @go-to-previous-image="handleLightboxPrevious"
