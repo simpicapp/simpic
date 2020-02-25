@@ -28,18 +28,16 @@ type Server interface {
 type server struct {
 	db          *internal.Database
 	storer      *internal.Storer
-	thumbnailer *internal.Thumbnailer
 	usermanager *internal.UserManager
 	photoReader PhotoReader
 	srv         *http.Server
 }
 
-func NewServer(db *internal.Database, thumbnailer *internal.Thumbnailer, usermanager *internal.UserManager, photoReader PhotoReader, storer *internal.Storer) Server {
+func NewServer(db *internal.Database, usermanager *internal.UserManager, photoReader PhotoReader, storer *internal.Storer) Server {
 	s := server{
 		db:          db,
 		photoReader: photoReader,
 		storer:      storer,
-		thumbnailer: thumbnailer,
 		usermanager: usermanager,
 	}
 

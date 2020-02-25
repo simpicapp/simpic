@@ -1,41 +1,105 @@
 package internal
 
 import (
+	"bytes"
+	"fmt"
+	"github.com/disintegration/imaging"
 	uuid "github.com/satori/go.uuid"
 	"github.com/simpicapp/simpic/internal/storage"
+	"image"
+	"image/jpeg"
 	"io"
 )
 
 type PhotoWriter interface {
 	Write(id uuid.UUID, kind storage.StoreKind) (io.WriteCloser, error)
+	DeleteAll(id uuid.UUID) error
 }
 
 type Storer struct {
-	db     *Database
-	writer PhotoWriter
+	db              *Database
+	writer          PhotoWriter
+	thumbnailHeight int
 }
 
-func NewStorer(db *Database, driver PhotoWriter) *Storer {
+func NewStorer(db *Database, driver PhotoWriter, thumbnailHeight int) *Storer {
 	return &Storer{
-		db:     db,
-		writer: driver,
+		db:              db,
+		writer:          driver,
+		thumbnailHeight: thumbnailHeight,
 	}
 }
 
-func (s *Storer) Store(fileName string, uploader int) (*Photo, io.WriteCloser, error) {
+func (s *Storer) Store(fileName string, uploader int, stream io.Reader) (*Photo, error) {
 	photo := NewPhoto(fileName)
 	photo.Uploader = uploader
 
-	err := s.db.Add(photo)
+	var buf bytes.Buffer
+	img, format, err := image.Decode(io.TeeReader(stream, &buf))
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	writer, err := s.writer.Write(photo.Id, storage.KindPhoto)
-	if err != nil {
-		_ = s.db.DeletePhoto(photo)
-		return nil, nil, err
+	photo.Width = img.Bounds().Dx()
+	photo.Height = img.Bounds().Dx()
+	photo.Type = imageTypeForFormat(format)
+
+	if photo.Type == Unknown {
+		return nil, fmt.Errorf("unknown image format: %s", format)
 	}
 
-	return photo, writer, err
+	out, err := s.writer.Write(photo.Id, storage.KindPhoto)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = io.Copy(out, &buf)
+	if err != nil {
+		_ = out.Close()
+		return nil, err
+	}
+
+	if err := out.Close(); err != nil {
+		return nil, err
+	}
+
+	if err := s.storeThumbnail(photo, img); err != nil {
+		_ = s.writer.DeleteAll(photo.Id)
+		return nil, err
+	}
+
+	if err := s.db.Add(photo); err != nil {
+		_ = s.writer.DeleteAll(photo.Id)
+		return nil, err
+	}
+
+	return photo, nil
+}
+
+func (s *Storer) storeThumbnail(photo *Photo, img image.Image) error {
+	thumb := imaging.Resize(img, 0, s.thumbnailHeight, imaging.Lanczos)
+	thumbOut, err := s.writer.Write(photo.Id, storage.KindThumbnail)
+	if err != nil {
+		return err
+	}
+
+	if err := jpeg.Encode(thumbOut, thumb, &jpeg.Options{Quality: 80}); err != nil {
+		_ = thumbOut.Close()
+		return fmt.Errorf("unable to create thumbnail: %v", err)
+	}
+
+	return thumbOut.Close()
+}
+
+func imageTypeForFormat(format string) PhotoType {
+	switch format {
+	case "jpeg":
+		return Jpeg
+	case "png":
+		return Png
+	case "gif":
+		return Gif
+	default:
+		return Unknown
+	}
 }

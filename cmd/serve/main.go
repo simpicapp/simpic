@@ -65,14 +65,11 @@ func makeServer() {
 
 	driver := storage.DiskStore{Path: *dataDir}
 
-	thumbnailer := internal.NewThumbnailer(driver, 220)
-
 	srv = api.NewServer(
 		db,
-		thumbnailer,
 		userManager,
 		driver,
-		internal.NewStorer(db, driver))
+		internal.NewStorer(db, driver, 220))
 }
 
 func startServer() {

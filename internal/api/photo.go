@@ -37,11 +37,11 @@ func (s *server) handleDeletePhotos() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleGetPhoto() http.HandlerFunc {
+func (s *server) handleGetData(t storage.StoreKind) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		photo := r.Context().Value(ctxPhoto).(*internal.Photo)
 
-		stream, err := s.photoReader.Read(photo.Id, storage.KindPhoto)
+		stream, err := s.photoReader.Read(photo.Id, t)
 		if err != nil {
 			log.Printf("unable to retrieve photo '%s': %v\n", photo.Id, err)
 			writeError(w, http.StatusInternalServerError, "No photo found")
@@ -53,26 +53,6 @@ func (s *server) handleGetPhoto() http.HandlerFunc {
 		}()
 
 		w.Header().Set("Content-Type", mimeTypeFor(photo.Type))
-		_, _ = io.Copy(w, stream)
-	}
-}
-
-func (s *server) handleGetThumbnail() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		photo := r.Context().Value(ctxPhoto).(*internal.Photo)
-
-		stream, err := s.thumbnailer.Thumbnail(photo.Id)
-		if err != nil {
-			log.Printf("unable to retrieve thumbnail '%s': %v\n", photo.Id, err)
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
-
-		defer func() {
-			_ = stream.Close()
-		}()
-
-		w.Header().Set("Content-Type", "image/jpeg")
 		_, _ = io.Copy(w, stream)
 	}
 }
@@ -97,36 +77,18 @@ func (s *server) handleStorePhoto() http.HandlerFunc {
 		}()
 
 		user := r.Context().Value(ctxUser).(*internal.User)
-		photo, writer, err := s.storer.Store(headers.Filename, user.Id)
+		photo, err := s.storer.Store(headers.Filename, user.Id, file)
 		if err != nil {
 			log.Printf("unable to create photo '%s': %v\n", headers.Filename, err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
-		if _, err := io.Copy(writer, file); err != nil {
-			log.Printf("unable to write photo '%s': %v\n", headers.Filename, err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		if err := writer.Close(); err != nil {
-			log.Printf("unable to close photo '%s': %v\n", headers.Filename, err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		go func() {
-			if err := s.thumbnailer.Generate(photo.Id); err != nil {
-				log.Printf("Failed to generate thumbnail for uploaded image %s: %v\n", photo.Id, err)
-			}
-		}()
-
 		http.Redirect(w, r, fmt.Sprintf("/photos/%s", photo.Id.String()), http.StatusSeeOther)
 	}
 }
 
-func mimeTypeFor(t internal.Type) string {
+func mimeTypeFor(t internal.PhotoType) string {
 	switch t {
 	case internal.Jpeg:
 		return "image/jpeg"

@@ -2,16 +2,7 @@ package internal
 
 import (
 	uuid "github.com/satori/go.uuid"
-	"strings"
 	"time"
-)
-
-type Type int
-
-const (
-	Unknown Type = iota
-	Jpeg
-	Png
 )
 
 type Photo struct {
@@ -20,7 +11,7 @@ type Photo struct {
 	Width     int       `json:"width" db:"photo_width"`
 	Height    int       `json:"height" db:"photo_height"`
 	Timestamp time.Time `json:"timestamp" db:"photo_uploaded"`
-	Type      Type      `json:"type" db:"photo_type"`
+	Type      PhotoType `json:"type" db:"photo_type"`
 	Uploader  int       `json:"user_id" db:"photo_uploader"`
 }
 
@@ -29,17 +20,5 @@ func NewPhoto(fileName string) *Photo {
 		Id:        uuid.NewV4(),
 		FileName:  fileName,
 		Timestamp: time.Now(),
-		Type:      typeFromFilename(fileName),
-	}
-}
-
-func typeFromFilename(fileName string) Type {
-	lower := strings.ToLower(fileName)
-	if strings.HasSuffix(lower, ".jpg") || strings.HasSuffix(lower, ".jpeg") {
-		return Jpeg
-	} else if strings.HasSuffix(lower, ".png") {
-		return Png
-	} else {
-		return Unknown
 	}
 }
