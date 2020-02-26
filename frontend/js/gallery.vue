@@ -14,7 +14,7 @@
         ></router-view>
 
         <thumbnail v-for="photo in photos"
-                   :id="photo.id"
+                   :imageId="photo.id"
                    :caption="photo.file_name"
                    :key="photo.id"
                    :selected="selection[photo.id]"

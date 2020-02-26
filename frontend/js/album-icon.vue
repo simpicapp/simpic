@@ -1,47 +1,61 @@
 <template>
-    <a :href="'/data/image/' + cover" @click.prevent="handleClick">
-        <img :src="'/data/thumb/' + cover" :alt="caption" v-if="cover != null">
-        <p class="caption">{{ caption }}</p>
+    <a :href="'#/albums/' + id + '/'" @click.prevent="handleClick" :style="styles">
+        <div class="caption"><span>{{ caption }}</span> <span>{{ photos }}</span></div>
     </a>
 </template>
 
 <style lang="scss" scoped>
+    @use '../css/vars';
+    $border-radius: 10px;
+
     a {
         position: relative;
         margin: 10px 15px;
-        border: 1px solid #333333;
-        width: 240px;
-        height: 250px;
-        display: flex;
-        flex-direction: column;
+        min-width: 300px;
+        max-width: 300px;
+        height: 200px;
+        display: block;
         text-decoration: none;
-        border-radius: 10px;
-        justify-content: space-evenly;
-        align-items: center;
-        background-color: #E6D1AD;
+        border-radius: $border-radius;
+        background-repeat: no-repeat;
+        background-position: 50%;
+        background-size: cover;
+        box-shadow: 10px -10px 0px #99999966;
 
         &:hover {
-            background-color: #f6e1bb;
+            background-size: 110%;
+            box-shadow: 10px -10px 0px #66666666;
+
+            .caption {
+                font-weight: bold;
+            }
         }
     }
 
-    img {
-        max-width: 200px;
-        max-height: 200px;
-        border: 1px solid black;
-    }
-
-    p {
+    .caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 10px;
         margin: 0;
-        color: black;
+        color: white;
         font-size: large;
-        font-weight: bold;
+        background-color: rgba(vars.$primary, 0.85);
+        width: 100%;
+        border-bottom-left-radius: $border-radius;
+        border-bottom-right-radius: $border-radius;
+        display: flex;
+        justify-content: space-between;
     }
 </style>
 
 <script>
+  import ThumbnailBackground from './thumbnail-background'
+
   export default {
-    props: ['id', 'caption', 'cover'],
+    mixins: [ThumbnailBackground],
+    props: ['id', 'caption', 'photos', 'imageId'],
     methods: {
       handleClick () {
         this.$router.push({ path: './' + this.id + '/' })

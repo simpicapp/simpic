@@ -1,6 +1,6 @@
 <template>
     <div class="thumbnail" :class="{ selecting }" :style="styles">
-        <a :href="'/data/image/' + id" @click.prevent="handleClick">
+        <a :href="'/data/image/' + imageId" @click.prevent="handleClick">
             <div class="overlay">
                 <p class="caption">{{ caption }}</p>
             </div>
@@ -98,19 +98,11 @@
 </style>
 
 <script>
-  import { cache } from './cache'
+  import ThumbnailBackground from './thumbnail-background'
 
   export default {
-    props: ['id', 'caption', 'selecting', 'selected'],
-    data () {
-      return {
-        styles: {
-          backgroundImage: '',
-          flexBasis: 0,
-          maxWidth: 0
-        }
-      }
-    },
+    mixins: [ThumbnailBackground],
+    props: ['imageId', 'caption', 'selecting', 'selected'],
     methods: {
       handleClick (e) {
         if (this.selecting && e.ctrlKey) {
@@ -118,31 +110,19 @@
           this.handleToggle()
         } else if (this.selecting && e.shiftKey) {
           // Shift+click is a shortcut for range selection
-          this.$emit('select-range', this.id)
+          this.$emit('select-range', this.imageId)
         } else {
-          this.$router.push({ path: 'photo/' + this.id })
-          this.$emit('showing-photo', this.id)
+          this.$router.push({ path: 'photo/' + this.imageId })
+          this.$emit('showing-photo', this.imageId)
         }
       },
       handleToggle () {
         if (this.selected) {
-          this.$emit('deselected', this.id)
+          this.$emit('deselected', this.imageId)
         } else {
-          this.$emit('selected', this.id)
+          this.$emit('selected', this.imageId)
         }
       }
-    },
-    mounted () {
-      cache.getThumbnail(this.id).then((image) => {
-        const canvas = document.createElement('canvas')
-        canvas.width = image.naturalWidth
-        canvas.height = image.naturalHeight
-        canvas.getContext('2d').drawImage(image, 0, 0)
-
-        this.styles.maxWidth = (image.naturalWidth * 1.5) + 'px'
-        this.styles.flexBasis = image.naturalWidth + 'px'
-        this.styles.backgroundImage = 'url(' + canvas.toDataURL('image/jpeg') + ')'
-      })
     }
   }
 </script>

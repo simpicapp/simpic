@@ -4,7 +4,8 @@
                :key="album.id"
                :id="album.id"
                :caption="album.name"
-               :cover="album.cover_photo">
+               :imageId="album.cover_photo"
+               :photos="album.photos">
         </Album>
 
         <div class="nothing-here" v-if="!loading && albums.length === 0">
@@ -27,6 +28,7 @@
     main {
         display: flex;
         flex-wrap: wrap;
+        padding: 20px;
     }
 </style>
 
