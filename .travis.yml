@@ -11,3 +11,9 @@ jobs:
       node_js: "12"
       script:
         - npm run lint
+
+    - name: "Docker"
+      services:
+        - docker
+      script:
+        - docker build .
