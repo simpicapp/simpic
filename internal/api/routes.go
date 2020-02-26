@@ -24,7 +24,7 @@ func (s *server) routes() http.Handler {
 
 	r.Route("/data", func(r chi.Router) {
 		r.Group(func(r chi.Router) {
-			r.Use(s.photoContext)
+			r.Use(s.photoContext, s.cacheContext)
 			r.Get("/image/{uuid}", s.handleGetData(storage.KindPhoto))
 			r.Get("/thumb/{uuid}", s.handleGetData(storage.KindThumbnail))
 		})

@@ -84,3 +84,10 @@ func (s *server) requireAnyUser(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
+func (s *server) cacheContext(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Cache-Control", "max-age=31536000")
+		next.ServeHTTP(w, r)
+	})
+}

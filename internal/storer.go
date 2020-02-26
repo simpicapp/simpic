@@ -41,7 +41,7 @@ func (s *Storer) Store(fileName string, uploader int, stream io.Reader) (*Photo,
 	}
 
 	photo.Width = img.Bounds().Dx()
-	photo.Height = img.Bounds().Dx()
+	photo.Height = img.Bounds().Dy()
 	photo.Type = imageTypeForFormat(format)
 
 	if photo.Type == Unknown {

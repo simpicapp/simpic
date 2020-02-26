@@ -2,7 +2,7 @@
     <transition name="fade" appear @after-enter="transitionFinished = true">
         <div class="background" :class="{darker}" @click="handleBackgroundClick">
             <transition name="fade" @after-leave="$emit('close')">
-                <div @click.stop v-if="showContent">
+                <div @click.stop v-show="showContent">
                     <slot></slot>
                 </div>
             </transition>

@@ -1,11 +1,11 @@
 <template>
     <modal @close="$router.push('../')" :should-close="close" :darker="true">
-        <div id="lightbox" @click="close = true">
+        <div id="lightbox" @click="close = true" ref="container">
             <div id="prev-overlay" @click.stop.prevent="$emit('go-to-previous-image')">
                 <span>←</span>
             </div>
             <div id="close">&times; Close</div>
-            <img :src="'/data/image/' + id" @click.stop>
+            <canvas ref="canvas" :width="width" :height="height" @click.stop></canvas>
             <div id="next-overlay" @click.stop.prevent="$emit('go-to-next-image')">
                 <span>→</span>
             </div>
@@ -26,11 +26,6 @@
         justify-content: center;
         overscroll-behavior: contain;
         flex-direction: column;
-    }
-
-    img {
-        max-width: 95%;
-        max-height: 90%;
     }
 
     #close {
@@ -57,6 +52,7 @@
         font-size: xx-large;
         color: #999;
         cursor: pointer;
+        user-select: none;
 
         &:hover {
             background: #ffffff33;
@@ -75,15 +71,21 @@
 
 <script>
   import Modal from './modal'
+  import { cache } from './cache'
 
   export default {
     components: { Modal },
     props: ['id'],
+
     data () {
       return {
-        close: false
+        close: false,
+        height: 0,
+        metadata: {},
+        width: 0
       }
     },
+
     methods: {
       handleKey (event) {
         if (event.code === 'Escape') {
@@ -93,13 +95,63 @@
         } else if (event.code === 'ArrowRight') {
           this.$emit('go-to-next-image')
         }
+      },
+
+      handleResize () {
+        this.setSize()
+        this.$nextTick(this.startLoading)
+      },
+
+      setSize () {
+        const widthRatio = this.metadata.width / (window.innerWidth * 0.95)
+        const heightRatio = this.metadata.height / (window.innerHeight * 0.90)
+        const scale = Math.max(1, widthRatio, heightRatio)
+
+        this.width = Math.round(this.metadata.width / scale)
+        this.height = Math.round(this.metadata.height / scale)
+      },
+
+      startLoading () {
+        const id = this.id
+        cache.getMetadata(this.id).then((metadata) => {
+          if (this.id !== id) { throw Error('wrong-id') }
+          this.metadata = metadata
+          this.setSize()
+          return cache.getThumbnail(this.id)
+        }).then((img) => {
+          if (this.id !== id) { throw Error('wrong-id') }
+          const ctx = this.$refs.canvas.getContext('2d')
+          ctx.filter = 'blur(2px)'
+          ctx.drawImage(img, 0, 0, this.width, this.height)
+          return cache.getImage(this.id)
+        }).then((img) => {
+          if (this.id !== id) { throw Error('wrong-id') }
+          const ctx = this.$refs.canvas.getContext('2d')
+          ctx.filter = 'none'
+          ctx.drawImage(img, 0, 0, this.width, this.height)
+        }).catch((err) => {
+          if (err.message !== 'wrong-id') {
+            console.log(err)
+          }
+        })
       }
     },
+
+    watch: {
+      id () {
+        this.startLoading()
+      }
+    },
+
     mounted () {
       window.addEventListener('keyup', this.handleKey)
+      window.addEventListener('resize', this.handleResize)
+      this.$nextTick(this.startLoading)
     },
+
     destroyed () {
       window.removeEventListener('keyup', this.handleKey)
+      window.removeEventListener('resize', this.handleResize)
     }
   }
 </script>

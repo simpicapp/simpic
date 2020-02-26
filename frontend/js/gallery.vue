@@ -59,6 +59,7 @@
   import { EventBus } from './bus'
   import thumbnail from './thumbnail'
   import GalleryToolbar from './gallery-toolbar'
+  import { cache } from './cache'
 
   export default {
     components: {
@@ -158,6 +159,7 @@
           this.offset = this.offset + data.length
           this.hasMore = data.length > 0
           this.loading = false
+          cache.storeMetadata(data)
         })
       }
     },

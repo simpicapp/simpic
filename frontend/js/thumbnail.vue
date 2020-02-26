@@ -98,6 +98,8 @@
 </style>
 
 <script>
+  import { cache } from './cache'
+
   export default {
     props: ['id', 'caption', 'selecting', 'selected'],
     data () {
@@ -134,8 +136,7 @@
       }
     },
     mounted () {
-      const image = new Image()
-      image.onload = () => {
+      cache.getThumbnail(this.id).then((image) => {
         const canvas = document.createElement('canvas')
         canvas.width = image.naturalWidth
         canvas.height = image.naturalHeight
@@ -144,8 +145,7 @@
         this.styles.maxWidth = (image.naturalWidth * 1.5) + 'px'
         this.styles.flexBasis = image.naturalWidth + 'px'
         this.styles.backgroundImage = 'url(' + canvas.toDataURL('image/jpeg') + ')'
-      }
-      image.src = '/data/thumb/' + this.id
+      })
     }
   }
 </script>
