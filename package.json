@@ -4,6 +4,7 @@
   "description": "= Simpic",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint --ext .js,.vue frontend",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

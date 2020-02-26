@@ -1,0 +1,13 @@
+os: "linux"
+
+jobs:
+  include:
+    - name: "Backend"
+      language: go
+      go: "1.14"
+
+    - name: "Frontend"
+      language: node_js
+      node_js: "12"
+      script:
+        - npm run lint
