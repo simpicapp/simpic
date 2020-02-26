@@ -19,7 +19,6 @@
                    :selecting="selecting"
                    @selected="handleItemSelected"
                    @deselected="handleItemDeselected"
-                   @showing-photo="handleLightboxDisplayed"
                    @select-range="handleSelectRange"
         ></thumbnail>
 
@@ -76,8 +75,7 @@
         loading: true,
         offset: 0,
         photos: [],
-        selection: {},
-        showing: null
+        selection: {}
       }
     },
     computed: {
@@ -101,21 +99,13 @@
         this.$set(this.selection, id, true)
         this.lastSelection = id
       },
-      handleLightboxDisplayed (id) {
-        const comp = this
-        this.photos.forEach(function (photo, index) {
-          if (photo.id === id) {
-            comp.showing = index
-          }
-        })
+      handleLightboxNext (id) {
+        const index = (_.findIndex(this.photos, { id }) + 1) % this.photos.length
+        this.$router.push({ path: this.photos[index].id })
       },
-      handleLightboxNext () {
-        this.showing = (this.showing + 1) % this.photos.length
-        this.$router.push({ path: this.photos[this.showing].id })
-      },
-      handleLightboxPrevious () {
-        this.showing = (this.showing - 1 + this.photos.length) % this.photos.length
-        this.$router.push({ path: this.photos[this.showing].id })
+      handleLightboxPrevious (id) {
+        const index = (_.findIndex(this.photos, { id }) - 1 + this.photos.length) % this.photos.length
+        this.$router.push({ path: this.photos[index].id })
       },
       handleSelectRange (id) {
         if (this.selection.length === 0 || this.lastSelection === null) {

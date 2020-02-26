@@ -1,12 +1,12 @@
 <template>
     <modal @close="$router.push('../')" :should-close="close" :darker="true">
         <div id="lightbox" @click="close = true" ref="container">
-            <div id="prev-overlay" @click.stop.prevent="$emit('go-to-previous-image')">
+            <div id="prev-overlay" @click.stop.prevent="$emit('go-to-previous-image', this.id)">
                 <span>←</span>
             </div>
             <div id="close">&times; Close</div>
             <canvas ref="canvas" :width="width" :height="height" @click.stop></canvas>
-            <div id="next-overlay" @click.stop.prevent="$emit('go-to-next-image')">
+            <div id="next-overlay" @click.stop.prevent="$emit('go-to-next-image', this.id)">
                 <span>→</span>
             </div>
         </div>
@@ -91,9 +91,9 @@
         if (event.code === 'Escape') {
           this.close = true
         } else if (event.code === 'ArrowLeft') {
-          this.$emit('go-to-previous-image')
+          this.$emit('go-to-previous-image', this.id)
         } else if (event.code === 'ArrowRight') {
-          this.$emit('go-to-next-image')
+          this.$emit('go-to-next-image', this.id)
         }
       },
 

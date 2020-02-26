@@ -112,8 +112,8 @@
           // Shift+click is a shortcut for range selection
           this.$emit('select-range', this.imageId)
         } else {
+          // Otherwise just show the lightbox
           this.$router.push({ path: 'photo/' + this.imageId })
-          this.$emit('showing-photo', this.imageId)
         }
       },
       handleToggle () {
