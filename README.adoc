@@ -1,27 +1,52 @@
-image::resources/banner.png[Simpic]
+:figure-caption!:
+image::resources/banner.png?raw=true[Simpic]
 
 Simpic is a simple picture hosting service, effectively a slimmed down and self-hosted alternative to Google Photos.
 
-== Feature status
+== Features
 
-Simpic is currently pre-MVP. Unless you want to help develop it, there's probably not much here for you yet.
-You can see planned features in the https://github.com/simpicapp/simpic/issues[issue tracker].
+[.float-group]
+--
+.Timeline view
+[link=resources/screenshots/v1-timeline.jpg?raw=true]
+image::resources/screenshots/v1-timeline.jpg?raw=true[Simpic's timeline view,width=320,float="left"]
+
+.Album list
+[link=resources/screenshots/v1-albums.jpg?raw=true]
+image::resources/screenshots/v1-albums.jpg?raw=true[Simpic's album view,width=320,float="left"]
+--
+
+* Quickly and easily upload files by dragging and dropping them to your browser
+* View all files in an infinite-scrolling timeline view
+* Click on images to pop them out in a lightbox
+* Bulk select images with ctrl+click and shift+click shortcuts
+* Organise images into albums for easy browsing
+
+Simpic is still early in its life, and at this point is considered a "minimal viable product".
+That means it works, but it does as little as possible while still being useful!
+You can see planned features in the https://github.com/simpicapp/simpic/issues[issue tracker];
+feel free to chime in if you have suggestions or spot bugs!
 
 == Running
 
-The simplest and easiest approach to running Simpic is to use Docker. You can use the example
-docker-compose.yml file in this repository to quickly build footnote:[Eventually Simpic will
-be published to Docker Hub and you'll be able to pull the image from there instead of
-building yourself.] and start an instance of Simpic alongside its own Postgres server.
+Simpic is intended to be ran using Docker. If you want to see it distributed in another way,
+please https://github.com/simpicapp/simpic/issues/new[open an issue] and tell us about it.
 
-Assuming you have https://docs.docker.com/install/[installed docker]
-and https://docs.docker.com/compose/install/[docker-compose], all you need to do is:
+Simpic requires a Postgres database to use to store meta-data, and a directory on disk where
+it can write photos and thumbnails to. At present Simpic expects to be ran behind a reverse
+proxy that can handle TLS termination for it.
+
+You can get a copy of Simpic and a Postgres database for it to use by using the
+example docker-compose.yml file in this repository. Assuming you have
+https://docs.docker.com/install/[installed docker]
+and https://docs.docker.com/compose/install/[docker-compose], all you need to do is
+grab the file, change the passwords to your liking, and then:
 
 ----
 docker-compose up -d
 ----
 
-And then Simpic will be accessible on port 8080.
+Simpic will be accessible on port 8080.
 
 === Configuration
 

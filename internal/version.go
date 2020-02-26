@@ -25,7 +25,7 @@ func GetVersionString() string {
 	parts := strings.SplitN(GitTag, "-", 2)
 	if len(parts) > 1 {
 		// Some kind of untagged version
-		return fmt.Sprintf("Simpic/%s+unreleased (%s)", parts[0], GitSHA)
+		return fmt.Sprintf("Simpic/%s+dev (%s)", parts[0], GitSHA)
 	}
 
 	// Actual tagged commit

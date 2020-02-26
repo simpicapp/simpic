@@ -51,7 +51,7 @@
           return 'Pre-release build'
         } else {
           const parts = this.$root.gitTag.split('-')
-          return parts[0] + (parts.length > 1 ? '+changes' : '')
+          return parts[0] + (parts.length > 1 ? '+dev' : '')
         }
       }
     }
