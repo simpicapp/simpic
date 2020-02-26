@@ -121,7 +121,8 @@
         }).then((img) => {
           if (this.id !== id) { throw Error('wrong-id') }
           const ctx = this.$refs.canvas.getContext('2d')
-          ctx.filter = 'blur(2px)'
+          ctx.filter = 'blur(4px)'
+          ctx.clearRect(0, 0, this.width, this.height)
           ctx.drawImage(img, 0, 0, this.width, this.height)
           return cache.getImage(this.id)
         }).then((img) => {
