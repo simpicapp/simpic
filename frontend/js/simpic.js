@@ -48,6 +48,8 @@ new Vue({
     ]
   }),
   data: {
+    gitSHA: '',
+    gitTag: '',
     loggedIn: false,
     username: ''
   },

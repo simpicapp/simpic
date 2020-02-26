@@ -9,7 +9,7 @@ import (
 
 func (s *server) routes() http.Handler {
 	r := createRouter()
-	r.Use(s.authenticatedContext)
+	r.Use(s.authenticatedContext, s.provideVersion)
 	r.Post("/login", s.handleAuthenticate())
 	r.Get("/timeline", s.handleTimeline())
 

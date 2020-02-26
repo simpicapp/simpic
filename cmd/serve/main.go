@@ -39,7 +39,7 @@ func main() {
 	startServer()
 	startPruningSessions()
 
-	log.Println("Simpic has started")
+	log.Printf("%s has started\n", internal.GetVersionString())
 
 	<-c
 

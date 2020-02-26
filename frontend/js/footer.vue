@@ -1,7 +1,8 @@
 <template>
     <footer>
         <a href="https://simpic.app/">Simpic - simple self-hosted picture manager</a> &middot;
-        <span class="version">pre-mvp development build</span>
+        <span class="version">{{ versionName }}</span>
+        <a :href="`https://github.com/simpicapp/simpic/commit/${$root.gitSHA}`" class="sha" v-if="$root.gitSHA">({{ $root.gitSHA }})</a>
     </footer>
 </template>
 
@@ -20,8 +21,18 @@
     a {
         color: black;
         transition: color 300ms linear;
+
         &:hover {
             color: blue;
+        }
+
+        &.sha {
+            color: #999999;
+            text-decoration: none;
+
+            &:hover {
+                color: black;
+            }
         }
     }
 
@@ -29,3 +40,20 @@
         color: #333;
     }
 </style>
+
+<script>
+  export default {
+    computed: {
+      versionName () {
+        if (this.$root.gitTag === '') {
+          return 'Unknown release'
+        } else if (this.$root.gitTag === this.$root.gitSHA) {
+          return 'Pre-release build'
+        } else {
+          const parts = this.$root.gitTag.split('-')
+          return parts[0] + (parts.length > 1 ? '+changes' : '')
+        }
+      }
+    }
+  }
+</script>
