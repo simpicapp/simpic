@@ -7,8 +7,6 @@
                          @clear-selection="clearSelection">
         </gallery-toolbar>
 
-        <p v-if="loading">Loading...</p>
-
         <router-view @go-to-previous-image="handleLightboxPrevious"
                      @go-to-next-image="handleLightboxNext"
         ></router-view>
@@ -24,6 +22,8 @@
                    @showing-photo="handleLightboxDisplayed"
                    @select-range="handleSelectRange"
         ></thumbnail>
+
+        <spinner v-if="loading"></spinner>
 
         <div class="nothing-here" v-if="!loading && photos.length === 0">
             <div>
@@ -57,14 +57,16 @@
   import _ from 'lodash'
   import Axios from 'axios'
   import { EventBus } from './bus'
-  import thumbnail from './thumbnail'
+  import Thumbnail from './thumbnail'
   import GalleryToolbar from './gallery-toolbar'
+  import Spinner from './spinner'
   import { cache } from './cache'
 
   export default {
     components: {
       GalleryToolbar,
-      thumbnail
+      Spinner,
+      Thumbnail
     },
     props: ['album', 'endpoint'],
     data: function () {
