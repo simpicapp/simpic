@@ -19,6 +19,7 @@
 
     a {
         color: black;
+        transition: color 300ms linear;
         &:hover {
             color: blue;
         }

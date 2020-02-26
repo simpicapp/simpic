@@ -54,6 +54,8 @@
             justify-content: center;
             border-left: 1px solid darken(vars.$primary, 10%);
             border-right: 1px solid darken(vars.$primary, 10%);
+            background-color: vars.$primary;
+            transition: background-color 200ms ease-in;
 
             &.router-link-active, &:hover {
                 text-decoration: none;
@@ -67,13 +69,14 @@
         }
 
         button {
-            background-color: transparent;
             border: 1px solid white;
             border-radius: 2px;
             color: white;
             padding: 5px 20px;
             cursor: pointer;
             margin-right: 20px;
+            background-color: vars.$primary;
+            transition: background-color 200ms ease-in;
 
             &:hover, &:active {
                 background: lighten(vars.$primary, 5%);
