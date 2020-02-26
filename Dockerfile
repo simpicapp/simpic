@@ -1,4 +1,4 @@
-FROM node:12-stretch AS parcel
+FROM node:13-stretch AS parcel
 
 RUN npm install -g parcel-bundler
 RUN mkdir /tmp/site
