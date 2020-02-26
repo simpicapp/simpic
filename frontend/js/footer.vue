@@ -10,7 +10,11 @@
         border-top: 1px solid #ccc;
         background-color: #eee;
         margin-top: 10px;
-        padding: 20px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        column-gap: 10px;
+        padding-left: 20px;
     }
 
     a {

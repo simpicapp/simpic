@@ -1,11 +1,13 @@
 <template>
     <div>
         <toolbar></toolbar>
-        <router-view></router-view>
-        <uploader></uploader>
-        <login></login>
-        <album-picker></album-picker>
-        <toaster></toaster>
+        <div id="content">
+            <router-view></router-view>
+            <uploader></uploader>
+            <login></login>
+            <album-picker></album-picker>
+            <toaster></toaster>
+        </div>
         <bottom-bar></bottom-bar>
     </div>
 </template>
@@ -37,6 +39,10 @@
 
     input[type=submit]:hover, input[type=submit]:active {
         background-color: vars.$primary;
+    }
+
+    #content {
+        min-height: calc(100vh - 90px - 80px)
     }
 </style>
 
