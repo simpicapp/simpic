@@ -109,12 +109,22 @@ func (d *Database) DeleteAlbum(album *Album) error {
 }
 
 func (d *Database) GetAlbum(id uuid.UUID) (album *Album, err error) {
-	err = d.db.Collection("albums").Find("album_uuid", id).One(&album)
+	err = d.db.SelectFrom("albums").
+		Columns(db.Raw("(SELECT COUNT(*) FROM album_contents ac WHERE ac.album_uuid = albums.album_uuid) AS photo_count")).
+		Columns("albums.*").
+		Where("album_uuid", id).
+		One(&album)
 	return
 }
 
 func (d *Database) GetAlbums(offset, count int) (albums []Album, err error) {
-	err = d.db.Collection("albums").Find().OrderBy("album_name").Offset(offset).Limit(count).All(&albums)
+	err = d.db.SelectFrom("albums").
+		Columns(db.Raw("(SELECT COUNT(*) FROM album_contents ac WHERE ac.album_uuid = albums.album_uuid) AS photo_count")).
+		Columns("albums.*").
+		OrderBy("album_name").
+		Offset(offset).
+		Limit(count).
+		All(&albums)
 	return
 }
 

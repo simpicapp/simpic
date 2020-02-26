@@ -124,9 +124,6 @@
           this.$emit('showing-photo', this.id)
         }
       },
-      handleImageLoaded (e) {
-        console.log(e)
-      },
       handleToggle () {
         if (this.selected) {
           this.$emit('deselected', this.id)

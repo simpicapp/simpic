@@ -11,6 +11,7 @@ type Album struct {
 	Cover   *uuid.UUID `json:"cover_photo,omitempty" db:"photo_uuid,omitempty"`
 	Owner   int        `json:"owner_id" db:"album_owner"`
 	Created time.Time  `json:"created" db:"album_created"`
+	Photos  int        `json:"photos" db:"photo_count,omitempty"`
 }
 
 type AlbumEntry struct {
