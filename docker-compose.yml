@@ -4,7 +4,7 @@ version: '3'
 services:
 
   simpic:
-    build: .
+    image: simpicapp/simpic:v1.0
     restart: always
     ports:
       - 8080:8080/tcp
