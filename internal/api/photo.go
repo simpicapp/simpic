@@ -39,6 +39,10 @@ func (s *server) handleDeletePhotos() http.HandlerFunc {
 			}
 		}
 
+		if err := s.db.RefreshMissingCoverImages(); err != nil {
+			log.Printf("Unable to refresh cover images: %v\n", err)
+		}
+
 		w.WriteHeader(http.StatusNoContent)
 	}
 }

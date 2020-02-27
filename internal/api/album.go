@@ -100,6 +100,10 @@ func (s *server) handleAlterPhotosInAlbum() http.HandlerFunc {
 			}
 		}
 
+		if err := s.db.RefreshCoverImage(album.Id); err != nil {
+			log.Printf("Unable to update cover image for album %s: %v\n", album.Id, err)
+		}
+
 		w.WriteHeader(http.StatusNoContent)
 	}
 }
@@ -128,18 +132,5 @@ func (s *server) addToAlbum(user *internal.User, album *internal.Album, ids []uu
 		})
 	}
 
-	err = s.db.AddAlbumPhotos(photos)
-	if err != nil {
-		return fmt.Errorf("unable to add photos: %v", err)
-	}
-
-	if album.Cover == nil {
-		album.Cover = &ids[0]
-		err = s.db.UpdateAlbum(album)
-		if err != nil {
-			log.Printf("unable to update cover for album %s: %v\n", album.Id, err)
-		}
-	}
-
-	return nil
+	return s.db.AddAlbumPhotos(photos)
 }

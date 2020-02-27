@@ -1,0 +1,12 @@
+= Changelog
+
+== v2.0
+
+=== Features
+
+- Added ability to delete albums
+
+=== Fixes
+
+- Fixed version not being set in docker builds
+- Album covers are now updated if you remove that photo from the album

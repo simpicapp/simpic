@@ -170,6 +170,30 @@ func (d *Database) RemoveAlbumPhotos(album uuid.UUID, photos []uuid.UUID) error 
 		Delete()
 }
 
+func (d *Database) RefreshCoverImage(album uuid.UUID) error {
+	_, err := d.db.Update("albums").Where("album_uuid", album).
+		Set("photo_uuid", db.Raw(`(
+			SELECT photo_uuid
+			FROM album_contents
+			WHERE albums.album_uuid = album_contents.album_uuid
+			ORDER BY content_order
+			LIMIT 1
+		)`)).Exec()
+	return err
+}
+
+func (d *Database) RefreshMissingCoverImages() error {
+	_, err := d.db.Update("albums").Where("photo_uuid IS NULL").
+		Set("photo_uuid", db.Raw(`(
+			SELECT photo_uuid
+			FROM album_contents
+			WHERE albums.album_uuid = album_contents.album_uuid
+			ORDER BY content_order
+			LIMIT 1
+		)`)).Exec()
+	return err
+}
+
 //endregion
 
 //region Users
