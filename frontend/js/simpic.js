@@ -49,9 +49,9 @@ new Vue({
   }),
   data: {
     gitSHA: '',
-    gitTag: '',
     loggedIn: false,
-    username: ''
+    username: '',
+    version: '1.0+dev'
   },
   el: '#main',
   components: { App },

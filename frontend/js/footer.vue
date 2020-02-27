@@ -1,7 +1,7 @@
 <template>
     <footer>
         <a href="https://simpic.app/">Simpic - simple self-hosted picture manager</a> &middot;
-        <span class="version">{{ versionName }}</span>
+        <span class="version">{{ $root.version }}</span>
         <a :href="`https://github.com/simpicapp/simpic/commit/${$root.gitSHA}`" class="sha" v-if="$root.gitSHA">({{ $root.gitSHA }})</a>
     </footer>
 </template>
@@ -40,20 +40,3 @@
         color: #333;
     }
 </style>
-
-<script>
-  export default {
-    computed: {
-      versionName () {
-        if (this.$root.gitTag === '') {
-          return 'Unknown release'
-        } else if (this.$root.gitTag === this.$root.gitSHA) {
-          return 'Pre-release build'
-        } else {
-          const parts = this.$root.gitTag.split('-')
-          return parts[0] + (parts.length > 1 ? '+dev' : '')
-        }
-      }
-    }
-  }
-</script>
