@@ -35,6 +35,7 @@
 <script>
   import Album from './album-icon'
   import Axios from 'axios'
+  import { EventBus } from './bus'
 
   export default {
     components: { Album },
@@ -44,11 +45,20 @@
         loading: true
       }
     },
+    methods: {
+      refresh () {
+        Axios.get('albums').then(({ data }) => {
+          this.albums = data
+          this.loading = false
+        })
+      }
+    },
     mounted () {
-      Axios.get('albums').then(({ data }) => {
-        this.albums = data
-        this.loading = false
-      })
+      this.refresh()
+      EventBus.$on('albums-updated', this.refresh)
+    },
+    beforeDestroy () {
+      EventBus.$off('albums-updated', this.refresh)
     }
   }
 </script>

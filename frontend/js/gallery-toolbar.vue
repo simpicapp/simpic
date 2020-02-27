@@ -8,16 +8,11 @@
             <button @click="$emit('clear-selection')">Clear selection</button>
         </aside>
 
-        <modal v-if="showConfirmation" :closeable="false" :should-close="closeConfirmation"
-               @close="showConfirmation = false">
-            <popup title="Confirm deletion" position="center" :closeable="false">
-                <p>Are you sure you wish to delete {{ selectionCount }} photo{{ selectionCount === 1 ? '' : 's'}}?</p>
-                <div class="buttons">
-                    <button @click="doDelete" class="danger-button">Yes, delete</button>
-                    <button @click="cancelDelete">No, cancel</button>
-                </div>
-            </popup>
-        </modal>
+        <DeleteDialog v-if="showConfirmation"
+                      @yes="doDelete"
+                      @close="showConfirmation = false"
+                      :what="`${selectionCount} photo${selectionCount === 1 ? '' : 's'}`">
+        </DeleteDialog>
     </div>
 </template>
 
@@ -51,13 +46,11 @@
 <script>
   import { EventBus } from './bus'
   import Axios from 'axios'
-  import Modal from './modal'
-  import Popup from './popup'
+  import DeleteDialog from './delete-dialog'
 
   export default {
     components: {
-      Modal,
-      Popup
+      DeleteDialog
     },
     props: [
       'selectionCount',
@@ -66,14 +59,10 @@
     ],
     data () {
       return {
-        closeConfirmation: false,
         showConfirmation: false
       }
     },
     methods: {
-      cancelDelete () {
-        this.closeConfirmation = true
-      },
       doDelete () {
         Axios.post('/photos/delete', { photos: Object.keys(this.selection) }).then(() => {
           this.closeConfirmation = true
@@ -93,7 +82,6 @@
         }))
       },
       handleDelete () {
-        this.closeConfirmation = false
         this.showConfirmation = true
       },
       handleRemoveFromAlbum () {
