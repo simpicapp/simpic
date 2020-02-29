@@ -1,6 +1,6 @@
-import Axios from 'axios'
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import './composition-plugin'
 
 import Album from './components/album.vue'
 import Albums from './components/albums.vue'
@@ -49,23 +49,8 @@ new Vue({
   }),
   data: {
     gitSHA: '',
-    loggedIn: false,
-    username: '',
     version: '1.0+dev'
   },
   el: '#main',
-  render: (h) => h(App),
-  methods: {
-    checkUser () {
-      Axios.get('/users/me').then(({ data: { username } }) => {
-        this.username = username;
-        this.loggedIn = true
-      }).catch(() => {
-        this.loggedIn = false
-      })
-    }
-  },
-  created () {
-    this.checkUser()
-  }
+  render: (h) => h(App)
 });

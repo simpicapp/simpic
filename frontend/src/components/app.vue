@@ -47,16 +47,17 @@
 </style>
 
 <script lang="ts">
-  import {throttle} from 'lodash-es'
   import Vue from 'vue'
+  import {defineComponent} from "@vue/composition-api";
 
   import Uploader from './uploader.vue'
   import Login from './login.vue'
   import Toolbar from './toolbar.vue'
   import BottomBar from './footer.vue'
-  import {EventBus} from './bus'
   import AlbumPicker from './album-picker.vue'
   import Toaster from './toaster.vue'
+  import {usesScrollWatcher} from "@/features/scroll";
+  import {useAuthentication} from "@/features/auth";
 
   Vue.directive('focus', {
     inserted: function (el) {
@@ -64,7 +65,7 @@
     }
   });
 
-  export default Vue.extend({
+  export default defineComponent({
     components: {
       AlbumPicker,
       BottomBar,
@@ -73,35 +74,11 @@
       Toolbar,
       Uploader
     },
-    data() {
-      return {
-        bottom: false
-      }
-    },
-    methods: {
-      bottomVisible() {
-        const scrollY = window.scrollY;
-        const visible = document.documentElement.clientHeight;
-        const pageHeight = document.documentElement.scrollHeight;
-        return visible + scrollY >= pageHeight - 400
-      },
-      emitBottom: throttle(() => EventBus.$emit('bottom'), 250),
-      handleScroll() {
-        this.bottom = this.bottomVisible()
-      }
-    },
-    beforeDestroy() {
-      window.removeEventListener('scroll', this.handleScroll)
-    },
-    created() {
-      window.addEventListener('scroll', this.handleScroll)
-    },
-    watch: {
-      bottom(newVal) {
-        if (newVal) {
-          this.emitBottom()
-        }
-      }
+    setup() {
+      usesScrollWatcher();
+
+      const {checkUser} = useAuthentication();
+      checkUser()
     }
   })
 </script>

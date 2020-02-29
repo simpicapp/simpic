@@ -4,10 +4,10 @@
     <router-link to="/timeline/"><span>Timeline</span></router-link>
     <router-link to="/albums/"><span>Albums</span></router-link>
     <span class="grow"></span>
-    <button @click="loginClick" v-if="!$root.loggedIn">Login</button>
+    <button @click="loginClick" v-if="!loggedIn">Login</button>
     <template v-else>
-      <div class="username">Logged in as {{$root.username}}</div>
-      <button @click="logoutClick">Logout</button>
+      <div class="username">Logged in as {{username}}</div>
+      <button @click="logout">Logout</button>
     </template>
   </header>
 </template>
@@ -90,20 +90,23 @@
 </style>
 
 <script>
-  import Axios from 'axios'
   import { EventBus } from './bus'
-  import Vue from 'vue'
+  import { defineComponent } from '@vue/composition-api'
+  import { useAuthentication } from '@/features/auth'
 
-  export default Vue.extend({
+  export default defineComponent({
     methods: {
       loginClick () {
         EventBus.$emit('login')
       },
-      logoutClick () {
-        Axios.get('/logout').then(() => {
-          this.$root.loggedIn = false
-          EventBus.$emit('toast', 'You have been logged out')
-        })
+    },
+    setup () {
+      const { loggedIn, username, logout } = useAuthentication()
+
+      return {
+        loggedIn,
+        username,
+        logout
       }
     }
   })

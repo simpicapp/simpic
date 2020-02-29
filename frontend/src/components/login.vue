@@ -38,63 +38,64 @@
   }
 </style>
 
-<script>
-  import Axios from 'axios'
-  import { EventBus } from './bus'
-  import Popup from './popup'
-  import Modal from './modal'
-  import Vue from 'vue'
+<script lang="ts">
+  import {EventBus} from './bus'
+  import Popup from './popup.vue'
+  import Modal from './modal.vue'
+  import {defineComponent, onMounted, onUnmounted, reactive, toRefs} from '@vue/composition-api'
+  import {useAuthentication} from '@/features/auth'
 
-  export default Vue.extend({
+  export default defineComponent({
     components: {
       Modal,
       Popup
     },
-    data () {
-      return {
+    setup() {
+      const {login} = useAuthentication();
+
+      const state = reactive({
         alert: '',
         close: false,
         loggingIn: false,
         password: '',
         username: '',
         visible: false
-      }
-    },
-    methods: {
-      doLogin () {
-        this.alert = ''
-        this.loggingIn = true
+      });
 
-        Axios.post('/login', {
-          password: this.password,
-          username: this.username
-        }).then(() => {
-          this.$root.checkUser()
-          this.close = true
-          this.username = ''
-          this.password = ''
-          EventBus.$emit('toast', 'You are now logged in')
+      function show() {
+        state.close = false;
+        state.alert = '';
+        state.visible = true;
+      }
+
+      function doLogin() {
+        state.alert = '';
+        state.loggingIn = true;
+
+        login(state.username, state.password).then(() => {
+          state.close = true;
+          state.username = '';
+          state.password = ''
         }).catch((error) => {
           if (error.response) {
-            this.alert = error.response.data.error
+            state.alert = error.response.data.error
           } else {
-            this.alert = error.message
+            state.alert = error.message
           }
         }).finally(() => {
-          this.loggingIn = false
-        })
-      },
-      show () {
-        this.close = false
-        this.alert = ''
-        this.visible = true
+          state.loggingIn = false
+        });
       }
-    },
-    created () {
-      EventBus.$on('login', this.show)
-    },
-    beforeDestroy () {
-      EventBus.$off('login', this.show)
+
+      onMounted(() => {
+        EventBus.$on('login', show)
+      });
+
+      onUnmounted(() => {
+        EventBus.$off('login', show)
+      });
+
+      return {doLogin, ...toRefs(state)}
     }
   })
 </script>
