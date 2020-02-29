@@ -1,13 +1,16 @@
 {
   "compilerOptions": {
     "target": "es5",
+    "allowJs": false,
     "module": "esnext",
     "strict": true,
     "jsx": "preserve",
     "importHelpers": true,
     "moduleResolution": "node",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "baseUrl": ".",
     "outDir": "ts-dist",
