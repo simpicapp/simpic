@@ -57,7 +57,12 @@
 
   export default Vue.extend({
     mixins: [ThumbnailBackground],
-    props: ['id', 'caption', 'photos', 'imageId'],
+    props: {
+      'id': String,
+      'caption': String,
+      'photos': Number,
+      'imageId': String,
+    },
     methods: {
       handleClick() {
         this.$router.push({path: './' + this.id + '/'})

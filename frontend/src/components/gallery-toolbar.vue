@@ -53,11 +53,11 @@
     components: {
       DeleteDialog
     },
-    props: [
-      'selectionCount',
-      'selection',
-      'album'
-    ],
+    props: {
+      album: String,
+      selectionCount: Number,
+      selection: Number,
+    },
     data() {
       return {
         showConfirmation: false

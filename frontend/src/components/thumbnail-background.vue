@@ -3,7 +3,7 @@
   import Vue from 'vue'
 
   export default Vue.extend({
-    props: ['imageId'],
+    props: {imageId: String},
     data() {
       return {
         styles: {

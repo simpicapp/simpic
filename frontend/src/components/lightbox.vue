@@ -85,7 +85,7 @@
 
   export default Vue.extend({
     components: {Modal},
-    props: ['id'],
+    props: {id: String},
 
     data(): State {
       return {
