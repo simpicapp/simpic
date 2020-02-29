@@ -39,11 +39,11 @@
 </style>
 
 <script lang="ts">
-  import {EventBus} from './bus'
   import Popup from './popup.vue'
   import Modal from './modal.vue'
-  import {defineComponent, onMounted, onUnmounted, reactive, toRefs} from '@vue/composition-api'
+  import {defineComponent, reactive, toRefs} from '@vue/composition-api'
   import {useAuthentication} from '@/features/auth'
+  import {useEventListener} from "@/features/eventbus";
 
   export default defineComponent({
     components: {
@@ -61,12 +61,6 @@
         username: '',
         visible: false
       });
-
-      function show() {
-        state.close = false;
-        state.alert = '';
-        state.visible = true;
-      }
 
       function doLogin() {
         state.alert = '';
@@ -87,12 +81,10 @@
         });
       }
 
-      onMounted(() => {
-        EventBus.$on('login', show)
-      });
-
-      onUnmounted(() => {
-        EventBus.$off('login', show)
+      useEventListener('login', () => {
+        state.close = false;
+        state.alert = '';
+        state.visible = true;
       });
 
       return {doLogin, ...toRefs(state)}

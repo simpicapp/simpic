@@ -70,8 +70,9 @@
   import Axios from 'axios'
   import {EventBus} from './bus'
   import Popup from './popup.vue'
-  import {defineComponent, onMounted, onUnmounted, reactive, toRefs} from '@vue/composition-api'
+  import {defineComponent, reactive, toRefs} from '@vue/composition-api'
   import {useAuthentication} from "@/features/auth";
+  import {useDocumentListener} from "@/features/listeners";
 
   export default defineComponent({
     components: {
@@ -136,22 +137,19 @@
         }
       }
 
-      function dragEnterHandler(e: DragEvent) {
-        if (e.dataTransfer && e.dataTransfer.types.includes('Files')) {
-          e.stopPropagation();
-          e.preventDefault();
-          state.dragging = true;
-          stopDragging.cancel()
-        }
-      }
-
-      function dragLeaveHandler(e: DragEvent) {
+      useDocumentListener('drop', (e) => {
         e.stopPropagation();
         e.preventDefault();
-        stopDragging()
-      }
 
-      function dragOverHandler(e: DragEvent) {
+        stopDragging.cancel();
+        state.dragging = false;
+
+        if (e.dataTransfer && loggedIn.value) {
+          Array.from(e.dataTransfer.files).forEach(acceptNewFile)
+        }
+      });
+
+      useDocumentListener('dragover', (e) => {
         if (e.dataTransfer && e.dataTransfer.types.includes('Files')) {
           e.stopPropagation();
           e.preventDefault();
@@ -166,32 +164,21 @@
           state.dragging = true;
           stopDragging.cancel()
         }
-      }
-
-      function dropHandler(e: DragEvent) {
-        e.stopPropagation();
-        e.preventDefault();
-
-        stopDragging.cancel();
-        state.dragging = false;
-
-        if (e.dataTransfer && loggedIn.value) {
-          Array.from(e.dataTransfer.files).forEach(acceptNewFile)
-        }
-      }
-
-      onMounted(() => {
-        document.addEventListener('drop', dropHandler);
-        document.addEventListener('dragover', dragOverHandler);
-        document.addEventListener('dragenter', dragEnterHandler);
-        document.addEventListener('dragleave', dragLeaveHandler)
       });
 
-      onUnmounted(() => {
-        document.removeEventListener('drop', dropHandler);
-        document.removeEventListener('dragover', dragOverHandler);
-        document.removeEventListener('dragenter', dragEnterHandler);
-        document.removeEventListener('dragleave', dragLeaveHandler)
+      useDocumentListener('dragenter', (e) => {
+        if (e.dataTransfer && e.dataTransfer.types.includes('Files')) {
+          e.stopPropagation();
+          e.preventDefault();
+          state.dragging = true;
+          stopDragging.cancel()
+        }
+      });
+
+      useDocumentListener('dragleave', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        stopDragging()
       });
 
       return {loggedIn, ...toRefs(state)}

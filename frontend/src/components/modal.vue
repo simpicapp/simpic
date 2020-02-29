@@ -37,7 +37,8 @@
 </style>
 
 <script lang="ts">
-  import {computed, defineComponent, onMounted, onUnmounted, reactive, toRefs} from "@vue/composition-api";
+  import {computed, defineComponent, reactive, toRefs} from "@vue/composition-api";
+  import {useWindowListener} from "@/features/listeners";
 
   // Modal has a double stage animation: background, then content.
   //
@@ -68,14 +69,11 @@
         }
       }
 
-      function handleKey(event: KeyboardEvent) {
+      useWindowListener('keyup', (event) => {
         if (props.closeable && event.code === 'Escape') {
           state.closing = false
         }
-      }
-
-      onMounted(() => window.addEventListener('keyup', handleKey));
-      onUnmounted(() => window.removeEventListener('keyup', handleKey));
+      });
 
       const showContent = computed(() => !props.shouldClose && !state.closing && state.transitionFinished);
 
