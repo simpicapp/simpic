@@ -8,7 +8,8 @@
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
-    "lint": "vue-cli-service lint --no-fix"
+    "lint": "vue-cli-service lint --no-fix",
+    "check-format": "prettier --check 'src/**/*.ts' 'src/**/*.vue'"
   },
   "dependencies": {
     "@vue/composition-api": "^0.4.0",
