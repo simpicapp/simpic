@@ -4,7 +4,7 @@
                      :selection="selection"
                      :selection-count="selectionCount"
                      @clear-selection="clearSelection"
-                     v-if="$root.loggedIn">
+                     v-if="loggedIn">
     </gallery-toolbar>
 
     <router-view @go-to-next-image="handleLightboxNext"
@@ -27,7 +27,7 @@
     <div class="nothing-here" v-if="!loading && photos.length === 0">
       <div>
         <p>There's nothing here</p>
-        <p v-if="!$root.loggedIn">
+        <p v-if="!loggedIn">
           You might need to login to see this content.
         </p>
         <p v-else-if="!!album">
@@ -52,118 +52,154 @@
   }
 </style>
 
-<script>
-  import { findIndex } from 'lodash-es'
+<script lang="ts">
+  import {findIndex} from 'lodash-es'
   import Axios from 'axios'
-  import { EventBus } from './bus'
-  import Thumbnail from './thumbnail'
-  import GalleryToolbar from './gallery-toolbar'
-  import Spinner from './spinner'
-  import { cache } from './cache'
-  import Vue from 'vue'
+  import Thumbnail from './thumbnail.vue'
+  import GalleryToolbar from './gallery-toolbar.vue'
+  import Spinner from './spinner.vue'
+  import {cache} from './cache'
+  import {computed, defineComponent, onMounted, reactive, toRefs} from '@vue/composition-api'
+  import {useAuthentication} from '@/features/auth'
+  import {useScrollWatcher} from '@/features/scroll'
+  import Vue from "vue";
+  import {useRouter} from "@/features/router";
+  import {Data} from "@vue/composition-api/dist/component";
+  import {useEventListener} from "@/features/eventbus";
 
-  export default Vue.extend({
+  export default defineComponent({
     components: {
       GalleryToolbar,
       Spinner,
       Thumbnail
     },
-    props: ['album', 'endpoint'],
-    data: function () {
-      return {
+    props: {
+      'album': String,
+      'endpoint': String
+    },
+    setup(props) {
+      const {router} = useRouter();
+      const {loggedIn} = useAuthentication();
+
+      interface Photo {
+        id: string;
+      }
+
+      interface Selection {
+        [key: string]: boolean;
+      }
+
+      interface State extends Data {
+        hasMore: boolean;
+        lastSelection: null | string;
+        loading: boolean;
+        offset: number;
+        photos: Array<Photo>;
+        selection: Selection;
+      }
+
+      const state: State = reactive({
         hasMore: true,
         lastSelection: null,
         loading: true,
         offset: 0,
         photos: [],
         selection: {}
-      }
-    },
-    computed: {
-      selecting () {
-        return this.selectionCount > 0
-      },
-      selectionCount () {
-        return Object.keys(this.selection).length
-      }
-    },
-    methods: {
-      clearSelection () {
-        this.selection = {}
-        this.lastSelection = null
-      },
-      handleItemDeselected (id) {
-        this.$delete(this.selection, id)
-        this.lastSelection = null
-      },
-      handleItemSelected (id) {
-        this.$set(this.selection, id, true)
-        this.lastSelection = id
-      },
-      handleLightboxNext (id) {
-        const index = (findIndex(this.photos, { id }) + 1) % this.photos.length
-        this.$router.push({ path: this.photos[index].id })
-      },
-      handleLightboxPrevious (id) {
-        const index = (findIndex(this.photos, { id }) - 1 + this.photos.length) % this.photos.length
-        this.$router.push({ path: this.photos[index].id })
-      },
-      handleSelectRange (id) {
-        if (this.selection.length === 0 || this.lastSelection === null) {
-          this.handleItemSelected(id)
-        } else {
-          const lastIndex = findIndex(this.photos, { id: this.lastSelection })
-          const ourIndex = findIndex(this.photos, { id: id })
+      });
 
-          let slice = []
-          if (lastIndex < ourIndex) {
-            slice = this.photos.slice(lastIndex + 1, ourIndex + 1)
-          } else if (ourIndex < lastIndex) {
-            slice = this.photos.slice(ourIndex, lastIndex)
-          }
+      function update() {
+        state.loading = true;
 
-          slice.map((p) => p.id).forEach((id) => {
-            this.$set(this.selection, id, true)
-          })
-
-          this.lastSelection = id
-        }
-      },
-      infiniteScroll () {
-        if (!this.loading && this.hasMore) {
-          this.update()
-        }
-      },
-      refresh () {
-        this.selection = {}
-        this.offset = 0
-        this.hasMore = true
-        this.update()
-      },
-      update () {
-        this.loading = true
-
-        Axios.get(this.endpoint + '?offset=' + this.offset).then(({ data }) => {
-          if (this.offset === 0) {
-            this.photos = data
+        Axios.get(props.endpoint + '?offset=' + state.offset).then(({data}) => {
+          if (state.offset === 0) {
+            state.photos = data
           } else {
-            this.photos = this.photos.concat(data)
+            state.photos = state.photos.concat(data)
           }
-          this.offset = this.offset + data.length
-          this.hasMore = data.length > 0
-          this.loading = false
+          state.offset = state.offset + data.length;
+          state.hasMore = data.length > 0;
+          state.loading = false;
           cache.storeMetadata(data)
         })
       }
-    },
-    beforeDestroy () {
-      EventBus.$off('bottom', this.infiniteScroll)
-      EventBus.$off('refresh-gallery', this.refresh)
-    },
-    mounted () {
-      this.update()
-      EventBus.$on('bottom', this.infiniteScroll)
-      EventBus.$on('refresh-gallery', this.refresh)
+
+      onMounted(update);
+
+      useScrollWatcher(() => {
+        if (!state.loading && state.hasMore) {
+          update()
+        }
+      });
+
+      useEventListener('refresh-gallery', () => {
+        state.selection = {};
+        state.offset = 0;
+        state.hasMore = true;
+        update()
+      });
+
+      const selectionCount = computed(() => Object.keys(state.selection).length);
+      const selecting = computed(() => selectionCount.value > 0);
+
+      function clearSelection() {
+        state.selection = {};
+        state.lastSelection = null
+      }
+
+      function handleItemDeselected(id: string) {
+        Vue.delete(state.selection, id);
+        state.lastSelection = null
+      }
+
+      function handleItemSelected(id: string) {
+        Vue.set(state.selection, id, true);
+        state.lastSelection = id
+      }
+
+      function handleLightboxNext(id: string) {
+        const index = (findIndex(state.photos, {id}) + 1) % state.photos.length;
+        router.push({path: state.photos[index].id})
+      }
+
+      function handleLightboxPrevious(id: string) {
+        const index = (findIndex(state.photos, {id}) - 1 + state.photos.length) % state.photos.length;
+        router.push({path: state.photos[index].id})
+      }
+
+      function handleSelectRange(id: string) {
+        if (Object.keys(state.selection).length === 0 || state.lastSelection === null) {
+          handleItemSelected(id)
+        } else {
+          const lastIndex = findIndex(state.photos, {id: state.lastSelection});
+          const ourIndex = findIndex(state.photos, {id: id});
+
+          let slice: Photo[] = [];
+          if (lastIndex < ourIndex) {
+            slice = state.photos.slice(lastIndex + 1, ourIndex + 1)
+          } else if (ourIndex < lastIndex) {
+            slice = state.photos.slice(ourIndex, lastIndex)
+          }
+
+          slice.map((p) => p.id).forEach((id) => {
+            Vue.set(state.selection, id, true)
+          });
+
+          state.lastSelection = id
+        }
+      }
+
+      return {
+        loggedIn,
+        selecting,
+        selectionCount,
+        clearSelection,
+        handleLightboxNext,
+        handleLightboxPrevious,
+        handleItemSelected,
+        handleItemDeselected,
+        handleSelectRange,
+        ...toRefs(state)
+      }
     }
   })
 </script>

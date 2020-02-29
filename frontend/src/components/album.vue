@@ -3,7 +3,7 @@
     <div class="toolbar">
       <h2>{{ name }}</h2>
       <ActionIcon :working="deleting" @click="confirmDelete()" name="trash-alt"
-                  v-if="$root.loggedIn"></ActionIcon>
+                  v-if="loggedIn"></ActionIcon>
     </div>
     <gallery :album="id" :endpoint="'/albums/' + id + '/photos'"></gallery>
 
@@ -42,50 +42,57 @@
   import {EventBus} from './bus'
   import ActionIcon from './action-icon.vue'
   import DeleteDialog from './delete-dialog.vue'
-  import Vue from 'vue'
+  import {defineComponent, onMounted, reactive, toRefs} from "@vue/composition-api";
+  import {useRouter} from "@/features/router";
+  import {useAuthentication} from "@/features/auth";
+  import {useEventListener} from "@/features/eventbus";
 
-  export default Vue.extend({
+  export default defineComponent({
     components: {
       ActionIcon,
       DeleteDialog,
       Gallery
     },
-    props: ['id'],
-    data() {
-      return {
-        deleting: false,
-        name: '',
-        showConfirmation: false
-      }
+    props: {
+      'id': String
     },
-    methods: {
-      confirmDelete() {
-        this.showConfirmation = true
-      },
-      doDelete() {
-        this.deleting = true;
-        Axios.delete('/albums/' + this.id).then(() => {
-          EventBus.$emit('albums-updated');
-          EventBus.$emit('toast', 'Album deleted');
-          this.deleting = false;
-          this.$router.replace('/albums')
-        })
-      },
-      handleAlbumUpdated(album: string) {
-        if (album === this.id) {
+    setup(props) {
+      const {router} = useRouter();
+      const {loggedIn} = useAuthentication();
+
+      useEventListener('album-updated', (album: string) => {
+        if (album === props.id) {
           EventBus.$emit('refresh-gallery')
         }
-      }
-    },
-    mounted() {
-      Axios.get('/albums/' + this.id).then(({data: {name}}) => {
-        this.name = name
       });
 
-      EventBus.$on('album-updated', this.handleAlbumUpdated)
-    },
-    destroyed() {
-      EventBus.$off('album-updated', this.handleAlbumUpdated)
+      const state = reactive({
+        name: '',
+        showConfirmation: false,
+        deleting: false
+      });
+
+      function confirmDelete() {
+        state.showConfirmation = true
+      }
+
+      function doDelete() {
+        state.deleting = true;
+        Axios.delete('/albums/' + props.id).then(() => {
+          EventBus.$emit('albums-updated');
+          EventBus.$emit('toast', 'Album deleted');
+          state.deleting = false;
+          router.replace('/albums')
+        })
+      }
+
+      onMounted(() => {
+        Axios.get('/albums/' + props.id).then(({data: {name}}) => {
+          state.name = name
+        })
+      });
+
+      return {confirmDelete, doDelete, loggedIn, ...toRefs(state)};
     }
   })
 </script>

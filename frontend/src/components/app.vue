@@ -56,7 +56,6 @@
   import BottomBar from './footer.vue'
   import AlbumPicker from './album-picker.vue'
   import Toaster from './toaster.vue'
-  import {usesScrollWatcher} from "@/features/scroll";
   import {useAuthentication} from "@/features/auth";
 
   Vue.directive('focus', {
@@ -75,8 +74,6 @@
       Uploader
     },
     setup() {
-      usesScrollWatcher();
-
       const {checkUser} = useAuthentication();
       checkUser()
     }

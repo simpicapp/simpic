@@ -1,15 +1,12 @@
 import Axios from 'axios'
 import {castArray} from 'lodash-es'
 import LRUMap from 'mnemonist/lru-map'
-
-interface Metadata {
-  id: string;
-}
+import {Photo} from "@/model/photo";
 
 class Cache {
   private readonly _cachedImages: LRUMap<string, Promise<HTMLImageElement>>;
   private readonly _cachedThumbnails: LRUMap<string, Promise<HTMLImageElement>>;
-  private readonly _cachedMetadata: LRUMap<string, Promise<Metadata>>;
+  private readonly _cachedMetadata: LRUMap<string, Promise<Photo>>;
 
   constructor() {
     this._cachedImages = new LRUMap(10);
@@ -17,21 +14,26 @@ class Cache {
     this._cachedThumbnails = new LRUMap(1000)
   }
 
-  storeMetadata(metadata: Metadata | Array<Metadata>) {
+  storeMetadata(metadata: Photo | Array<Photo>) {
     castArray(metadata).forEach((m) => {
       this._cachedMetadata.set(m.id, Promise.resolve(m))
     })
   }
 
-  getMetadata(id: string) {
-    if (!this._cachedMetadata.has(id)) {
-      this._cachedMetadata.set(id, Axios
-        .get('/photos/' + id)
-        .then(({data}) => {
-          return data
-        }))
+  getMetadata(id: string): Promise<Photo> {
+    const cached = this._cachedMetadata.get(id);
+    if (cached) {
+      return cached;
     }
-    return this._cachedMetadata.get(id)
+
+    const created = Axios
+      .get('/photos/' + id)
+      .then(({data}) => {
+        return data
+      });
+
+    this._cachedMetadata.set(id, created);
+    return created;
   }
 
   getThumbnail(id: string) {

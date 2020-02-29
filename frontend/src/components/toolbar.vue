@@ -89,19 +89,19 @@
   }
 </style>
 
-<script>
-  import { EventBus } from './bus'
-  import { defineComponent } from '@vue/composition-api'
-  import { useAuthentication } from '@/features/auth'
+<script lang="ts">
+  import {EventBus} from './bus'
+  import {defineComponent} from '@vue/composition-api'
+  import {useAuthentication} from '@/features/auth'
 
   export default defineComponent({
     methods: {
-      loginClick () {
+      loginClick() {
         EventBus.$emit('login')
       },
     },
-    setup () {
-      const { loggedIn, username, logout } = useAuthentication()
+    setup() {
+      const {loggedIn, username, logout} = useAuthentication();
 
       return {
         loggedIn,

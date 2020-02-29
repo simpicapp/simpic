@@ -1,11 +1,11 @@
 <template>
   <div>
-    <div class="upload-overlay" v-if="dragging && $root.loggedIn">
+    <div class="upload-overlay" v-if="dragging && loggedIn">
       <div id="drop-target">
         Drop files here to add to simpic
       </div>
     </div>
-    <div class="upload-overlay" v-if="dragging && !$root.loggedIn">
+    <div class="upload-overlay" v-if="dragging && !loggedIn">
       <div id="upload-login-prompt">
         You need to login before uploading files
       </div>
@@ -65,115 +65,136 @@
   }
 </style>
 
-<script>
-  import { debounce } from 'lodash-es'
+<script lang="ts">
+  import {debounce} from 'lodash-es'
   import Axios from 'axios'
-  import { EventBus } from './bus'
-  import popup from './popup'
-  import Vue from 'vue'
+  import {EventBus} from './bus'
+  import Popup from './popup.vue'
+  import {defineComponent, onMounted, onUnmounted, reactive, toRefs} from '@vue/composition-api'
+  import {useAuthentication} from "@/features/auth";
 
-  export default Vue.extend({
+  export default defineComponent({
     components: {
-      popup
+      Popup
     },
-    data () {
-      return {
-        dragging: false,
-        files: [],
-        nextUpload: 0,
-        stopDragging: debounce(function () {
-          this.dragging = false
-        }, 100),
-        visible: false
+    setup() {
+      const {loggedIn} = useAuthentication();
+
+      interface Upload {
+        started: boolean;
+        finished: boolean;
+        failed: boolean;
+        name: string;
+        file: File;
       }
-    },
-    methods: {
-      acceptNewFile (file) {
-        this.files.push({
+
+      let nextUpload = 0;
+
+      const state = reactive({
+        dragging: false,
+        files: new Array<Upload>(),
+        visible: false
+      });
+
+      const stopDragging = debounce(() => {
+        state.dragging = false
+      }, 100);
+
+      function startUpload() {
+        const file = state.files[nextUpload];
+        const formData = new FormData();
+        formData.append('file', file.file);
+        file.started = true;
+
+        Axios.post('/photos', formData).then(() => {
+          file.finished = true;
+          EventBus.$emit('upload-complete')
+        }).catch((e) => {
+          console.log('Failed to upload file', file, e);
+          file.failed = true
+        }).finally(() => {
+          nextUpload++;
+          if (nextUpload <= state.files.length - 1) {
+            startUpload()
+          }
+        })
+      }
+
+      function acceptNewFile(file: File) {
+        state.files.push({
           failed: false,
           file,
           finished: false,
           name: file.name,
           started: false
-        })
+        });
 
-        this.visible = true
+        state.visible = true;
 
-        if (this.nextUpload === this.files.length - 1) {
-          this.startUpload()
+        if (nextUpload === state.files.length - 1) {
+          startUpload()
         }
-      },
-      dragEnterHandler (e) {
-        if (e.dataTransfer.types.includes('Files')) {
-          e.stopPropagation()
-          e.preventDefault()
-          this.dragging = true
-          this.stopDragging.cancel()
-        }
-      },
-      dragLeaveHandler (e) {
-        e.stopPropagation()
-        e.preventDefault()
-        this.stopDragging()
-      },
-      dragOverHandler (e) {
-        if (e.dataTransfer.types.includes('Files')) {
-          e.stopPropagation()
-          e.preventDefault()
+      }
 
-          if (this.$root.loggedIn) {
+      function dragEnterHandler(e: DragEvent) {
+        if (e.dataTransfer && e.dataTransfer.types.includes('Files')) {
+          e.stopPropagation();
+          e.preventDefault();
+          state.dragging = true;
+          stopDragging.cancel()
+        }
+      }
+
+      function dragLeaveHandler(e: DragEvent) {
+        e.stopPropagation();
+        e.preventDefault();
+        stopDragging()
+      }
+
+      function dragOverHandler(e: DragEvent) {
+        if (e.dataTransfer && e.dataTransfer.types.includes('Files')) {
+          e.stopPropagation();
+          e.preventDefault();
+
+          if (loggedIn.value) {
             e.dataTransfer.dropEffect = 'copy'
           } else {
-            e.dataTransfer.effectAllowed = 'none'
+            e.dataTransfer.effectAllowed = 'none';
             e.dataTransfer.dropEffect = 'none'
           }
 
-          this.dragging = true
-          this.stopDragging.cancel()
+          state.dragging = true;
+          stopDragging.cancel()
         }
-      },
-      dropHandler (e) {
-        e.stopPropagation()
-        e.preventDefault()
-
-        this.stopDragging.cancel()
-        this.dragging = false
-
-        if (this.$root.loggedIn) {
-          [...e.dataTransfer.files].forEach(this.acceptNewFile)
-        }
-      },
-      startUpload () {
-        const file = this.files[this.nextUpload]
-        const formData = new FormData()
-        formData.append('file', file.file)
-        file.started = true
-
-        Axios.post('/photos', formData).then(() => {
-          file.finished = true
-          EventBus.$emit('upload-complete')
-        }).catch((e) => {
-          console.log('Failed to upload file', file, e)
-          file.failed = true
-        }).finally(() => {
-          this.nextUpload++
-          if (this.nextUpload <= this.files.length - 1) {
-            this.startUpload()
-          }
-        })
       }
-    },
-    mounted () {
-      document.addEventListener('drop', this.dropHandler)
-      document.addEventListener('dragover', this.dragOverHandler)
-      document.addEventListener('dragenter', this.dragEnterHandler)
-      document.addEventListener('dragleave', this.dragLeaveHandler)
-    },
-    beforeDestroy () {
-      document.removeEventListener('drop', this.dropHandler)
-      document.removeEventListener('dragover', this.dragOverHandler)
-      document.removeEventListener('dragenter', this.dragEnterHandler)
-      document.removeEventListener('dragleave', this.dragLeaveHandler)
+
+      function dropHandler(e: DragEvent) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        stopDragging.cancel();
+        state.dragging = false;
+
+        if (e.dataTransfer && loggedIn.value) {
+          Array.from(e.dataTransfer.files).forEach(acceptNewFile)
+        }
+      }
+
+      onMounted(() => {
+        document.addEventListener('drop', dropHandler);
+        document.addEventListener('dragover', dragOverHandler);
+        document.addEventListener('dragenter', dragEnterHandler);
+        document.addEventListener('dragleave', dragLeaveHandler)
+      });
+
+      onUnmounted(() => {
+        document.removeEventListener('drop', dropHandler);
+        document.removeEventListener('dragover', dragOverHandler);
+        document.removeEventListener('dragenter', dragEnterHandler);
+        document.removeEventListener('dragleave', dragLeaveHandler)
+      });
+
+      return {loggedIn, ...toRefs(state)}
     }
   })
 </script>

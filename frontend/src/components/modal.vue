@@ -36,8 +36,8 @@
 
 </style>
 
-<script>
-  import Vue from 'vue'
+<script lang="ts">
+  import {computed, defineComponent, onMounted, onUnmounted, reactive, toRefs} from "@vue/composition-api";
 
   // Modal has a double stage animation: background, then content.
   //
@@ -50,49 +50,36 @@
   //  showContent is a computed value over those that enables the actual modal content only if we're not closing
   //  and the outer transition has finished.
 
-  export default Vue.extend({
+  export default defineComponent({
     props: {
-      closeable: {
-        type: Boolean,
-        default: true
-      },
-      darker: {
-        type: Boolean,
-        default: false
-      },
-      shouldClose: {
-        type: Boolean,
-        default: false
-      }
+      closeable: Boolean,
+      darker: Boolean,
+      shouldClose: Boolean
     },
-    data () {
-      return {
+    setup(props) {
+      const state = reactive({
         closing: false,
         transitionFinished: false
-      }
-    },
-    methods: {
-      handleBackgroundClick () {
-        if (this.closeable) {
-          this.closing = true
-        }
-      },
-      handleKey (event) {
-        if (event.code === 'Escape') {
-          this.closing = false
+      });
+
+      function handleBackgroundClick() {
+        if (props.closeable) {
+          state.closing = true
         }
       }
-    },
-    computed: {
-      showContent () {
-        return !this.shouldClose && !this.closing && this.transitionFinished
+
+      function handleKey(event: KeyboardEvent) {
+        if (props.closeable && event.code === 'Escape') {
+          state.closing = false
+        }
       }
-    },
-    mounted () {
-      window.addEventListener('keyup', this.handleKey)
-    },
-    destroyed () {
-      window.removeEventListener('keyup', this.handleKey)
+
+      onMounted(() => window.addEventListener('keyup', handleKey));
+      onUnmounted(() => window.removeEventListener('keyup', handleKey));
+
+      const showContent = computed(() => !props.shouldClose && !state.closing && state.transitionFinished);
+
+      return {handleBackgroundClick, showContent, ...toRefs(state)}
     }
   })
 </script>

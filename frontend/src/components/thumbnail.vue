@@ -7,7 +7,7 @@
       <span :class="{ selected }" @click.prevent.stop="handleToggle"
             class="tickbox"
             role="button"
-            v-if="$root.loggedIn">
+            v-if="loggedIn">
                 {{ selected ? '☑' : '☐'}}
             </span>
     </a>
@@ -99,31 +99,44 @@
 
 <script lang="ts">
   import ThumbnailBackground from './thumbnail-background.vue'
-  import Vue from 'vue'
+  import {defineComponent} from "@vue/composition-api";
+  import {useRouter} from "@/features/router";
+  import {useAuthentication} from "@/features/auth";
 
-  export default Vue.extend({
+  export default defineComponent({
     mixins: [ThumbnailBackground],
-    props: ['imageId', 'caption', 'selecting', 'selected'],
-    methods: {
-      handleClick(e: MouseEvent) {
-        if (this.selecting && e.ctrlKey) {
-          // Ctrl+click during selection is a shortcut for toggling
-          this.handleToggle()
-        } else if (this.selecting && e.shiftKey) {
-          // Shift+click is a shortcut for range selection
-          this.$emit('select-range', this.imageId)
+    props: {
+      'imageId': String,
+      'caption': String,
+      'selecting': Boolean,
+      'selected': Boolean
+    },
+    setup(props, ctx) {
+      const {router} = useRouter();
+      const {loggedIn} = useAuthentication();
+
+      function handleToggle() {
+        if (props.selected) {
+          ctx.emit('deselected', props.imageId)
         } else {
-          // Otherwise just show the lightbox
-          this.$router.push({path: 'photo/' + this.imageId})
-        }
-      },
-      handleToggle() {
-        if (this.selected) {
-          this.$emit('deselected', this.imageId)
-        } else {
-          this.$emit('selected', this.imageId)
+          ctx.emit('selected', props.imageId)
         }
       }
+
+      function handleClick(e: MouseEvent) {
+        if (props.selecting && e.ctrlKey) {
+          // Ctrl+click during selection is a shortcut for toggling
+          handleToggle()
+        } else if (props.selecting && e.shiftKey) {
+          // Shift+click is a shortcut for range selection
+          ctx.emit('select-range', props.imageId)
+        } else {
+          // Otherwise just show the lightbox
+          router.push({path: 'photo/' + props.imageId})
+        }
+      }
+
+      return {handleClick, handleToggle, loggedIn}
     }
   })
 </script>

@@ -1,11 +1,10 @@
 import {onMounted, onUnmounted} from "@vue/composition-api";
 import {throttle} from "lodash-es";
-import {EventBus} from "@/components/bus";
 
-export function usesScrollWatcher() {
+export function useScrollWatcher(onBottom: () => void) {
   let atBottom = false;
 
-  const emitBottom = throttle(() => EventBus.$emit('bottom'), 250);
+  const emitBottom = throttle(onBottom, 250);
 
   function bottomVisible() {
     const scrollY = window.scrollY;

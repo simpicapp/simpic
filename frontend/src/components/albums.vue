@@ -11,7 +11,7 @@
     <div class="nothing-here" v-if="!loading && albums.length === 0">
       <div>
         <p>There's nothing here</p>
-        <p v-if="!$root.loggedIn">
+        <p v-if="!loggedIn">
           You might need to login to see this content.
         </p>
         <p v-else>
@@ -35,31 +35,31 @@
 <script lang="ts">
   import Album from './album-icon.vue'
   import Axios from 'axios'
-  import {EventBus} from './bus'
-  import Vue from 'vue'
+  import {defineComponent, onMounted, reactive, toRefs} from "@vue/composition-api";
+  import {useEventListener} from "@/features/eventbus";
+  import {useAuthentication} from "@/features/auth";
 
-  export default Vue.extend({
+  export default defineComponent({
     components: {Album},
-    data() {
-      return {
+    setup() {
+      const {loggedIn} = useAuthentication();
+
+      const state = reactive({
         albums: [],
         loading: true
-      }
-    },
-    methods: {
-      refresh() {
+      });
+
+      function refresh() {
         Axios.get('albums').then(({data}) => {
-          this.albums = data;
-          this.loading = false
+          state.albums = data;
+          state.loading = false
         })
       }
-    },
-    mounted() {
-      this.refresh();
-      EventBus.$on('albums-updated', this.refresh)
-    },
-    beforeDestroy() {
-      EventBus.$off('albums-updated', this.refresh)
+
+      useEventListener('albums-updated', refresh);
+      onMounted(refresh);
+
+      return {loggedIn, ...toRefs(state)};
     }
   })
 </script>

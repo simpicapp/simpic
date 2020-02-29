@@ -69,26 +69,40 @@
   }
 </style>
 
-<script>
-  import Modal from './modal'
-  import { cache } from './cache'
+<script lang="ts">
+  import Modal from './modal.vue'
+  import {cache} from './cache'
   import Vue from 'vue'
+  import {Data} from "@vue/composition-api/dist/component";
+  import {Photo} from "@/model/photo";
+
+  interface State extends Data {
+    close: boolean;
+    width: number;
+    height: number;
+    metadata: Photo;
+  }
 
   export default Vue.extend({
-    components: { Modal },
+    components: {Modal},
     props: ['id'],
 
-    data () {
+    data(): State {
       return {
         close: false,
         height: 0,
-        metadata: {},
+        metadata: {
+          id: '',
+          file_name: '', // eslint-disable-line @typescript-eslint/camelcase
+          width: 0,
+          height: 0,
+        },
         width: 0
       }
     },
 
     methods: {
-      handleKey (event) {
+      handleKey(event: KeyboardEvent) {
         if (event.code === 'Escape') {
           this.close = true
         } else if (event.code === 'ArrowLeft') {
@@ -98,39 +112,53 @@
         }
       },
 
-      handleResize () {
-        this.setSize()
+      handleResize() {
+        this.setSize();
         this.$nextTick(this.startLoading)
       },
 
-      setSize () {
-        const widthRatio = this.metadata.width / (window.innerWidth * 0.95)
-        const heightRatio = this.metadata.height / (window.innerHeight * 0.90)
-        const scale = Math.max(1, widthRatio, heightRatio)
+      setSize() {
+        const widthRatio = this.metadata.width / (window.innerWidth * 0.95);
+        const heightRatio = this.metadata.height / (window.innerHeight * 0.90);
+        const scale = Math.max(1, widthRatio, heightRatio);
 
-        this.width = Math.round(this.metadata.width / scale)
+        this.width = Math.round(this.metadata.width / scale);
         this.height = Math.round(this.metadata.height / scale)
       },
 
-      startLoading () {
-        const id = this.id
+      context() {
+        return (this.$refs.canvas as HTMLCanvasElement).getContext('2d')
+      },
+
+      startLoading() {
+        const id = this.id;
         cache.getMetadata(this.id).then((metadata) => {
-          if (this.id !== id) { throw Error('wrong-id') }
-          this.metadata = metadata
-          this.setSize()
+          if (this.id !== id) {
+            throw Error('wrong-id')
+          }
+          this.metadata = metadata;
+          this.setSize();
           return cache.getThumbnail(this.id)
         }).then((img) => {
-          if (this.id !== id) { throw Error('wrong-id') }
-          const ctx = this.$refs.canvas.getContext('2d')
-          ctx.filter = 'blur(4px)'
-          ctx.clearRect(0, 0, this.width, this.height)
-          ctx.drawImage(img, 0, 0, this.width, this.height)
+          if (this.id !== id) {
+            throw Error('wrong-id')
+          }
+          const ctx = this.context();
+          if (ctx) {
+            ctx.filter = 'blur(4px)';
+            ctx.clearRect(0, 0, this.width, this.height);
+            ctx.drawImage(img, 0, 0, this.width, this.height);
+          }
           return cache.getImage(this.id)
         }).then((img) => {
-          if (this.id !== id) { throw Error('wrong-id') }
-          const ctx = this.$refs.canvas.getContext('2d')
-          ctx.filter = 'none'
-          ctx.drawImage(img, 0, 0, this.width, this.height)
+          if (this.id !== id) {
+            throw Error('wrong-id')
+          }
+          const ctx = this.context();
+          if (ctx) {
+            ctx.filter = 'none';
+            ctx.drawImage(img, 0, 0, this.width, this.height)
+          }
         }).catch((err) => {
           if (err.message !== 'wrong-id') {
             console.log(err)
@@ -140,19 +168,19 @@
     },
 
     watch: {
-      id () {
+      id() {
         this.startLoading()
       }
     },
 
-    mounted () {
-      window.addEventListener('keyup', this.handleKey)
-      window.addEventListener('resize', this.handleResize)
+    mounted() {
+      window.addEventListener('keyup', this.handleKey);
+      window.addEventListener('resize', this.handleResize);
       this.$nextTick(this.startLoading)
     },
 
-    destroyed () {
-      window.removeEventListener('keyup', this.handleKey)
+    destroyed() {
+      window.removeEventListener('keyup', this.handleKey);
       window.removeEventListener('resize', this.handleResize)
     }
   })
