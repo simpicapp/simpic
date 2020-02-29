@@ -20,10 +20,9 @@
   }
 </style>
 
-<script>
-  import Modal from './modal'
-  import Popup from './popup'
-
+<script lang="ts">
+  import Modal from './modal.vue'
+  import Popup from './popup.vue'
   import Vue from 'vue'
 
   export default Vue.extend({
@@ -43,7 +42,7 @@
         default: 'Yes'
       }
     },
-    data () {
+    data() {
       return {
         shouldClose: false
       }
@@ -53,16 +52,16 @@
       Popup
     },
     methods: {
-      onClose () {
-        this.$emit('close')
+      onClose() {
+        this.$emit('close');
         this.shouldClose = false
       },
-      onNo () {
-        this.$emit('no')
+      onNo() {
+        this.$emit('no');
         this.shouldClose = true
       },
-      onYes () {
-        this.$emit('yes')
+      onYes() {
+        this.$emit('yes');
         this.shouldClose = true
       }
     }

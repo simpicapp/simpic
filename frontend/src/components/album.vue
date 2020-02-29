@@ -35,14 +35,13 @@
   }
 </style>
 
-<script>
+<script lang="ts">
   import 'vue-awesome/icons/trash-alt'
   import Axios from 'axios'
-  import Gallery from './gallery'
-  import { EventBus } from './bus'
-  import ActionIcon from './action-icon'
-  import DeleteDialog from './delete-dialog'
-
+  import Gallery from './gallery.vue'
+  import {EventBus} from './bus'
+  import ActionIcon from './action-icon.vue'
+  import DeleteDialog from './delete-dialog.vue'
   import Vue from 'vue'
 
   export default Vue.extend({
@@ -52,7 +51,7 @@
       Gallery
     },
     props: ['id'],
-    data () {
+    data() {
       return {
         deleting: false,
         name: '',
@@ -60,32 +59,32 @@
       }
     },
     methods: {
-      confirmDelete () {
+      confirmDelete() {
         this.showConfirmation = true
       },
-      doDelete () {
-        this.deleting = true
+      doDelete() {
+        this.deleting = true;
         Axios.delete('/albums/' + this.id).then(() => {
-          EventBus.$emit('albums-updated')
-          EventBus.$emit('toast', 'Album deleted')
-          this.deleting = false
+          EventBus.$emit('albums-updated');
+          EventBus.$emit('toast', 'Album deleted');
+          this.deleting = false;
           this.$router.replace('/albums')
         })
       },
-      handleAlbumUpdated (album) {
+      handleAlbumUpdated(album: string) {
         if (album === this.id) {
           EventBus.$emit('refresh-gallery')
         }
       }
     },
-    mounted () {
-      Axios.get('/albums/' + this.id).then(({ data: { name } }) => {
+    mounted() {
+      Axios.get('/albums/' + this.id).then(({data: {name}}) => {
         this.name = name
-      })
+      });
 
       EventBus.$on('album-updated', this.handleAlbumUpdated)
     },
-    destroyed () {
+    destroyed() {
       EventBus.$off('album-updated', this.handleAlbumUpdated)
     }
   })

@@ -77,13 +77,22 @@
   }
 </style>
 
-<script>
+<script lang="ts">
   import Axios from 'axios'
-  import Modal from './modal'
-  import Popup from './popup'
-  import { EventBus } from './bus'
-  import AlbumCreator from './album-creator'
+  import Modal from './modal.vue'
+  import Popup from './popup.vue'
+  import {EventBus} from './bus'
+  import AlbumCreator from './album-creator.vue'
   import Vue from 'vue'
+
+  interface Album {
+    id: string;
+    name: string;
+    cover_photo: string;
+    owner_id: number;
+    created: string;
+    photos: number;
+  }
 
   export default Vue.extend({
     components: {
@@ -91,47 +100,50 @@
       Modal,
       Popup
     },
-    data () {
+    data() {
       return {
-        albums: [],
+        albums: Array<Album>(),
         alert: '',
         close: false,
         name: '',
-        reject () { /* noop */ },
-        resolve () { /* noop */ },
+        reject() { /* noop */
+        },
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        resolve(_: string) { /* noop */
+        },
         selecting: true,
         visible: false
       }
     },
     methods: {
-      handleAlbumSelected (albumId) {
-        this.visible = false
+      handleAlbumSelected(albumId: string) {
+        this.visible = false;
         this.resolve(albumId)
       },
-      handleClosed () {
-        this.visible = false
+      handleClosed() {
+        this.visible = false;
         this.reject()
       },
-      handleNewAlbumSelected () {
+      handleNewAlbumSelected() {
         this.selecting = false
       },
-      show (resolve, reject) {
-        this.albums = []
-        this.resolve = resolve
-        this.reject = reject
-        this.close = false
-        this.selecting = true
-        this.visible = true
+      show(resolve: (_: string) => void, reject: () => void) {
+        this.albums = [];
+        this.resolve = resolve;
+        this.reject = reject;
+        this.close = false;
+        this.selecting = true;
+        this.visible = true;
 
-        Axios.get('/albums').then(({ data }) => {
+        Axios.get('/albums').then(({data}) => {
           this.albums = data
         })
       }
     },
-    created () {
+    created() {
       EventBus.$on('pick-album', this.show)
     },
-    beforeDestroy () {
+    beforeDestroy() {
       EventBus.$off('pick-album', this.show)
     }
   })

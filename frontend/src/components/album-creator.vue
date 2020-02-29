@@ -34,24 +34,24 @@
   }
 </style>
 
-<script>
+<script lang="ts">
   import Axios from 'axios'
-  import Popup from './popup'
+  import Popup from './popup.vue'
 
   import Vue from 'vue'
 
   export default Vue.extend({
-    components: { Popup },
-    data () {
+    components: {Popup},
+    data() {
       return {
         alert: '',
         name: ''
       }
     },
     methods: {
-      doCreate () {
-        Axios.post('/albums', { name: this.name }).then(({ data: { id } }) => {
-          this.$emit('created', id)
+      doCreate() {
+        Axios.post('/albums', {name: this.name}).then(({data: {id}}) => {
+          this.$emit('created', id);
           this.name = ''
         }).catch((error) => {
           if (error.response) {
@@ -61,8 +61,8 @@
           }
         })
       },
-      handleClosed () {
-        this.$emit('close')
+      handleClosed() {
+        this.$emit('close');
         this.name = ''
       }
     }

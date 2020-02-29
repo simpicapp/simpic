@@ -54,11 +54,10 @@ new Vue({
     version: '1.0+dev'
   },
   el: '#main',
-  components: {App},
   render: (h) => h(App),
   methods: {
-    checkUser() {
-      Axios.get('/users/me').then(({data: {username}}) => {
+    checkUser () {
+      Axios.get('/users/me').then(({ data: { username } }) => {
         this.username = username;
         this.loggedIn = true
       }).catch(() => {
@@ -66,7 +65,7 @@ new Vue({
       })
     }
   },
-  created() {
+  created () {
     this.checkUser()
   }
 });

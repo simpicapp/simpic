@@ -51,17 +51,16 @@
   }
 </style>
 
-<script>
-  import ThumbnailBackground from './thumbnail-background'
-
+<script lang="ts">
+  import ThumbnailBackground from './thumbnail-background.vue'
   import Vue from 'vue'
 
   export default Vue.extend({
     mixins: [ThumbnailBackground],
     props: ['id', 'caption', 'photos', 'imageId'],
     methods: {
-      handleClick () {
-        this.$router.push({ path: './' + this.id + '/' })
+      handleClick() {
+        this.$router.push({path: './' + this.id + '/'})
       }
     }
   })

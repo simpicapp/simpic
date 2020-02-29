@@ -43,10 +43,10 @@
 
 </style>
 
-<script>
-  import { EventBus } from './bus'
+<script lang="ts">
+  import {EventBus} from './bus'
   import Axios from 'axios'
-  import DeleteDialog from './delete-dialog'
+  import DeleteDialog from './delete-dialog.vue'
   import Vue from 'vue'
 
   export default Vue.extend({
@@ -58,39 +58,38 @@
       'selection',
       'album'
     ],
-    data () {
+    data() {
       return {
         showConfirmation: false
       }
     },
     methods: {
-      doDelete () {
-        Axios.post('/photos/delete', { photos: Object.keys(this.selection) }).then(() => {
-          this.closeConfirmation = true
-          EventBus.$emit('toast', this.selectionCount + ' photo' + (this.selectionCount === 1 ? '' : 's') + ' deleted')
+      doDelete() {
+        Axios.post('/photos/delete', {photos: Object.keys(this.selection)}).then(() => {
+          EventBus.$emit('toast', this.selectionCount + ' photo' + (this.selectionCount === 1 ? '' : 's') + ' deleted');
           EventBus.$emit('refresh-gallery')
         })
       },
-      handleAddToAlbum () {
+      handleAddToAlbum() {
         new Promise((resolve, reject) => {
           EventBus.$emit('pick-album', resolve, reject)
         }).then(album => Axios.post('/albums/' + album + '/photos', {
           // eslint-disable-next-line @typescript-eslint/camelcase
           add_photos: Object.keys(this.selection)
         }).then(() => {
-          EventBus.$emit('toast', this.selectionCount + ' photo' + (this.selectionCount === 1 ? '' : 's') + ' added to album')
-          EventBus.$emit('album-updated', album)
+          EventBus.$emit('toast', this.selectionCount + ' photo' + (this.selectionCount === 1 ? '' : 's') + ' added to album');
+          EventBus.$emit('album-updated', album);
           this.$emit('clear-selection')
         }))
       },
-      handleDelete () {
+      handleDelete() {
         this.showConfirmation = true
       },
-      handleRemoveFromAlbum () {
+      handleRemoveFromAlbum() {
         // eslint-disable-next-line @typescript-eslint/camelcase
-        Axios.post('/albums/' + this.album + '/photos', { remove_photos: Object.keys(this.selection) }).then(() => {
-          EventBus.$emit('toast', this.selectionCount + ' photo' + (this.selectionCount === 1 ? '' : 's') + ' removed from album')
-          EventBus.$emit('album-updated', this.album)
+        Axios.post('/albums/' + this.album + '/photos', {remove_photos: Object.keys(this.selection)}).then(() => {
+          EventBus.$emit('toast', this.selectionCount + ' photo' + (this.selectionCount === 1 ? '' : 's') + ' removed from album');
+          EventBus.$emit('album-updated', this.album);
           this.$emit('clear-selection')
         })
       }

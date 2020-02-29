@@ -10,9 +10,8 @@
   </ConfirmDialog>
 </template>
 
-<script>
-  import ConfirmDialog from './confirm-dialog'
-
+<script lang="ts">
+  import ConfirmDialog from './confirm-dialog.vue'
   import Vue from 'vue'
 
   export default Vue.extend({

@@ -46,23 +46,23 @@
   }
 </style>
 
-<script>
-  import { throttle } from 'lodash-es'
+<script lang="ts">
+  import {throttle} from 'lodash-es'
   import Vue from 'vue'
 
-  import Uploader from './uploader'
-  import Login from './login'
-  import Toolbar from './toolbar'
-  import BottomBar from './footer'
-  import { EventBus } from './bus'
-  import AlbumPicker from './album-picker'
-  import Toaster from './toaster'
+  import Uploader from './uploader.vue'
+  import Login from './login.vue'
+  import Toolbar from './toolbar.vue'
+  import BottomBar from './footer.vue'
+  import {EventBus} from './bus'
+  import AlbumPicker from './album-picker.vue'
+  import Toaster from './toaster.vue'
 
   Vue.directive('focus', {
     inserted: function (el) {
       el.focus()
     }
-  })
+  });
 
   export default Vue.extend({
     components: {
@@ -73,31 +73,31 @@
       Toolbar,
       Uploader
     },
-    data () {
+    data() {
       return {
         bottom: false
       }
     },
     methods: {
-      bottomVisible () {
-        const scrollY = window.scrollY
-        const visible = document.documentElement.clientHeight
-        const pageHeight = document.documentElement.scrollHeight
+      bottomVisible() {
+        const scrollY = window.scrollY;
+        const visible = document.documentElement.clientHeight;
+        const pageHeight = document.documentElement.scrollHeight;
         return visible + scrollY >= pageHeight - 400
       },
       emitBottom: throttle(() => EventBus.$emit('bottom'), 250),
-      handleScroll () {
+      handleScroll() {
         this.bottom = this.bottomVisible()
       }
     },
-    beforeDestroy () {
+    beforeDestroy() {
       window.removeEventListener('scroll', this.handleScroll)
     },
-    created () {
+    created() {
       window.addEventListener('scroll', this.handleScroll)
     },
     watch: {
-      bottom (newVal) {
+      bottom(newVal) {
         if (newVal) {
           this.emitBottom()
         }

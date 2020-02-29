@@ -38,31 +38,31 @@
   }
 </style>
 
-<script>
-  import { EventBus } from './bus'
+<script lang="ts">
+  import {EventBus} from './bus'
   import Vue from 'vue'
 
   export default Vue.extend({
-    data () {
+    data() {
       return {
         message: '',
         visible: false
       }
     },
     methods: {
-      hide () {
+      hide() {
         this.visible = false
       },
-      showToast (toast) {
-        this.message = toast
-        this.visible = true
+      showToast(toast: string) {
+        this.message = toast;
+        this.visible = true;
         setTimeout(this.hide, 3500)
       }
     },
-    mounted () {
+    mounted() {
       EventBus.$on('toast', this.showToast)
     },
-    destroyed () {
+    destroyed() {
       EventBus.$off('toast', this.showToast)
     }
   })

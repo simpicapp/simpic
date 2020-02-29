@@ -14,9 +14,9 @@
   }
 </style>
 
-<script>
+<script lang="ts">
   import 'vue-awesome/icons/spinner'
-  import Icon from 'vue-awesome/components/Icon'
+  import Icon from 'vue-awesome/components/Icon.vue'
   import Vue from 'vue'
 
   export default Vue.extend({
@@ -25,7 +25,7 @@
       Icon
     },
     computed: {
-      icon () {
+      icon() {
         return this.working ? 'spinner' : this.name
       }
     }

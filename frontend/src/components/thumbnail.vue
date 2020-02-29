@@ -97,15 +97,15 @@
   }
 </style>
 
-<script>
-  import ThumbnailBackground from './thumbnail-background'
+<script lang="ts">
+  import ThumbnailBackground from './thumbnail-background.vue'
   import Vue from 'vue'
 
   export default Vue.extend({
     mixins: [ThumbnailBackground],
     props: ['imageId', 'caption', 'selecting', 'selected'],
     methods: {
-      handleClick (e) {
+      handleClick(e: MouseEvent) {
         if (this.selecting && e.ctrlKey) {
           // Ctrl+click during selection is a shortcut for toggling
           this.handleToggle()
@@ -114,10 +114,10 @@
           this.$emit('select-range', this.imageId)
         } else {
           // Otherwise just show the lightbox
-          this.$router.push({ path: 'photo/' + this.imageId })
+          this.$router.push({path: 'photo/' + this.imageId})
         }
       },
-      handleToggle () {
+      handleToggle() {
         if (this.selected) {
           this.$emit('deselected', this.imageId)
         } else {

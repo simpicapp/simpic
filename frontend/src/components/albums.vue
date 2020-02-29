@@ -32,33 +32,33 @@
   }
 </style>
 
-<script>
-  import Album from './album-icon'
+<script lang="ts">
+  import Album from './album-icon.vue'
   import Axios from 'axios'
-  import { EventBus } from './bus'
+  import {EventBus} from './bus'
   import Vue from 'vue'
 
   export default Vue.extend({
-    components: { Album },
-    data () {
+    components: {Album},
+    data() {
       return {
         albums: [],
         loading: true
       }
     },
     methods: {
-      refresh () {
-        Axios.get('albums').then(({ data }) => {
-          this.albums = data
+      refresh() {
+        Axios.get('albums').then(({data}) => {
+          this.albums = data;
           this.loading = false
         })
       }
     },
-    mounted () {
-      this.refresh()
+    mounted() {
+      this.refresh();
       EventBus.$on('albums-updated', this.refresh)
     },
-    beforeDestroy () {
+    beforeDestroy() {
       EventBus.$off('albums-updated', this.refresh)
     }
   })
