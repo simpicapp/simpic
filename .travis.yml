@@ -9,8 +9,10 @@ jobs:
     - name: "Frontend"
       language: node_js
       node_js: "12"
+      before_install:
+        - cd frontend
       script:
-        - cd frontend && npm run lint
+        - npm run lint
 
     - name: "Docker"
       services:
