@@ -100,19 +100,19 @@ It currently has the following options:
 
 == Developing
 
-The docker-compose.dev.yml file in this repository contains a simple postgres service
-that is exposed on localhost:5432, and a service to live rebuild the JavaScript frontend
-that exposes a websocket endpoint on localhost:8081.
+=== Project structure
 
-With these two running, you can run Simpic as a normal Go binary with the following env
-var to use the local postgres server:
+Simpic has a Go backend and a JavaScript frontend that uses Vue.js. The Go code lives under `cmd` (for the program
+entry points) and `internal` (for everything else). The JavaScript is contained under the `frontend` folder.
 
-----
-SIMPIC_DSN=user=simpic dbname=simpic password=nWK9aY9gkh sslmode=disable
-----
+=== Hot reloading
 
-The frontend will then automatically rebuild and reload in response to changes to the
-source.
+The NPM project in `frontend` has a `serve` script that will run a hot-module-reloading development server,
+and it is configured to pass API calls to localhost on port 8080. To get it up and running:
+
+    cd frontend
+    npm install
+    npm run serve
 
 == Contributing
 
