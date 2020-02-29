@@ -1,11 +1,13 @@
 <template>
   <main>
-    <Album :caption="album.name"
-           :id="album.id"
-           :imageId="album.cover_photo"
-           :key="album.id"
-           :photos="album.photos"
-           v-for="album in albums">
+    <Album
+      :caption="album.name"
+      :id="album.id"
+      :imageId="album.cover_photo"
+      :key="album.id"
+      :photos="album.photos"
+      v-for="album in albums"
+    >
     </Album>
 
     <div class="nothing-here" v-if="!loading && albums.length === 0">
@@ -33,8 +35,8 @@
 </style>
 
 <script lang="ts">
-  import Album from './album-icon.vue'
-  import Axios from 'axios'
+  import Album from "./album-icon.vue";
+  import Axios from "axios";
   import {defineComponent, onMounted, reactive, toRefs} from "@vue/composition-api";
   import {useEventListener} from "@/features/eventbus";
   import {useAuthentication} from "@/features/auth";
@@ -46,20 +48,20 @@
 
       const state = reactive({
         albums: [],
-        loading: true
+        loading: true,
       });
 
       function refresh() {
-        Axios.get('albums').then(({data}) => {
+        Axios.get("albums").then(({data}) => {
           state.albums = data;
-          state.loading = false
-        })
+          state.loading = false;
+        });
       }
 
-      useEventListener('albums-updated', refresh);
+      useEventListener("albums-updated", refresh);
       onMounted(refresh);
 
       return {loggedIn, ...toRefs(state)};
-    }
-  })
+    },
+  });
 </script>

@@ -1,7 +1,7 @@
 <template>
   <transition appear name="boing">
     <aside @click="hide" v-if="visible">
-      {{message}}
+      {{ message }}
     </aside>
   </transition>
 </template>
@@ -33,37 +33,38 @@
     transition: all 100ms linear;
   }
 
-  .boing-enter, .boing-leave-to {
-    transform: translateY(150px)
+  .boing-enter,
+  .boing-leave-to {
+    transform: translateY(150px);
   }
 </style>
 
 <script lang="ts">
-  import {EventBus} from './bus'
-  import Vue from 'vue'
+  import {EventBus} from "./bus";
+  import Vue from "vue";
 
   export default Vue.extend({
     data() {
       return {
-        message: '',
-        visible: false
-      }
+        message: "",
+        visible: false,
+      };
     },
     methods: {
       hide() {
-        this.visible = false
+        this.visible = false;
       },
       showToast(toast: string) {
         this.message = toast;
         this.visible = true;
-        setTimeout(this.hide, 3500)
-      }
+        setTimeout(this.hide, 3500);
+      },
     },
     mounted() {
-      EventBus.$on('toast', this.showToast)
+      EventBus.$on("toast", this.showToast);
     },
     destroyed() {
-      EventBus.$off('toast', this.showToast)
-    }
-  })
+      EventBus.$off("toast", this.showToast);
+    },
+  });
 </script>

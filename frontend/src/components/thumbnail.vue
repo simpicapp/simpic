@@ -1,15 +1,12 @@
 <template>
-  <div :class="{ selecting }" :style="styles" class="thumbnail">
+  <div :class="{selecting}" :style="styles" class="thumbnail">
     <a :href="'/data/image/' + imageId" @click.prevent="handleClick">
       <div class="overlay">
         <p class="caption">{{ caption }}</p>
       </div>
-      <span :class="{ selected }" @click.prevent.stop="handleToggle"
-            class="tickbox"
-            role="button"
-            v-if="loggedIn">
-                {{ selected ? '☑' : '☐'}}
-            </span>
+      <span :class="{selected}" @click.prevent.stop="handleToggle" class="tickbox" role="button" v-if="loggedIn">
+        {{ selected ? "☑" : "☐" }}
+      </span>
     </a>
   </div>
 </template>
@@ -71,7 +68,9 @@
     }
   }
 
-  .thumbnail:hover .overlay, .thumbnail:hover .tickbox, .thumbnail.selecting .tickbox {
+  .thumbnail:hover .overlay,
+  .thumbnail:hover .tickbox,
+  .thumbnail.selecting .tickbox {
     opacity: 1;
     transition: opacity 300ms var(--ease-out-cubic);
   }
@@ -98,7 +97,7 @@
 </style>
 
 <script lang="ts">
-  import ThumbnailBackground from './thumbnail-background.vue'
+  import ThumbnailBackground from "./thumbnail-background.vue";
   import {defineComponent} from "@vue/composition-api";
   import {useRouter} from "@/features/router";
   import {useAuthentication} from "@/features/auth";
@@ -106,10 +105,10 @@
   export default defineComponent({
     mixins: [ThumbnailBackground],
     props: {
-      'imageId': String,
-      'caption': String,
-      'selecting': Boolean,
-      'selected': Boolean
+      imageId: String,
+      caption: String,
+      selecting: Boolean,
+      selected: Boolean,
     },
     setup(props, ctx) {
       const {router} = useRouter();
@@ -117,26 +116,26 @@
 
       function handleToggle() {
         if (props.selected) {
-          ctx.emit('deselected', props.imageId)
+          ctx.emit("deselected", props.imageId);
         } else {
-          ctx.emit('selected', props.imageId)
+          ctx.emit("selected", props.imageId);
         }
       }
 
       function handleClick(e: MouseEvent) {
         if (props.selecting && e.ctrlKey) {
           // Ctrl+click during selection is a shortcut for toggling
-          handleToggle()
+          handleToggle();
         } else if (props.selecting && e.shiftKey) {
           // Shift+click is a shortcut for range selection
-          ctx.emit('select-range', props.imageId)
+          ctx.emit("select-range", props.imageId);
         } else {
           // Otherwise just show the lightbox
-          router.push({path: 'photo/' + props.imageId})
+          router.push({path: "photo/" + props.imageId});
         }
       }
 
-      return {handleClick, handleToggle, loggedIn}
-    }
-  })
+      return {handleClick, handleToggle, loggedIn};
+    },
+  });
 </script>

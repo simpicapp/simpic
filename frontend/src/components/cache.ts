@@ -1,6 +1,6 @@
-import Axios from 'axios'
-import {castArray} from 'lodash-es'
-import LRUMap from 'mnemonist/lru-map'
+import Axios from "axios";
+import {castArray} from "lodash-es";
+import LRUMap from "mnemonist/lru-map";
 import {Photo} from "@/model/photo";
 
 class Cache {
@@ -11,13 +11,13 @@ class Cache {
   constructor() {
     this._cachedImages = new LRUMap(10);
     this._cachedMetadata = new LRUMap(1000);
-    this._cachedThumbnails = new LRUMap(1000)
+    this._cachedThumbnails = new LRUMap(1000);
   }
 
   storeMetadata(metadata: Photo | Array<Photo>) {
-    castArray(metadata).forEach((m) => {
-      this._cachedMetadata.set(m.id, Promise.resolve(m))
-    })
+    castArray(metadata).forEach(m => {
+      this._cachedMetadata.set(m.id, Promise.resolve(m));
+    });
   }
 
   getMetadata(id: string): Promise<Photo> {
@@ -26,43 +26,45 @@ class Cache {
       return cached;
     }
 
-    const created = Axios
-      .get('/photos/' + id)
-      .then(({data}) => {
-        return data
-      });
+    const created = Axios.get("/photos/" + id).then(({data}) => {
+      return data;
+    });
 
     this._cachedMetadata.set(id, created);
     return created;
   }
 
   getThumbnail(id: string) {
-    return this._loadImage(this._cachedThumbnails, '/data/thumb/', id)
+    return this._loadImage(this._cachedThumbnails, "/data/thumb/", id);
   }
 
   getImage(id: string) {
-    return this._loadImage(this._cachedImages, '/data/image/', id)
+    return this._loadImage(this._cachedImages, "/data/image/", id);
   }
 
-  _loadImage(cache: LRUMap<string, Promise<HTMLImageElement> | null>, prefix: string, id: string): Promise<HTMLImageElement> {
+  _loadImage(
+    cache: LRUMap<string, Promise<HTMLImageElement> | null>,
+    prefix: string,
+    id: string
+  ): Promise<HTMLImageElement> {
     const cached = cache.get(id);
     if (cached) {
-      return cached
+      return cached;
     }
 
     const created = new Promise<HTMLImageElement>((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        resolve(img)
+        resolve(img);
       };
       img.onerror = () => {
         cache.set(id, null);
-        reject(img)
+        reject(img);
       };
-      img.src = prefix + id
+      img.src = prefix + id;
     });
     cache.set(id, created);
-    return created
+    return created;
   }
 }
 

@@ -4,10 +4,10 @@
       <form @submit="doLogin">
         <p class="alert" v-if="alert.length > 0">{{ alert }}</p>
         <label for="username">Username</label>
-        <input :disabled="loggingIn" id="username" type="text" v-focus v-model="username">
+        <input :disabled="loggingIn" id="username" type="text" v-focus v-model="username" />
         <label for="password">Password</label>
-        <input :disabled="loggingIn" id="password" type="password" v-model="password">
-        <input :disabled="loggingIn" type="submit" value="Login">
+        <input :disabled="loggingIn" id="password" type="password" v-model="password" />
+        <input :disabled="loggingIn" type="submit" value="Login" />
       </form>
     </popup>
   </modal>
@@ -21,7 +21,7 @@
     align-items: center;
   }
 
-  input[type=submit] {
+  input[type="submit"] {
     grid-column: span 2;
   }
 
@@ -39,55 +39,58 @@
 </style>
 
 <script lang="ts">
-  import Popup from './popup.vue'
-  import Modal from './modal.vue'
-  import {defineComponent, reactive, toRefs} from '@vue/composition-api'
-  import {useAuthentication} from '@/features/auth'
+  import Popup from "./popup.vue";
+  import Modal from "./modal.vue";
+  import {defineComponent, reactive, toRefs} from "@vue/composition-api";
+  import {useAuthentication} from "@/features/auth";
   import {useEventListener} from "@/features/eventbus";
 
   export default defineComponent({
     components: {
       Modal,
-      Popup
+      Popup,
     },
     setup() {
       const {login} = useAuthentication();
 
       const state = reactive({
-        alert: '',
+        alert: "",
         close: false,
         loggingIn: false,
-        password: '',
-        username: '',
-        visible: false
+        password: "",
+        username: "",
+        visible: false,
       });
 
       function doLogin() {
-        state.alert = '';
+        state.alert = "";
         state.loggingIn = true;
 
-        login(state.username, state.password).then(() => {
-          state.close = true;
-          state.username = '';
-          state.password = ''
-        }).catch((error) => {
-          if (error.response) {
-            state.alert = error.response.data.error
-          } else {
-            state.alert = error.message
-          }
-        }).finally(() => {
-          state.loggingIn = false
-        });
+        login(state.username, state.password)
+          .then(() => {
+            state.close = true;
+            state.username = "";
+            state.password = "";
+          })
+          .catch(error => {
+            if (error.response) {
+              state.alert = error.response.data.error;
+            } else {
+              state.alert = error.message;
+            }
+          })
+          .finally(() => {
+            state.loggingIn = false;
+          });
       }
 
-      useEventListener('login', () => {
+      useEventListener("login", () => {
         state.close = false;
-        state.alert = '';
+        state.alert = "";
         state.visible = true;
       });
 
-      return {doLogin, ...toRefs(state)}
-    }
-  })
+      return {doLogin, ...toRefs(state)};
+    },
+  });
 </script>

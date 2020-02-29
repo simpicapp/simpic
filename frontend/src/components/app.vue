@@ -14,8 +14,8 @@
 
 <style lang="scss">
   @use '../assets/css/vars';
-  @import '../assets/css/global';
-  @import '../assets/css/reset';
+  @import "../assets/css/global";
+  @import "../assets/css/reset";
 
   body {
     font-family: sans-serif;
@@ -33,35 +33,36 @@
     padding: 5px;
   }
 
-  input[type=submit] {
+  input[type="submit"] {
     padding: 10px;
   }
 
-  input[type=submit]:hover, input[type=submit]:active {
+  input[type="submit"]:hover,
+  input[type="submit"]:active {
     background-color: vars.$primary;
   }
 
   #content {
-    min-height: calc(100vh - 90px - 80px)
+    min-height: calc(100vh - 90px - 80px);
   }
 </style>
 
 <script lang="ts">
-  import Vue from 'vue'
+  import Vue from "vue";
   import {defineComponent} from "@vue/composition-api";
 
-  import Uploader from './uploader.vue'
-  import Login from './login.vue'
-  import Toolbar from './toolbar.vue'
-  import BottomBar from './footer.vue'
-  import AlbumPicker from './album-picker.vue'
-  import Toaster from './toaster.vue'
+  import Uploader from "./uploader.vue";
+  import Login from "./login.vue";
+  import Toolbar from "./toolbar.vue";
+  import BottomBar from "./footer.vue";
+  import AlbumPicker from "./album-picker.vue";
+  import Toaster from "./toaster.vue";
   import {useAuthentication} from "@/features/auth";
 
-  Vue.directive('focus', {
-    inserted: function (el) {
-      el.focus()
-    }
+  Vue.directive("focus", {
+    inserted: function(el) {
+      el.focus();
+    },
   });
 
   export default defineComponent({
@@ -71,11 +72,11 @@
       Login,
       Toaster,
       Toolbar,
-      Uploader
+      Uploader,
     },
     setup() {
       const {checkUser} = useAuthentication();
-      checkUser()
-    }
-  })
+      checkUser();
+    },
+  });
 </script>

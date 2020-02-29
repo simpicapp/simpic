@@ -21,49 +21,49 @@
 </style>
 
 <script lang="ts">
-  import Modal from './modal.vue'
-  import Popup from './popup.vue'
-  import Vue from 'vue'
+  import Modal from "./modal.vue";
+  import Popup from "./popup.vue";
+  import Vue from "vue";
 
   export default Vue.extend({
     props: {
       body: String,
       dangerous: {
         type: Boolean,
-        default: false
+        default: false,
       },
       noText: {
         type: String,
-        default: 'No'
+        default: "No",
       },
       title: String,
       yesText: {
         type: String,
-        default: 'Yes'
-      }
+        default: "Yes",
+      },
     },
     data() {
       return {
-        shouldClose: false
-      }
+        shouldClose: false,
+      };
     },
     components: {
       Modal,
-      Popup
+      Popup,
     },
     methods: {
       onClose() {
-        this.$emit('close');
-        this.shouldClose = false
+        this.$emit("close");
+        this.shouldClose = false;
       },
       onNo() {
-        this.$emit('no');
-        this.shouldClose = true
+        this.$emit("no");
+        this.shouldClose = true;
       },
       onYes() {
-        this.$emit('yes');
-        this.shouldClose = true
-      }
-    }
-  })
+        this.$emit("yes");
+        this.shouldClose = true;
+      },
+    },
+  });
 </script>

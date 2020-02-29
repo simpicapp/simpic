@@ -60,20 +60,20 @@
 </style>
 
 <script lang="ts">
-  import Vue from 'vue'
+  import Vue from "vue";
 
   export default Vue.extend({
     props: {
       closeable: {
         type: Boolean,
-        default: true
+        default: true,
       },
       position: {
         type: String,
-        default: 'bottom_right',
-        validator: value => ['bottom_right', 'center'].indexOf(value) !== -1
+        default: "bottom_right",
+        validator: value => ["bottom_right", "center"].indexOf(value) !== -1,
       },
-      title: String
-    }
-  })
+      title: String,
+    },
+  });
 </script>

@@ -1,6 +1,8 @@
 <template>
   <a :href="'#/albums/' + id + '/'" :style="styles" @click.prevent="handleClick">
-    <div class="caption"><span>{{ caption }}</span> <span>{{ photos }}</span></div>
+    <div class="caption">
+      <span>{{ caption }}</span> <span>{{ photos }}</span>
+    </div>
   </a>
 </template>
 
@@ -52,21 +54,21 @@
 </style>
 
 <script lang="ts">
-  import ThumbnailBackground from './thumbnail-background.vue'
-  import Vue from 'vue'
+  import ThumbnailBackground from "./thumbnail-background.vue";
+  import Vue from "vue";
 
   export default Vue.extend({
     mixins: [ThumbnailBackground],
     props: {
-      'id': String,
-      'caption': String,
-      'photos': Number,
-      'imageId': String,
+      id: String,
+      caption: String,
+      photos: Number,
+      imageId: String,
     },
     methods: {
       handleClick() {
-        this.$router.push({path: './' + this.id + '/'})
-      }
-    }
-  })
+        this.$router.push({path: "./" + this.id + "/"});
+      },
+    },
+  });
 </script>

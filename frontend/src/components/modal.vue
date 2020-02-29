@@ -11,11 +11,13 @@
 </template>
 
 <style lang="scss" scoped>
-  .fade-enter, .fade-leave-to {
+  .fade-enter,
+  .fade-leave-to {
     opacity: 0;
   }
 
-  .fade-enter-active, .fade-leave-active {
+  .fade-enter-active,
+  .fade-leave-active {
     transition: 200ms opacity ease-out;
   }
 
@@ -33,7 +35,6 @@
       background-color: #000000ee;
     }
   }
-
 </style>
 
 <script lang="ts">
@@ -55,29 +56,29 @@
     props: {
       closeable: Boolean,
       darker: Boolean,
-      shouldClose: Boolean
+      shouldClose: Boolean,
     },
     setup(props) {
       const state = reactive({
         closing: false,
-        transitionFinished: false
+        transitionFinished: false,
       });
 
       function handleBackgroundClick() {
         if (props.closeable) {
-          state.closing = true
+          state.closing = true;
         }
       }
 
-      useWindowListener('keyup', (event) => {
-        if (props.closeable && event.code === 'Escape') {
-          state.closing = false
+      useWindowListener("keyup", event => {
+        if (props.closeable && event.code === "Escape") {
+          state.closing = false;
         }
       });
 
       const showContent = computed(() => !props.shouldClose && !state.closing && state.transitionFinished);
 
-      return {handleBackgroundClick, showContent, ...toRefs(state)}
-    }
-  })
+      return {handleBackgroundClick, showContent, ...toRefs(state)};
+    },
+  });
 </script>

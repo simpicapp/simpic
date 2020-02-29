@@ -13,13 +13,13 @@
     <popup @close="visible = false" id="uploader" title="Uploading..." v-if="visible">
       <table>
         <tbody>
-        <tr :key="file.name" v-for="file in files">
-          <td>{{ file.name }}</td>
-          <td v-if="file.failed">Error</td>
-          <td v-else-if="file.finished">Done</td>
-          <td v-else-if="file.started">Uploading</td>
-          <td v-else>Waiting</td>
-        </tr>
+          <tr :key="file.name" v-for="file in files">
+            <td>{{ file.name }}</td>
+            <td v-if="file.failed">Error</td>
+            <td v-else-if="file.finished">Done</td>
+            <td v-else-if="file.started">Uploading</td>
+            <td v-else>Waiting</td>
+          </tr>
         </tbody>
       </table>
     </popup>
@@ -66,17 +66,17 @@
 </style>
 
 <script lang="ts">
-  import {debounce} from 'lodash-es'
-  import Axios from 'axios'
-  import {EventBus} from './bus'
-  import Popup from './popup.vue'
-  import {defineComponent, reactive, toRefs} from '@vue/composition-api'
+  import {debounce} from "lodash-es";
+  import Axios from "axios";
+  import {EventBus} from "./bus";
+  import Popup from "./popup.vue";
+  import {defineComponent, reactive, toRefs} from "@vue/composition-api";
   import {useAuthentication} from "@/features/auth";
   import {useDocumentListener} from "@/features/listeners";
 
   export default defineComponent({
     components: {
-      Popup
+      Popup,
     },
     setup() {
       const {loggedIn} = useAuthentication();
@@ -94,31 +94,34 @@
       const state = reactive({
         dragging: false,
         files: new Array<Upload>(),
-        visible: false
+        visible: false,
       });
 
       const stopDragging = debounce(() => {
-        state.dragging = false
+        state.dragging = false;
       }, 100);
 
       function startUpload() {
         const file = state.files[nextUpload];
         const formData = new FormData();
-        formData.append('file', file.file);
+        formData.append("file", file.file);
         file.started = true;
 
-        Axios.post('/photos', formData).then(() => {
-          file.finished = true;
-          EventBus.$emit('upload-complete')
-        }).catch((e) => {
-          console.log('Failed to upload file', file, e);
-          file.failed = true
-        }).finally(() => {
-          nextUpload++;
-          if (nextUpload <= state.files.length - 1) {
-            startUpload()
-          }
-        })
+        Axios.post("/photos", formData)
+          .then(() => {
+            file.finished = true;
+            EventBus.$emit("upload-complete");
+          })
+          .catch(e => {
+            console.log("Failed to upload file", file, e);
+            file.failed = true;
+          })
+          .finally(() => {
+            nextUpload++;
+            if (nextUpload <= state.files.length - 1) {
+              startUpload();
+            }
+          });
       }
 
       function acceptNewFile(file: File) {
@@ -127,17 +130,17 @@
           file,
           finished: false,
           name: file.name,
-          started: false
+          started: false,
         });
 
         state.visible = true;
 
         if (nextUpload === state.files.length - 1) {
-          startUpload()
+          startUpload();
         }
       }
 
-      useDocumentListener('drop', (e) => {
+      useDocumentListener("drop", e => {
         e.stopPropagation();
         e.preventDefault();
 
@@ -145,43 +148,43 @@
         state.dragging = false;
 
         if (e.dataTransfer && loggedIn.value) {
-          Array.from(e.dataTransfer.files).forEach(acceptNewFile)
+          Array.from(e.dataTransfer.files).forEach(acceptNewFile);
         }
       });
 
-      useDocumentListener('dragover', (e) => {
-        if (e.dataTransfer && e.dataTransfer.types.includes('Files')) {
+      useDocumentListener("dragover", e => {
+        if (e.dataTransfer && e.dataTransfer.types.includes("Files")) {
           e.stopPropagation();
           e.preventDefault();
 
           if (loggedIn.value) {
-            e.dataTransfer.dropEffect = 'copy'
+            e.dataTransfer.dropEffect = "copy";
           } else {
-            e.dataTransfer.effectAllowed = 'none';
-            e.dataTransfer.dropEffect = 'none'
+            e.dataTransfer.effectAllowed = "none";
+            e.dataTransfer.dropEffect = "none";
           }
 
           state.dragging = true;
-          stopDragging.cancel()
+          stopDragging.cancel();
         }
       });
 
-      useDocumentListener('dragenter', (e) => {
-        if (e.dataTransfer && e.dataTransfer.types.includes('Files')) {
+      useDocumentListener("dragenter", e => {
+        if (e.dataTransfer && e.dataTransfer.types.includes("Files")) {
           e.stopPropagation();
           e.preventDefault();
           state.dragging = true;
-          stopDragging.cancel()
+          stopDragging.cancel();
         }
       });
 
-      useDocumentListener('dragleave', (e) => {
+      useDocumentListener("dragleave", e => {
         e.stopPropagation();
         e.preventDefault();
-        stopDragging()
+        stopDragging();
       });
 
-      return {loggedIn, ...toRefs(state)}
-    }
-  })
+      return {loggedIn, ...toRefs(state)};
+    },
+  });
 </script>

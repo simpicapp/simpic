@@ -1,12 +1,12 @@
 <template>
   <header>
-    <h1><img alt="Simpic" src="../assets/logo.png"></h1>
+    <h1><img alt="Simpic" src="../assets/logo.png" /></h1>
     <router-link to="/timeline/"><span>Timeline</span></router-link>
     <router-link to="/albums/"><span>Albums</span></router-link>
     <span class="grow"></span>
     <button @click="loginClick" v-if="!loggedIn">Login</button>
     <template v-else>
-      <div class="username">Logged in as {{username}}</div>
+      <div class="username">Logged in as {{ username }}</div>
       <button @click="logout">Logout</button>
     </template>
   </header>
@@ -57,7 +57,8 @@
       background-color: vars.$primary;
       transition: background-color 200ms ease-in;
 
-      &.router-link-active, &:hover {
+      &.router-link-active,
+      &:hover {
         text-decoration: none;
         color: white;
         background: lighten(vars.$primary, 5%);
@@ -78,7 +79,8 @@
       background-color: vars.$primary;
       transition: background-color 200ms ease-in;
 
-      &:hover, &:active {
+      &:hover,
+      &:active {
         background: lighten(vars.$primary, 5%);
       }
     }
@@ -90,14 +92,14 @@
 </style>
 
 <script lang="ts">
-  import {EventBus} from './bus'
-  import {defineComponent} from '@vue/composition-api'
-  import {useAuthentication} from '@/features/auth'
+  import {EventBus} from "./bus";
+  import {defineComponent} from "@vue/composition-api";
+  import {useAuthentication} from "@/features/auth";
 
   export default defineComponent({
     methods: {
       loginClick() {
-        EventBus.$emit('login')
+        EventBus.$emit("login");
       },
     },
     setup() {
@@ -106,8 +108,8 @@
       return {
         loggedIn,
         username,
-        logout
-      }
-    }
-  })
+        logout,
+      };
+    },
+  });
 </script>

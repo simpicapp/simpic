@@ -15,22 +15,22 @@
 </style>
 
 <script lang="ts">
-  import 'vue-awesome/icons/spinner'
-  import Icon from 'vue-awesome/components/Icon.vue'
-  import Vue from 'vue'
+  import "vue-awesome/icons/spinner";
+  import Icon from "vue-awesome/components/Icon.vue";
+  import Vue from "vue";
 
   export default Vue.extend({
     props: {
-      'name': String,
-      'working': Boolean
+      name: String,
+      working: Boolean,
     },
     components: {
-      Icon
+      Icon,
     },
     computed: {
       icon() {
-        return this.working ? 'spinner' : this.name
-      }
-    }
-  })
+        return this.working ? "spinner" : this.name;
+      },
+    },
+  });
 </script>

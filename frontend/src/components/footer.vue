@@ -2,8 +2,9 @@
   <footer>
     <a href="https://simpic.app/">Simpic - simple self-hosted picture manager</a> &middot;
     <span class="version">{{ $root.version }}</span>
-    <a :href="`https://github.com/simpicapp/simpic/commit/${$root.gitSHA}`" class="sha" v-if="$root.gitSHA">({{
-      $root.gitSHA }})</a>
+    <a :href="`https://github.com/simpicapp/simpic/commit/${$root.gitSHA}`" class="sha" v-if="$root.gitSHA"
+      >({{ $root.gitSHA }})</a
+    >
   </footer>
 </template>
 

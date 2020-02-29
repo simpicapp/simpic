@@ -10,34 +10,34 @@ const router = new VueRouter({
       children: [
         {
           component: Lightbox,
-          path: '/timeline/photo/:id',
-          props: true
-        }
+          path: "/timeline/photo/:id",
+          props: true,
+        },
       ],
       component: Timeline,
-      path: '/timeline/'
+      path: "/timeline/",
     },
     {
       component: Albums,
-      path: '/albums/'
+      path: "/albums/",
     },
     {
       children: [
         {
           component: Lightbox,
-          path: '/albums/:album/photo/:id',
-          props: true
-        }
+          path: "/albums/:album/photo/:id",
+          props: true,
+        },
       ],
       component: Album,
-      path: '/albums/:id',
-      props: true
+      path: "/albums/:id",
+      props: true,
     },
     {
-      path: '/',
-      redirect: '/timeline/'
-    }
-  ]
+      path: "/",
+      redirect: "/timeline/",
+    },
+  ],
 });
 
 export function useRouter() {

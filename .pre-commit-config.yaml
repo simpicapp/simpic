@@ -14,5 +14,9 @@ repos:
     hooks:
       - id: go-fmt
       - id: go-build
+  - repo: https://github.com/prettier/prettier
+    rev: 1.19.1
+    hooks:
+      - id: prettier
 
 exclude: vendor|go\.(sum|mod)

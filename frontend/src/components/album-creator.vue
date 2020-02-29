@@ -3,8 +3,8 @@
     <form @submit="doCreate">
       <p class="alert" v-if="alert.length > 0">{{ alert }}</p>
       <label for="name">Name</label>
-      <input id="name" placeholder="My Holiday" type="text" v-focus v-model="name">
-      <input type="submit" value="Create">
+      <input id="name" placeholder="My Holiday" type="text" v-focus v-model="name" />
+      <input type="submit" value="Create" />
     </form>
   </popup>
 </template>
@@ -17,7 +17,7 @@
     align-items: center;
   }
 
-  input[type=submit] {
+  input[type="submit"] {
     grid-column: span 2;
   }
 
@@ -35,36 +35,37 @@
 </style>
 
 <script lang="ts">
-  import Axios from 'axios'
-  import Popup from './popup.vue'
-
-  import Vue from 'vue'
+  import Axios from "axios";
+  import Popup from "./popup.vue";
+  import Vue from "vue";
 
   export default Vue.extend({
     components: {Popup},
     data() {
       return {
-        alert: '',
-        name: ''
-      }
+        alert: "",
+        name: "",
+      };
     },
     methods: {
       doCreate() {
-        Axios.post('/albums', {name: this.name}).then(({data: {id}}) => {
-          this.$emit('created', id);
-          this.name = ''
-        }).catch((error) => {
-          if (error.response) {
-            this.alert = error.response.data.error || error.message
-          } else {
-            this.alert = error.message
-          }
-        })
+        Axios.post("/albums", {name: this.name})
+          .then(({data: {id}}) => {
+            this.$emit("created", id);
+            this.name = "";
+          })
+          .catch(error => {
+            if (error.response) {
+              this.alert = error.response.data.error || error.message;
+            } else {
+              this.alert = error.message;
+            }
+          });
       },
       handleClosed() {
-        this.$emit('close');
-        this.name = ''
-      }
-    }
-  })
+        this.$emit("close");
+        this.name = "";
+      },
+    },
+  });
 </script>

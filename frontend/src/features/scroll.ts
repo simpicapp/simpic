@@ -10,22 +10,22 @@ export function useScrollWatcher(onBottom: () => void) {
     const scrollY = window.scrollY;
     const visible = document.documentElement.clientHeight;
     const pageHeight = document.documentElement.scrollHeight;
-    return visible + scrollY >= pageHeight - 400
+    return visible + scrollY >= pageHeight - 400;
   }
 
   function handleScroll() {
     const nowAtBotton = bottomVisible();
     if (nowAtBotton && !atBottom) {
-      emitBottom()
+      emitBottom();
     }
     atBottom = nowAtBotton;
   }
 
   onUnmounted(() => {
-    window.removeEventListener('scroll', handleScroll)
+    window.removeEventListener("scroll", handleScroll);
   });
 
   onMounted(() => {
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener("scroll", handleScroll);
   });
 }

@@ -3,11 +3,13 @@
     <popup @close="close = true" position="center" title="Select an Album" v-if="selecting">
       <div class="album-picker">
         <template v-for="album in albums">
-          <img :alt="album.name"
-               :key="album.id"
-               :src="'/data/thumb/' + album.cover_photo"
-               @click="handleAlbumSelected(album.id)"
-               v-if="album.cover_photo">
+          <img
+            :alt="album.name"
+            :key="album.id"
+            :src="'/data/thumb/' + album.cover_photo"
+            @click="handleAlbumSelected(album.id)"
+            v-if="album.cover_photo"
+          />
           <span :key="album.id" v-else></span>
           <div :key="album.id + '.name'" @click="handleAlbumSelected(album.id)">
             <span>{{ album.name }}</span>
@@ -17,10 +19,7 @@
         <div @click="handleNewAlbumSelected"><span>Create new album...</span></div>
       </div>
     </popup>
-    <album-creator @close="handleClosed"
-                   @created="handleAlbumSelected"
-                   v-else>
-    </album-creator>
+    <album-creator @close="handleClosed" @created="handleAlbumSelected" v-else> </album-creator>
   </modal>
 </template>
 
@@ -60,7 +59,7 @@
     align-items: center;
   }
 
-  input[type=submit] {
+  input[type="submit"] {
     grid-column: span 2;
   }
 
@@ -78,12 +77,12 @@
 </style>
 
 <script lang="ts">
-  import Axios from 'axios'
-  import Modal from './modal.vue'
-  import Popup from './popup.vue'
-  import {EventBus} from './bus'
-  import AlbumCreator from './album-creator.vue'
-  import Vue from 'vue'
+  import Axios from "axios";
+  import Modal from "./modal.vue";
+  import Popup from "./popup.vue";
+  import {EventBus} from "./bus";
+  import AlbumCreator from "./album-creator.vue";
+  import Vue from "vue";
 
   interface Album {
     id: string;
@@ -98,34 +97,36 @@
     components: {
       AlbumCreator,
       Modal,
-      Popup
+      Popup,
     },
     data() {
       return {
         albums: Array<Album>(),
-        alert: '',
+        alert: "",
         close: false,
-        name: '',
-        reject() { /* noop */
+        name: "",
+        reject() {
+          /* noop */
         },
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        resolve(_: string) { /* noop */
+        resolve(_: string) {
+          /* noop */
         },
         selecting: true,
-        visible: false
-      }
+        visible: false,
+      };
     },
     methods: {
       handleAlbumSelected(albumId: string) {
         this.visible = false;
-        this.resolve(albumId)
+        this.resolve(albumId);
       },
       handleClosed() {
         this.visible = false;
-        this.reject()
+        this.reject();
       },
       handleNewAlbumSelected() {
-        this.selecting = false
+        this.selecting = false;
       },
       show(resolve: (_: string) => void, reject: () => void) {
         this.albums = [];
@@ -135,16 +136,16 @@
         this.selecting = true;
         this.visible = true;
 
-        Axios.get('/albums').then(({data}) => {
-          this.albums = data
-        })
-      }
+        Axios.get("/albums").then(({data}) => {
+          this.albums = data;
+        });
+      },
     },
     created() {
-      EventBus.$on('pick-album', this.show)
+      EventBus.$on("pick-album", this.show);
     },
     beforeDestroy() {
-      EventBus.$off('pick-album', this.show)
-    }
-  })
+      EventBus.$off("pick-album", this.show);
+    },
+  });
 </script>

@@ -2,15 +2,11 @@
   <div>
     <div class="toolbar">
       <h2>{{ name }}</h2>
-      <ActionIcon :working="deleting" @click="confirmDelete()" name="trash-alt"
-                  v-if="loggedIn"></ActionIcon>
+      <ActionIcon :working="deleting" @click="confirmDelete()" name="trash-alt" v-if="loggedIn"></ActionIcon>
     </div>
     <gallery :album="id" :endpoint="'/albums/' + id + '/photos'"></gallery>
 
-    <DeleteDialog @close="showConfirmation = false"
-                  @yes="doDelete"
-                  v-if="showConfirmation"
-                  what="this album">
+    <DeleteDialog @close="showConfirmation = false" @yes="doDelete" v-if="showConfirmation" what="this album">
     </DeleteDialog>
   </div>
 </template>
@@ -36,12 +32,12 @@
 </style>
 
 <script lang="ts">
-  import 'vue-awesome/icons/trash-alt'
-  import Axios from 'axios'
-  import Gallery from './gallery.vue'
-  import {EventBus} from './bus'
-  import ActionIcon from './action-icon.vue'
-  import DeleteDialog from './delete-dialog.vue'
+  import "vue-awesome/icons/trash-alt";
+  import Axios from "axios";
+  import Gallery from "./gallery.vue";
+  import {EventBus} from "./bus";
+  import ActionIcon from "./action-icon.vue";
+  import DeleteDialog from "./delete-dialog.vue";
   import {defineComponent, onMounted, reactive, toRefs} from "@vue/composition-api";
   import {useRouter} from "@/features/router";
   import {useAuthentication} from "@/features/auth";
@@ -51,48 +47,48 @@
     components: {
       ActionIcon,
       DeleteDialog,
-      Gallery
+      Gallery,
     },
     props: {
-      'id': String
+      id: String,
     },
     setup(props) {
       const {router} = useRouter();
       const {loggedIn} = useAuthentication();
 
-      useEventListener('album-updated', (album: string) => {
+      useEventListener("album-updated", (album: string) => {
         if (album === props.id) {
-          EventBus.$emit('refresh-gallery')
+          EventBus.$emit("refresh-gallery");
         }
       });
 
       const state = reactive({
-        name: '',
+        name: "",
         showConfirmation: false,
-        deleting: false
+        deleting: false,
       });
 
       function confirmDelete() {
-        state.showConfirmation = true
+        state.showConfirmation = true;
       }
 
       function doDelete() {
         state.deleting = true;
-        Axios.delete('/albums/' + props.id).then(() => {
-          EventBus.$emit('albums-updated');
-          EventBus.$emit('toast', 'Album deleted');
+        Axios.delete("/albums/" + props.id).then(() => {
+          EventBus.$emit("albums-updated");
+          EventBus.$emit("toast", "Album deleted");
           state.deleting = false;
-          router.replace('/albums')
-        })
+          router.replace("/albums");
+        });
       }
 
       onMounted(() => {
-        Axios.get('/albums/' + props.id).then(({data: {name}}) => {
-          state.name = name
-        })
+        Axios.get("/albums/" + props.id).then(({data: {name}}) => {
+          state.name = name;
+        });
       });
 
       return {confirmDelete, doDelete, loggedIn, ...toRefs(state)};
-    }
-  })
+    },
+  });
 </script>

@@ -1,25 +1,26 @@
 <template>
   <main>
-    <gallery-toolbar :album="album"
-                     :selection="selection"
-                     :selection-count="selectionCount"
-                     @clear-selection="clearSelection"
-                     v-if="loggedIn">
+    <gallery-toolbar
+      :album="album"
+      :selection="selection"
+      :selection-count="selectionCount"
+      @clear-selection="clearSelection"
+      v-if="loggedIn"
+    >
     </gallery-toolbar>
 
-    <router-view @go-to-next-image="handleLightboxNext"
-                 @go-to-previous-image="handleLightboxPrevious"
-    ></router-view>
+    <router-view @go-to-next-image="handleLightboxNext" @go-to-previous-image="handleLightboxPrevious"></router-view>
 
-    <thumbnail :caption="photo.file_name"
-               :imageId="photo.id"
-               :key="photo.id"
-               :selected="selection[photo.id]"
-               :selecting="selecting"
-               @deselected="handleItemDeselected"
-               @select-range="handleSelectRange"
-               @selected="handleItemSelected"
-               v-for="photo in photos"
+    <thumbnail
+      :caption="photo.file_name"
+      :imageId="photo.id"
+      :key="photo.id"
+      :selected="selection[photo.id]"
+      :selecting="selecting"
+      @deselected="handleItemDeselected"
+      @select-range="handleSelectRange"
+      @selected="handleItemSelected"
+      v-for="photo in photos"
     ></thumbnail>
 
     <spinner v-if="loading"></spinner>
@@ -31,8 +32,7 @@
           You might need to login to see this content.
         </p>
         <p v-else-if="!!album">
-          You can upload pictures to Simpic simply by dragging and dropping them into your browser.
-          Give it a try!
+          You can upload pictures to Simpic simply by dragging and dropping them into your browser. Give it a try!
         </p>
         <p v-else>
           You can add pictures to albums by selecting them from the timeline.
@@ -53,15 +53,15 @@
 </style>
 
 <script lang="ts">
-  import {findIndex} from 'lodash-es'
-  import Axios from 'axios'
-  import Thumbnail from './thumbnail.vue'
-  import GalleryToolbar from './gallery-toolbar.vue'
-  import Spinner from './spinner.vue'
-  import {cache} from './cache'
-  import {computed, defineComponent, onMounted, reactive, toRefs} from '@vue/composition-api'
-  import {useAuthentication} from '@/features/auth'
-  import {useScrollWatcher} from '@/features/scroll'
+  import {findIndex} from "lodash-es";
+  import Axios from "axios";
+  import Thumbnail from "./thumbnail.vue";
+  import GalleryToolbar from "./gallery-toolbar.vue";
+  import Spinner from "./spinner.vue";
+  import {cache} from "./cache";
+  import {computed, defineComponent, onMounted, reactive, toRefs} from "@vue/composition-api";
+  import {useAuthentication} from "@/features/auth";
+  import {useScrollWatcher} from "@/features/scroll";
   import Vue from "vue";
   import {useRouter} from "@/features/router";
   import {Data} from "@vue/composition-api/dist/component";
@@ -71,11 +71,11 @@
     components: {
       GalleryToolbar,
       Spinner,
-      Thumbnail
+      Thumbnail,
     },
     props: {
-      'album': String,
-      'endpoint': String
+      album: String,
+      endpoint: String,
     },
     setup(props) {
       const {router} = useRouter();
@@ -104,38 +104,38 @@
         loading: true,
         offset: 0,
         photos: [],
-        selection: {}
+        selection: {},
       });
 
       function update() {
         state.loading = true;
 
-        Axios.get(props.endpoint + '?offset=' + state.offset).then(({data}) => {
+        Axios.get(props.endpoint + "?offset=" + state.offset).then(({data}) => {
           if (state.offset === 0) {
-            state.photos = data
+            state.photos = data;
           } else {
-            state.photos = state.photos.concat(data)
+            state.photos = state.photos.concat(data);
           }
           state.offset = state.offset + data.length;
           state.hasMore = data.length > 0;
           state.loading = false;
-          cache.storeMetadata(data)
-        })
+          cache.storeMetadata(data);
+        });
       }
 
       onMounted(update);
 
       useScrollWatcher(() => {
         if (!state.loading && state.hasMore) {
-          update()
+          update();
         }
       });
 
-      useEventListener('refresh-gallery', () => {
+      useEventListener("refresh-gallery", () => {
         state.selection = {};
         state.offset = 0;
         state.hasMore = true;
-        update()
+        update();
       });
 
       const selectionCount = computed(() => Object.keys(state.selection).length);
@@ -143,48 +143,50 @@
 
       function clearSelection() {
         state.selection = {};
-        state.lastSelection = null
+        state.lastSelection = null;
       }
 
       function handleItemDeselected(id: string) {
         Vue.delete(state.selection, id);
-        state.lastSelection = null
+        state.lastSelection = null;
       }
 
       function handleItemSelected(id: string) {
         Vue.set(state.selection, id, true);
-        state.lastSelection = id
+        state.lastSelection = id;
       }
 
       function handleLightboxNext(id: string) {
         const index = (findIndex(state.photos, {id}) + 1) % state.photos.length;
-        router.push({path: state.photos[index].id})
+        router.push({path: state.photos[index].id});
       }
 
       function handleLightboxPrevious(id: string) {
         const index = (findIndex(state.photos, {id}) - 1 + state.photos.length) % state.photos.length;
-        router.push({path: state.photos[index].id})
+        router.push({path: state.photos[index].id});
       }
 
       function handleSelectRange(id: string) {
         if (Object.keys(state.selection).length === 0 || state.lastSelection === null) {
-          handleItemSelected(id)
+          handleItemSelected(id);
         } else {
           const lastIndex = findIndex(state.photos, {id: state.lastSelection});
           const ourIndex = findIndex(state.photos, {id: id});
 
           let slice: Photo[] = [];
           if (lastIndex < ourIndex) {
-            slice = state.photos.slice(lastIndex + 1, ourIndex + 1)
+            slice = state.photos.slice(lastIndex + 1, ourIndex + 1);
           } else if (ourIndex < lastIndex) {
-            slice = state.photos.slice(ourIndex, lastIndex)
+            slice = state.photos.slice(ourIndex, lastIndex);
           }
 
-          slice.map((p) => p.id).forEach((id) => {
-            Vue.set(state.selection, id, true)
-          });
+          slice
+            .map(p => p.id)
+            .forEach(id => {
+              Vue.set(state.selection, id, true);
+            });
 
-          state.lastSelection = id
+          state.lastSelection = id;
         }
       }
 
@@ -198,8 +200,8 @@
         handleItemSelected,
         handleItemDeselected,
         handleSelectRange,
-        ...toRefs(state)
-      }
-    }
-  })
+        ...toRefs(state),
+      };
+    },
+  });
 </script>
