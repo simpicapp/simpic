@@ -57,7 +57,7 @@
     props: {
       album: String,
       selectionCount: Number,
-      selection: Number,
+      selection: Object,
     },
     data() {
       return {
