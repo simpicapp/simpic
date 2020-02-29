@@ -66,6 +66,7 @@
   import {useRouter} from "@/features/router";
   import {Data} from "@vue/composition-api/dist/component";
   import {useEventListener} from "@/features/eventbus";
+  import {Photo} from "@/model/photo";
 
   export default defineComponent({
     components: {
@@ -80,10 +81,6 @@
     setup(props) {
       const {router} = useRouter();
       const {loggedIn} = useAuthentication();
-
-      interface Photo {
-        id: string;
-      }
 
       interface Selection {
         [key: string]: boolean;

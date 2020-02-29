@@ -40,31 +40,27 @@
 </style>
 
 <script lang="ts">
-  import {EventBus} from "./bus";
-  import Vue from "vue";
+  import {defineComponent, reactive, toRefs} from "@vue/composition-api";
+  import {useEventListener} from "@/features/eventbus";
 
-  export default Vue.extend({
-    data() {
-      return {
+  export default defineComponent({
+    setup() {
+      const state = reactive({
         message: "",
         visible: false,
-      };
-    },
-    methods: {
-      hide() {
-        this.visible = false;
-      },
-      showToast(toast: string) {
-        this.message = toast;
-        this.visible = true;
-        setTimeout(this.hide, 3500);
-      },
-    },
-    mounted() {
-      EventBus.$on("toast", this.showToast);
-    },
-    destroyed() {
-      EventBus.$off("toast", this.showToast);
+      });
+
+      function hide() {
+        state.visible = false;
+      }
+
+      useEventListener("toast", (message: string) => {
+        state.message = message;
+        state.visible = true;
+        setTimeout(hide, 3500);
+      });
+
+      return {hide, ...toRefs(state)};
     },
   });
 </script>

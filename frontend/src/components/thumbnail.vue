@@ -97,13 +97,12 @@
 </style>
 
 <script lang="ts">
-  import ThumbnailBackground from "./thumbnail-background.vue";
   import {defineComponent} from "@vue/composition-api";
   import {useRouter} from "@/features/router";
   import {useAuthentication} from "@/features/auth";
+  import {useThumbnail} from "@/features/thumbnail";
 
   export default defineComponent({
-    mixins: [ThumbnailBackground],
     props: {
       imageId: String,
       caption: String,
@@ -113,6 +112,7 @@
     setup(props, ctx) {
       const {router} = useRouter();
       const {loggedIn} = useAuthentication();
+      const {styles} = useThumbnail(props.imageId);
 
       function handleToggle() {
         if (props.selected) {
@@ -135,7 +135,7 @@
         }
       }
 
-      return {handleClick, handleToggle, loggedIn};
+      return {handleClick, handleToggle, styles, loggedIn};
     },
   });
 </script>

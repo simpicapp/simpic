@@ -54,21 +54,26 @@
 </style>
 
 <script lang="ts">
-  import ThumbnailBackground from "./thumbnail-background.vue";
-  import Vue from "vue";
+  import {defineComponent} from "@vue/composition-api";
+  import {useRouter} from "@/features/router";
+  import {useThumbnail} from "@/features/thumbnail";
 
-  export default Vue.extend({
-    mixins: [ThumbnailBackground],
+  export default defineComponent({
     props: {
       id: String,
       caption: String,
       photos: Number,
       imageId: String,
     },
-    methods: {
-      handleClick() {
-        this.$router.push({path: "./" + this.id + "/"});
-      },
+    setup(props) {
+      const {router} = useRouter();
+      const {styles} = useThumbnail(props.imageId);
+
+      function handleClick() {
+        router.push({path: "./" + props.id + "/"});
+      }
+
+      return {handleClick, styles};
     },
   });
 </script>

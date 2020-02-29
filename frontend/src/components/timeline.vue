@@ -5,22 +5,15 @@
 <script lang="ts">
   import {EventBus} from "./bus";
   import Gallery from "./gallery.vue";
-  import Vue from "vue";
+  import {defineComponent} from "@vue/composition-api";
+  import {useEventListener} from "@/features/eventbus";
 
-  export default Vue.extend({
+  export default defineComponent({
     components: {
       Gallery,
     },
-    methods: {
-      refresh() {
-        EventBus.$emit("refresh-gallery");
-      },
-    },
-    beforeDestroy() {
-      EventBus.$off("upload-complete", this.refresh);
-    },
-    mounted() {
-      EventBus.$on("upload-complete", this.refresh);
+    setup() {
+      useEventListener("upload-complete", () => EventBus.$emit("refresh-gallery"));
     },
   });
 </script>

@@ -17,9 +17,9 @@
 <script lang="ts">
   import "vue-awesome/icons/spinner";
   import Icon from "vue-awesome/components/Icon.vue";
-  import Vue from "vue";
+  import {computed, defineComponent} from "@vue/composition-api";
 
-  export default Vue.extend({
+  export default defineComponent({
     props: {
       name: String,
       working: Boolean,
@@ -27,10 +27,9 @@
     components: {
       Icon,
     },
-    computed: {
-      icon() {
-        return this.working ? "spinner" : this.name;
-      },
+    setup(props) {
+      const icon = computed(() => (props.working ? "spinner" : props.name));
+      return {icon};
     },
   });
 </script>

@@ -97,15 +97,15 @@
   import {useAuthentication} from "@/features/auth";
 
   export default defineComponent({
-    methods: {
-      loginClick() {
-        EventBus.$emit("login");
-      },
-    },
     setup() {
       const {loggedIn, username, logout} = useAuthentication();
 
+      function loginClick() {
+        EventBus.$emit("login");
+      }
+
       return {
+        loginClick,
         loggedIn,
         username,
         logout,

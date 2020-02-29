@@ -14,12 +14,12 @@
 
 <script lang="ts">
   import ConfirmDialog from "./confirm-dialog.vue";
-  import Vue from "vue";
+  import {defineComponent} from "@vue/composition-api";
 
-  export default Vue.extend({
+  export default defineComponent({
     components: {
       ConfirmDialog,
     },
-    props: ["what"],
+    props: {what: String},
   });
 </script>
