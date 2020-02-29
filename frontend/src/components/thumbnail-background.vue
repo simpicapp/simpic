@@ -1,7 +1,8 @@
 <script>
   import { cache } from './cache'
+  import Vue from 'vue'
 
-  export default {
+  export default Vue.extend({
     props: ['imageId'],
     data () {
       return {
@@ -40,5 +41,5 @@
         this.showFallbackStyle()
       }
     }
-  }
+  })
 </script>

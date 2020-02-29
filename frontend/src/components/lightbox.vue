@@ -1,79 +1,80 @@
 <template>
-    <modal @close="$router.push('../')" :should-close="close" :darker="true">
-        <div id="lightbox" @click="close = true" ref="container">
-            <div id="prev-overlay" @click.stop.prevent="$emit('go-to-previous-image', id)">
-                <span>←</span>
-            </div>
-            <div id="close">&times; Close</div>
-            <canvas ref="canvas" :width="width" :height="height" @click.stop></canvas>
-            <div id="next-overlay" @click.stop.prevent="$emit('go-to-next-image', id)">
-                <span>→</span>
-            </div>
-        </div>
-    </modal>
+  <modal :darker="true" :should-close="close" @close="$router.push('../')">
+    <div @click="close = true" id="lightbox" ref="container">
+      <div @click.stop.prevent="$emit('go-to-previous-image', id)" id="prev-overlay">
+        <span>←</span>
+      </div>
+      <div id="close">&times; Close</div>
+      <canvas :height="height" :width="width" @click.stop ref="canvas"></canvas>
+      <div @click.stop.prevent="$emit('go-to-next-image', id)" id="next-overlay">
+        <span>→</span>
+      </div>
+    </div>
+  </modal>
 </template>
 
 <style lang="scss" scoped>
-    #lightbox {
-        z-index: 950;
-        position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overscroll-behavior: contain;
-        flex-direction: column;
+  #lightbox {
+    z-index: 950;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overscroll-behavior: contain;
+    flex-direction: column;
+  }
+
+  #close {
+    position: fixed;
+    top: 10px;
+    right: 220px;
+    color: #999;
+    padding: 10px;
+    cursor: pointer;
+
+    &:hover {
+      color: white;
     }
+  }
 
-    #close {
-        position: fixed;
-        top: 10px;
-        right: 220px;
-        color: #999;
-        padding: 10px;
-        cursor: pointer;
+  #next-overlay, #prev-overlay {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: xx-large;
+    color: #999;
+    cursor: pointer;
+    user-select: none;
 
-        &:hover {
-            color: white;
-        }
+    &:hover {
+      background: #ffffff33;
+      color: white;
     }
+  }
 
-    #next-overlay, #prev-overlay {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        width: 200px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: xx-large;
-        color: #999;
-        cursor: pointer;
-        user-select: none;
+  #next-overlay {
+    right: 0;
+  }
 
-        &:hover {
-            background: #ffffff33;
-            color: white;
-        }
-    }
-
-    #next-overlay {
-        right: 0;
-    }
-
-    #prev-overlay {
-        left: 0;
-    }
+  #prev-overlay {
+    left: 0;
+  }
 </style>
 
 <script>
   import Modal from './modal'
   import { cache } from './cache'
+  import Vue from 'vue'
 
-  export default {
+  export default Vue.extend({
     components: { Modal },
     props: ['id'],
 
@@ -154,5 +155,5 @@
       window.removeEventListener('keyup', this.handleKey)
       window.removeEventListener('resize', this.handleResize)
     }
-  }
+  })
 </script>

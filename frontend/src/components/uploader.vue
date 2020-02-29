@@ -1,68 +1,68 @@
 <template>
-    <div>
-        <div class="upload-overlay" v-if="dragging && $root.loggedIn">
-            <div id="drop-target">
-                Drop files here to add to simpic
-            </div>
-        </div>
-        <div class="upload-overlay" v-if="dragging && !$root.loggedIn">
-            <div id="upload-login-prompt">
-                You need to login before uploading files
-            </div>
-        </div>
-        <popup title="Uploading..." id="uploader" v-if="visible" @close="visible = false">
-            <table>
-                <tbody>
-                <tr v-for="file in files" :key="file.name">
-                    <td>{{ file.name }}</td>
-                    <td v-if="file.failed">Error</td>
-                    <td v-else-if="file.finished">Done</td>
-                    <td v-else-if="file.started">Uploading</td>
-                    <td v-else>Waiting</td>
-                </tr>
-                </tbody>
-            </table>
-        </popup>
+  <div>
+    <div class="upload-overlay" v-if="dragging && $root.loggedIn">
+      <div id="drop-target">
+        Drop files here to add to simpic
+      </div>
     </div>
+    <div class="upload-overlay" v-if="dragging && !$root.loggedIn">
+      <div id="upload-login-prompt">
+        You need to login before uploading files
+      </div>
+    </div>
+    <popup @close="visible = false" id="uploader" title="Uploading..." v-if="visible">
+      <table>
+        <tbody>
+        <tr :key="file.name" v-for="file in files">
+          <td>{{ file.name }}</td>
+          <td v-if="file.failed">Error</td>
+          <td v-else-if="file.finished">Done</td>
+          <td v-else-if="file.started">Uploading</td>
+          <td v-else>Waiting</td>
+        </tr>
+        </tbody>
+      </table>
+    </popup>
+  </div>
 </template>
 
 <style lang="scss" scoped>
-    td:first-child {
-        padding-right: 10px;
-    }
+  td:first-child {
+    padding-right: 10px;
+  }
 
-    .upload-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 1000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: #cccccccc;
-    }
+  .upload-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #cccccccc;
+  }
 
-    .upload-overlay > div {
-        width: 50%;
-        height: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: xx-large;
-    }
+  .upload-overlay > div {
+    width: 50%;
+    height: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: xx-large;
+  }
 
-    #drop-target {
-        background-color: lightsteelblue;
-        border: 10px dashed midnightblue;
-        border-radius: 10px;
-    }
+  #drop-target {
+    background-color: lightsteelblue;
+    border: 10px dashed midnightblue;
+    border-radius: 10px;
+  }
 
-    #upload-login-prompt {
-        background-color: #ffcccc;
-        border: 1px solid red;
-    }
+  #upload-login-prompt {
+    background-color: #ffcccc;
+    border: 1px solid red;
+  }
 </style>
 
 <script>
@@ -70,8 +70,9 @@
   import Axios from 'axios'
   import { EventBus } from './bus'
   import popup from './popup'
+  import Vue from 'vue'
 
-  export default {
+  export default Vue.extend({
     components: {
       popup
     },
@@ -174,5 +175,5 @@
       document.removeEventListener('dragenter', this.dragEnterHandler)
       document.removeEventListener('dragleave', this.dragLeaveHandler)
     }
-  }
+  })
 </script>

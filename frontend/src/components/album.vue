@@ -1,38 +1,38 @@
 <template>
-    <div>
-        <div class="toolbar">
-            <h2>{{ name }}</h2>
-            <ActionIcon v-if="$root.loggedIn" name="trash-alt" :working="deleting"
-                        @click="confirmDelete()"></ActionIcon>
-        </div>
-        <gallery :endpoint="'/albums/' + id + '/photos'" :album="id"></gallery>
-
-        <DeleteDialog v-if="showConfirmation"
-                      what="this album"
-                      @yes="doDelete"
-                      @close="showConfirmation = false">
-        </DeleteDialog>
+  <div>
+    <div class="toolbar">
+      <h2>{{ name }}</h2>
+      <ActionIcon :working="deleting" @click="confirmDelete()" name="trash-alt"
+                  v-if="$root.loggedIn"></ActionIcon>
     </div>
+    <gallery :album="id" :endpoint="'/albums/' + id + '/photos'"></gallery>
+
+    <DeleteDialog @close="showConfirmation = false"
+                  @yes="doDelete"
+                  v-if="showConfirmation"
+                  what="this album">
+    </DeleteDialog>
+  </div>
 </template>
 
 <style lang="scss" scoped>
-    h2 {
-        margin: 0 20px;
-    }
+  h2 {
+    margin: 0 20px;
+  }
 
-    .toolbar {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    }
+  .toolbar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
 
-    .buttons {
-        display: grid;
-        grid-template-columns: auto auto;
-        grid-column-gap: 20px;
-        justify-items: stretch;
-        margin-top: 30px;
-    }
+  .buttons {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-column-gap: 20px;
+    justify-items: stretch;
+    margin-top: 30px;
+  }
 </style>
 
 <script>
@@ -43,7 +43,9 @@
   import ActionIcon from './action-icon'
   import DeleteDialog from './delete-dialog'
 
-  export default {
+  import Vue from 'vue'
+
+  export default Vue.extend({
     components: {
       ActionIcon,
       DeleteDialog,
@@ -86,5 +88,5 @@
     destroyed () {
       EventBus.$off('album-updated', this.handleAlbumUpdated)
     }
-  }
+  })
 </script>

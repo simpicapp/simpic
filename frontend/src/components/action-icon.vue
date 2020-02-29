@@ -1,5 +1,5 @@
 <template>
-  <Icon :spin="working" :name="icon" scale="1.5" @click="$emit('click')"></Icon>
+  <Icon :name="icon" :spin="working" @click="$emit('click')" scale="1.5"></Icon>
 </template>
 
 <style lang="scss">
@@ -17,8 +17,9 @@
 <script>
   import 'vue-awesome/icons/spinner'
   import Icon from 'vue-awesome/components/Icon'
+  import Vue from 'vue'
 
-  export default {
+  export default Vue.extend({
     props: ['name', 'working'],
     components: {
       Icon
@@ -28,5 +29,5 @@
         return this.working ? 'spinner' : this.name
       }
     }
-  }
+  })
 </script>

@@ -1,45 +1,45 @@
 <template>
-    <div>
-        <aside class="selectionbar" v-if="selectionCount > 0">
-            {{ selectionCount }} selected
-            <button @click="handleAddToAlbum">Add to album</button>
-            <button @click="handleRemoveFromAlbum" v-if="!!album">Remove from album</button>
-            <button @click="handleDelete">Delete</button>
-            <button @click="$emit('clear-selection')">Clear selection</button>
-        </aside>
+  <div>
+    <aside class="selectionbar" v-if="selectionCount > 0">
+      {{ selectionCount }} selected
+      <button @click="handleAddToAlbum">Add to album</button>
+      <button @click="handleRemoveFromAlbum" v-if="!!album">Remove from album</button>
+      <button @click="handleDelete">Delete</button>
+      <button @click="$emit('clear-selection')">Clear selection</button>
+    </aside>
 
-        <DeleteDialog v-if="showConfirmation"
-                      @yes="doDelete"
-                      @close="showConfirmation = false"
-                      :what="`${selectionCount} photo${selectionCount === 1 ? '' : 's'}`">
-        </DeleteDialog>
-    </div>
+    <DeleteDialog :what="`${selectionCount} photo${selectionCount === 1 ? '' : 's'}`"
+                  @close="showConfirmation = false"
+                  @yes="doDelete"
+                  v-if="showConfirmation">
+    </DeleteDialog>
+  </div>
 </template>
 
 <style lang="scss" scoped>
-    .selectionbar {
-        position: fixed;
-        z-index: 800;
-        top: 0;
-        left: 25%;
-        right: 25%;
-        border: 2px solid black;
-        border-top: 0;
-        padding: 25px;
-        border-bottom-right-radius: 10px;
-        border-bottom-left-radius: 10px;
-        background: #ffffff;
-        display: flex;
-        justify-content: space-between;
-    }
+  .selectionbar {
+    position: fixed;
+    z-index: 800;
+    top: 0;
+    left: 25%;
+    right: 25%;
+    border: 2px solid black;
+    border-top: 0;
+    padding: 25px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    background: #ffffff;
+    display: flex;
+    justify-content: space-between;
+  }
 
-    .buttons {
-        display: grid;
-        grid-template-columns: auto auto;
-        grid-column-gap: 20px;
-        justify-items: stretch;
-        margin-top: 30px;
-    }
+  .buttons {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-column-gap: 20px;
+    justify-items: stretch;
+    margin-top: 30px;
+  }
 
 </style>
 
@@ -47,8 +47,9 @@
   import { EventBus } from './bus'
   import Axios from 'axios'
   import DeleteDialog from './delete-dialog'
+  import Vue from 'vue'
 
-  export default {
+  export default Vue.extend({
     components: {
       DeleteDialog
     },
@@ -94,5 +95,5 @@
         })
       }
     }
-  }
+  })
 </script>

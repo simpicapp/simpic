@@ -1,106 +1,107 @@
 <template>
-    <div class="thumbnail" :class="{ selecting }" :style="styles">
-        <a :href="'/data/image/' + imageId" @click.prevent="handleClick">
-            <div class="overlay">
-                <p class="caption">{{ caption }}</p>
-            </div>
-            <span role="button" class="tickbox"
-                  :class="{ selected }"
-                  @click.prevent.stop="handleToggle"
-                  v-if="$root.loggedIn">
+  <div :class="{ selecting }" :style="styles" class="thumbnail">
+    <a :href="'/data/image/' + imageId" @click.prevent="handleClick">
+      <div class="overlay">
+        <p class="caption">{{ caption }}</p>
+      </div>
+      <span :class="{ selected }" @click.prevent.stop="handleToggle"
+            class="tickbox"
+            role="button"
+            v-if="$root.loggedIn">
                 {{ selected ? '☑' : '☐'}}
             </span>
-        </a>
-    </div>
+    </a>
+  </div>
 </template>
 
 <style lang="scss" scoped>
-    .thumbnail {
-        flex-grow: 1;
-        flex-shrink: 1;
-        position: relative;
-        height: 200px;
-        margin: 3px 3px;
-        background-repeat: no-repeat;
-        background-position: 50%;
-        background-size: cover;
+  .thumbnail {
+    flex-grow: 1;
+    flex-shrink: 1;
+    position: relative;
+    height: 200px;
+    margin: 3px 3px;
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: cover;
+  }
+
+  a {
+    display: block;
+    height: 200px;
+  }
+
+  img {
+    max-width: 800px;
+  }
+
+  .overlay {
+    display: grid;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    grid-template-rows: 25% auto 25%;
+    grid-template-columns: 25% auto 25%;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 300ms var(--ease-in-cubic);
+  }
+
+  .tickbox {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    background-color: #ffffffdd;
+    font-size: xx-large;
+    align-items: center;
+    justify-content: center;
+    border-bottom-right-radius: 5px;
+    opacity: 0;
+    transition: opacity 300ms var(--ease-in-cubic);
+
+    color: #00000066;
+
+    &.selected {
+      color: black;
+    }
+  }
+
+  .thumbnail:hover .overlay, .thumbnail:hover .tickbox, .thumbnail.selecting .tickbox {
+    opacity: 1;
+    transition: opacity 300ms var(--ease-out-cubic);
+  }
+
+  .caption {
+    grid-area: 3 / 1 / 4 / 4;
+    text-align: center;
+    align-self: end;
+    margin: 0;
+    padding: 10px 0;
+    color: white;
+    overflow: hidden;
+    min-width: 0;
+
+    @supports (backdrop-filter: blur()) {
+      backdrop-filter: blur(10px);
+      background-color: #00000099;
     }
 
-    a {
-        display: block;
-        height: 200px;
+    @supports not (backdrop-filter: blur()) {
+      background-color: #000000cc;
     }
-
-    img {
-        max-width: 800px;
-    }
-
-    .overlay {
-        display: grid;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        grid-template-rows: 25% auto 25%;
-        grid-template-columns: 25% auto 25%;
-        overflow: hidden;
-        opacity: 0;
-        transition: opacity 300ms var(--ease-in-cubic);
-    }
-
-    .tickbox {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 50px;
-        height: 50px;
-        display: flex;
-        background-color: #ffffffdd;
-        font-size: xx-large;
-        align-items: center;
-        justify-content: center;
-        border-bottom-right-radius: 5px;
-        opacity: 0;
-        transition: opacity 300ms var(--ease-in-cubic);
-
-        color: #00000066;
-
-        &.selected {
-            color: black;
-        }
-    }
-
-    .thumbnail:hover .overlay, .thumbnail:hover .tickbox, .thumbnail.selecting .tickbox {
-        opacity: 1;
-        transition: opacity 300ms var(--ease-out-cubic);
-    }
-
-    .caption {
-        grid-area: 3 / 1 / 4 / 4;
-        text-align: center;
-        align-self: end;
-        margin: 0;
-        padding: 10px 0;
-        color: white;
-        overflow: hidden;
-        min-width: 0;
-
-        @supports (backdrop-filter: blur()) {
-            backdrop-filter: blur(10px);
-            background-color: #00000099;
-        }
-
-        @supports not (backdrop-filter: blur()) {
-            background-color: #000000cc;
-        }
-    }
+  }
 </style>
 
 <script>
   import ThumbnailBackground from './thumbnail-background'
+  import Vue from 'vue'
 
-  export default {
+  export default Vue.extend({
     mixins: [ThumbnailBackground],
     props: ['imageId', 'caption', 'selecting', 'selected'],
     methods: {
@@ -124,5 +125,5 @@
         }
       }
     }
-  }
+  })
 </script>

@@ -1,30 +1,32 @@
 <template>
-    <modal :closeable="false" :should-close="shouldClose" @close="onClose">
-        <popup :title="title" position="center" :closeable="false">
-            <p>{{ body }}</p>
-            <div class="buttons">
-                <button @click="onYes" :class="{'danger-button': dangerous}">{{ yesText }}</button>
-                <button @click="onNo">{{ noText }}</button>
-            </div>
-        </popup>
-    </modal>
+  <modal :closeable="false" :should-close="shouldClose" @close="onClose">
+    <popup :closeable="false" :title="title" position="center">
+      <p>{{ body }}</p>
+      <div class="buttons">
+        <button :class="{'danger-button': dangerous}" @click="onYes">{{ yesText }}</button>
+        <button @click="onNo">{{ noText }}</button>
+      </div>
+    </popup>
+  </modal>
 </template>
 
 <style lang="scss" scoped>
-    .buttons {
-        display: grid;
-        grid-template-columns: auto auto;
-        grid-column-gap: 20px;
-        justify-items: stretch;
-        margin-top: 30px;
-    }
+  .buttons {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-column-gap: 20px;
+    justify-items: stretch;
+    margin-top: 30px;
+  }
 </style>
 
 <script>
   import Modal from './modal'
   import Popup from './popup'
 
-  export default {
+  import Vue from 'vue'
+
+  export default Vue.extend({
     props: {
       body: String,
       dangerous: {
@@ -64,5 +66,5 @@
         this.shouldClose = true
       }
     }
-  }
+  })
 </script>

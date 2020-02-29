@@ -8,7 +8,7 @@ import App from './components/app.vue'
 import Lightbox from './components/lightbox.vue'
 import Timeline from './components/timeline.vue'
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 // eslint-disable-next-line no-new
 new Vue({
@@ -54,19 +54,19 @@ new Vue({
     version: '1.0+dev'
   },
   el: '#main',
-  components: { App },
+  components: {App},
   render: (h) => h(App),
   methods: {
-    checkUser () {
-      Axios.get('/users/me').then(({ data: { username } }) => {
-        this.username = username
+    checkUser() {
+      Axios.get('/users/me').then(({data: {username}}) => {
+        this.username = username;
         this.loggedIn = true
       }).catch(() => {
         this.loggedIn = false
       })
     }
   },
-  created () {
+  created() {
     this.checkUser()
   }
-})
+});

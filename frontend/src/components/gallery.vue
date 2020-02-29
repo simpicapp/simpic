@@ -1,25 +1,25 @@
 <template>
   <main>
-    <gallery-toolbar v-if="$root.loggedIn"
-                     :album="album"
+    <gallery-toolbar :album="album"
                      :selection="selection"
                      :selection-count="selectionCount"
-                     @clear-selection="clearSelection">
+                     @clear-selection="clearSelection"
+                     v-if="$root.loggedIn">
     </gallery-toolbar>
 
-    <router-view @go-to-previous-image="handleLightboxPrevious"
-                 @go-to-next-image="handleLightboxNext"
+    <router-view @go-to-next-image="handleLightboxNext"
+                 @go-to-previous-image="handleLightboxPrevious"
     ></router-view>
 
-    <thumbnail v-for="photo in photos"
+    <thumbnail :caption="photo.file_name"
                :imageId="photo.id"
-               :caption="photo.file_name"
                :key="photo.id"
                :selected="selection[photo.id]"
                :selecting="selecting"
-               @selected="handleItemSelected"
                @deselected="handleItemDeselected"
                @select-range="handleSelectRange"
+               @selected="handleItemSelected"
+               v-for="photo in photos"
     ></thumbnail>
 
     <spinner v-if="loading"></spinner>
@@ -60,8 +60,9 @@
   import GalleryToolbar from './gallery-toolbar'
   import Spinner from './spinner'
   import { cache } from './cache'
+  import Vue from 'vue'
 
-  export default {
+  export default Vue.extend({
     components: {
       GalleryToolbar,
       Spinner,
@@ -164,5 +165,5 @@
       EventBus.$on('bottom', this.infiniteScroll)
       EventBus.$on('refresh-gallery', this.refresh)
     }
-  }
+  })
 </script>

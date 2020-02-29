@@ -1,12 +1,13 @@
 <template>
-    <gallery endpoint="/timeline"></gallery>
+  <gallery endpoint="/timeline"></gallery>
 </template>
 
 <script>
   import { EventBus } from './bus'
   import Gallery from './gallery'
+  import Vue from 'vue'
 
-  export default {
+  export default Vue.extend({
     components: {
       Gallery
     },
@@ -21,5 +22,5 @@
     mounted () {
       EventBus.$on('upload-complete', this.refresh)
     }
-  }
+  })
 </script>
