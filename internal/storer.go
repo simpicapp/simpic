@@ -30,9 +30,10 @@ func NewStorer(db *Database, driver PhotoWriter, thumbnailHeight int) *Storer {
 	}
 }
 
-func (s *Storer) Store(fileName string, uploader int, stream io.Reader) (*Photo, error) {
+func (s *Storer) Store(fileName string, uploader int, visibility Visibility, stream io.Reader) (*Photo, error) {
 	photo := NewPhoto(fileName)
 	photo.Uploader = uploader
+	photo.Visibility = visibility
 
 	var buf bytes.Buffer
 	img, format, err := image.Decode(io.TeeReader(stream, &buf))

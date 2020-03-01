@@ -68,6 +68,10 @@ It currently has the following options:
 | false
 | Enables verbose logging of SQL queries.
 
+| SIMPIC_DEFAULT_VISIBILITY
+| public
+| Sets the visibility for newly uploaded files. One of `public`, `unlisted` or `private`.
+
 | SIMPIC_DSN
 | -
 | The 'data source name' to use to connect to the Postgres database. See:

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"flag"
 	"fmt"
 	uuid "github.com/satori/go.uuid"
 	"github.com/simpicapp/simpic/internal"
@@ -8,6 +9,10 @@ import (
 	"io"
 	"log"
 	"net/http"
+)
+
+var (
+	defaultVisibility = flag.String("default-visibility", "public", "Default visibility for newly uploaded photos: public, unlisted or private")
 )
 
 func (s *server) handleGetPhotoInfo() http.HandlerFunc {
@@ -87,7 +92,7 @@ func (s *server) handleStorePhoto() http.HandlerFunc {
 		}()
 
 		user := r.Context().Value(ctxUser).(*internal.User)
-		photo, err := s.storer.Store(headers.Filename, user.Id, file)
+		photo, err := s.storer.Store(headers.Filename, user.Id, getDefaultVisibility(), file)
 		if err != nil {
 			log.Printf("unable to create photo '%s': %v\n", headers.Filename, err)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -107,5 +112,19 @@ func mimeTypeFor(t internal.PhotoType) string {
 	default:
 		log.Printf("No known content type for type %d\n", t)
 		return "application/octet-stream"
+	}
+}
+
+func getDefaultVisibility() internal.Visibility {
+	switch *defaultVisibility {
+	case "public":
+		return internal.VisPublic
+	case "unlisted":
+		return internal.VisUnlisted
+	case "private":
+		return internal.VisPrivate
+	default:
+		log.Printf("Warning: unknown default visibility %s. Setting photos to private.\n", *defaultVisibility)
+		return internal.VisPrivate
 	}
 }
