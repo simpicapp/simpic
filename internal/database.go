@@ -73,13 +73,21 @@ func (d *Database) Add(photo *Photo) (err error) {
 	return
 }
 
-func (d *Database) GetPhoto(id uuid.UUID) (photo *Photo, err error) {
-	err = d.db.Collection("photos").Find("photo_uuid", id).One(&photo)
+func (d *Database) GetPhoto(id uuid.UUID, maxVisibility Visibility) (photo *Photo, err error) {
+	err = d.db.Collection("photos").
+		Find("photo_uuid", id).
+		And("photo_visibility <=", maxVisibility).
+		One(&photo)
 	return
 }
 
-func (d *Database) GetPhotosByTime(offset, count int) (photos []Photo, err error) {
-	err = d.db.Collection("photos").Find().OrderBy("-photo_uploaded").Offset(offset).Limit(count).All(&photos)
+func (d *Database) GetPhotosByTime(maxVisibility Visibility, offset, count int) (photos []Photo, err error) {
+	err = d.db.Collection("photos").Find().
+		Where("photo_visibility <=", maxVisibility).
+		OrderBy("-photo_uploaded").
+		Offset(offset).
+		Limit(count).
+		All(&photos)
 	return
 }
 
@@ -108,19 +116,21 @@ func (d *Database) DeleteAlbum(album *Album) error {
 	return d.db.Collection("albums").Find("album_uuid", album.Id).Delete()
 }
 
-func (d *Database) GetAlbum(id uuid.UUID) (album *Album, err error) {
+func (d *Database) GetAlbum(maxVisibility Visibility, id uuid.UUID) (album *Album, err error) {
 	err = d.db.SelectFrom("albums").
 		Columns(db.Raw("(SELECT COUNT(*) FROM album_contents ac WHERE ac.album_uuid = albums.album_uuid) AS photo_count")).
 		Columns("albums.*").
 		Where("album_uuid", id).
+		And("album_visibility <=", maxVisibility).
 		One(&album)
 	return
 }
 
-func (d *Database) GetAlbums(offset, count int) (albums []Album, err error) {
+func (d *Database) GetAlbums(maxVisibility Visibility, offset, count int) (albums []Album, err error) {
 	err = d.db.SelectFrom("albums").
 		Columns(db.Raw("(SELECT COUNT(*) FROM album_contents ac WHERE ac.album_uuid = albums.album_uuid) AS photo_count")).
 		Columns("albums.*").
+		Where("album_visibility <=", maxVisibility).
 		OrderBy("album_name").
 		Offset(offset).
 		Limit(count).
@@ -143,11 +153,15 @@ func (d *Database) GetAlbumOrderMax(album uuid.UUID) (int, error) {
 	}
 }
 
-func (d *Database) GetAlbumPhotos(album uuid.UUID, offset, count int) (photos []AlbumPhoto, err error) {
+func (d *Database) GetAlbumPhotos(album uuid.UUID, maxVisibility Visibility, offset, count int) (photos []AlbumPhoto, err error) {
 	err = d.db.SelectFrom("album_contents").
 		Join("photos").Using("photo_uuid").
-		Where("album_uuid = ?", album).OrderBy("-content_order").
-		Offset(offset).Limit(count).All(&photos)
+		Where("album_uuid = ?", album).
+		And("photo_visibility <=", maxVisibility).
+		OrderBy("-content_order").
+		Offset(offset).
+		Limit(count).
+		All(&photos)
 	return
 }
 
@@ -173,9 +187,11 @@ func (d *Database) RemoveAlbumPhotos(album uuid.UUID, photos []uuid.UUID) error 
 func (d *Database) RefreshCoverImage(album uuid.UUID) error {
 	_, err := d.db.Update("albums").Where("album_uuid", album).
 		Set("photo_uuid", db.Raw(`(
-			SELECT photo_uuid
+			SELECT photos.photo_uuid
 			FROM album_contents
+			JOIN photos ON album_contents.photo_uuid = photos.photo_uuid
 			WHERE albums.album_uuid = album_contents.album_uuid
+			AND photo_visibility <= album_visibility
 			ORDER BY content_order
 			LIMIT 1
 		)`)).Exec()
@@ -185,9 +201,11 @@ func (d *Database) RefreshCoverImage(album uuid.UUID) error {
 func (d *Database) RefreshMissingCoverImages() error {
 	_, err := d.db.Update("albums").Where("photo_uuid IS NULL").
 		Set("photo_uuid", db.Raw(`(
-			SELECT photo_uuid
+			SELECT photos.photo_uuid
 			FROM album_contents
+			JOIN photos ON album_contents.photo_uuid = photos.photo_uuid
 			WHERE albums.album_uuid = album_contents.album_uuid
+			AND photo_visibility <= album_visibility
 			ORDER BY content_order
 			LIMIT 1
 		)`)).Exec()

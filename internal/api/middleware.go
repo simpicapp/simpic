@@ -9,10 +9,11 @@ import (
 )
 
 const (
-	ctxAlbum   = "album"
-	ctxPhoto   = "photo"
-	ctxSession = "session"
-	ctxUser    = "user"
+	ctxAlbum      = "album"
+	ctxPhoto      = "photo"
+	ctxSession    = "session"
+	ctxUser       = "user"
+	ctxVisibility = "visibility"
 )
 
 func (s *server) albumContext(next http.Handler) http.Handler {
@@ -23,7 +24,7 @@ func (s *server) albumContext(next http.Handler) http.Handler {
 			return
 		}
 
-		album, err := s.db.GetAlbum(id)
+		album, err := s.db.GetAlbum(visForAccess(r), id)
 		if err != nil {
 			writeError(w, http.StatusNotFound, "No such album")
 			return
@@ -42,7 +43,7 @@ func (s *server) photoContext(next http.Handler) http.Handler {
 			return
 		}
 
-		photo, err := s.db.GetPhoto(id)
+		photo, err := s.db.GetPhoto(id, visForAccess(r))
 		if err != nil {
 			writeError(w, http.StatusNotFound, "No such photo")
 			return
@@ -58,18 +59,21 @@ func (s *server) authenticatedContext(next http.Handler) http.Handler {
 		cookie, err := r.Cookie(cookieName)
 		if err != nil {
 			s.clearAuthCookie(w)
-			next.ServeHTTP(w, r)
+			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxVisibility, internal.VisPublic)))
 			return
 		}
 
 		session, err := s.db.GetSession(cookie.Value)
 		if err != nil {
 			s.clearAuthCookie(w)
-			next.ServeHTTP(w, r)
+			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxVisibility, internal.VisPublic)))
 			return
 		}
 
-		ctx := context.WithValue(context.WithValue(r.Context(), ctxUser, &session.User), ctxSession, &session.Session)
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, ctxVisibility, internal.VisPrivate)
+		ctx = context.WithValue(ctx, ctxUser, &session.User)
+		ctx = context.WithValue(ctx, ctxSession, &session.Session)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -98,4 +102,20 @@ func (s *server) provideVersion(next http.Handler) http.Handler {
 		w.Header().Add("Server", internal.GetVersionString())
 		next.ServeHTTP(w, r)
 	})
+}
+
+// visForBrowsing provides the visibility level for the current user if they are browsing a list of resources.
+func visForBrowsing(r *http.Request) internal.Visibility {
+	return r.Context().Value(ctxVisibility).(internal.Visibility)
+}
+
+// visForAccess provides the visibility level for the current user if they are accessing a resource directly.
+// This is a higher level than visForBrowsing as an anonymous user that knows the resource ID is allowed access
+// to VisUnlisted resources.
+func visForAccess(r *http.Request) internal.Visibility {
+	vis := visForBrowsing(r)
+	if vis == internal.VisPublic {
+		return internal.VisUnlisted
+	}
+	return vis
 }

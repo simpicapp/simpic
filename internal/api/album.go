@@ -55,7 +55,7 @@ func (s *server) handleDeleteAlbum() http.HandlerFunc {
 func (s *server) handleGetAlbums() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		paginate(w, r, func(offset, count int) (i interface{}, err error) {
-			return s.db.GetAlbums(offset, count)
+			return s.db.GetAlbums(visForBrowsing(r), offset, count)
 		})
 	}
 }
@@ -64,7 +64,7 @@ func (s *server) handleGetPhotosForAlbum() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		album := r.Context().Value(ctxAlbum).(*internal.Album)
 		paginate(w, r, func(offset, count int) (i interface{}, err error) {
-			return s.db.GetAlbumPhotos(album.Id, offset, count)
+			return s.db.GetAlbumPhotos(album.Id, visForAccess(r), offset, count)
 		})
 	}
 }
