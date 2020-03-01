@@ -1,11 +1,13 @@
 <template>
   <div>
     <aside class="selectionbar" v-if="selectionCount > 0">
-      {{ selectionCount }} selected
-      <button @click="handleAddToAlbum">Add to album</button>
-      <button @click="handleRemoveFromAlbum" v-if="!!album">Remove from album</button>
-      <button @click="handleDelete">Delete</button>
-      <button @click="$emit('clear-selection')">Clear selection</button>
+      <span>{{ selectionNoun }} selected</span>
+      <Icon name="folder-plus" @click="handleAddToAlbum" title="Add to album"></Icon>
+      <Icon name="folder-minus" @click="handleRemoveFromAlbum" v-if="!!album" title="Remove from this album"></Icon>
+      &middot;
+      <Icon name="trash-alt" @click="handleDelete" title="Delete"></Icon>
+      &middot;
+      <Icon name="times" @click="$emit('clear-selection')" title="Clear selection"></Icon>
     </aside>
 
     <DeleteDialog
@@ -19,28 +21,37 @@
 </template>
 
 <style lang="scss" scoped>
+  @use '../assets/css/vars';
+
   .selectionbar {
     position: fixed;
     z-index: 800;
-    top: 0;
-    left: 25%;
-    right: 25%;
-    border: 2px solid black;
-    border-top: 0;
-    padding: 25px;
-    border-bottom-right-radius: 10px;
-    border-bottom-left-radius: 10px;
+    top: 20px;
+    right: 20px;
+    border: 1px solid vars.$primary;
+    box-shadow: 0 0 10px black;
+    padding: 10px 25px;
+    border-radius: 10px;
     background: #ffffff;
     display: flex;
     justify-content: space-between;
-  }
+    align-items: center;
 
-  .buttons {
-    display: grid;
-    grid-template-columns: auto auto;
-    grid-column-gap: 20px;
-    justify-items: stretch;
-    margin-top: 30px;
+    span {
+      margin-right: 20px;
+    }
+
+    svg {
+      box-sizing: content-box;
+      width: 24px;
+      height: 24px;
+      padding: 10px;
+      cursor: pointer;
+
+      &:hover {
+        color: vars.$primary;
+      }
+    }
   }
 </style>
 
@@ -49,10 +60,16 @@
   import Axios from "axios";
   import DeleteDialog from "./delete-dialog.vue";
   import {computed, defineComponent, reactive, toRefs} from "@vue/composition-api";
+  import "vue-awesome/icons/folder-plus";
+  import "vue-awesome/icons/folder-minus";
+  import "vue-awesome/icons/times";
+  import "vue-awesome/icons/trash-alt";
+  import Icon from "vue-awesome/components/Icon.vue";
 
   export default defineComponent({
     components: {
       DeleteDialog,
+      Icon,
     },
     props: {
       album: String,
@@ -117,7 +134,7 @@
         });
       }
 
-      return {handleDelete, handleRemoveFromAlbum, handleAddToAlbum, doDelete, ...toRefs(state)};
+      return {handleDelete, handleRemoveFromAlbum, handleAddToAlbum, doDelete, selectionNoun, ...toRefs(state)};
     },
   });
 </script>

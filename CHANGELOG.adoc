@@ -4,9 +4,21 @@
 
 === Features
 
-- Added ability to delete albums
+* Added ability to delete albums
+* Albums and photos now have a visibility:
+** *Public*:
+*** public photos always appear in the timeline and any albums they're added to;
+*** public albums are listed in the albums page for all users.
+** *Unlisted*:
+*** unlisted photos only appear in the timeline or public albums for logged-in users;
+*** unlisted albums only appear in the albums page for logged-in users
+*** if an anonymous user knows the ID (or URL) for an unlisted resource they can still see it
+*** if an anonymous user browses an unlisted album they will see unlisted photos in it
+** *Private*:
+*** photos and albums are hidden and cannot be seen or browsed except by logged-in users
+* The toolbar when selecting images is now less intrusive and uses icons
 
 === Fixes
 
-- Fixed version not being set in docker builds
-- Album covers are now updated if you remove that photo from the album
+* Fixed version not being set in docker builds
+* Album covers are now updated if you remove that photo from the album
