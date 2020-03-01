@@ -5,7 +5,7 @@ import {EventBus} from "@/components/bus";
 const state = reactive({
   username: "",
   loggedIn: false,
-  wasLoggedIn: undefined as Boolean | undefined,
+  wasLoggedIn: undefined as boolean | undefined,
 });
 
 export function useAuthentication() {
