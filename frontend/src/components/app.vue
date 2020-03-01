@@ -1,13 +1,14 @@
 <template>
   <div>
     <toolbar></toolbar>
-    <div id="content">
+    <div id="content" v-if="ready">
       <router-view></router-view>
       <uploader></uploader>
       <login></login>
       <album-picker></album-picker>
       <toaster></toaster>
     </div>
+    <spinner v-else></spinner>
     <bottom-bar></bottom-bar>
   </div>
 </template>
@@ -49,13 +50,14 @@
 
 <script lang="ts">
   import Vue from "vue";
-  import {defineComponent} from "@vue/composition-api";
+  import {defineComponent, onMounted, reactive, toRefs} from "@vue/composition-api";
 
   import Uploader from "./uploader.vue";
   import Login from "./login.vue";
   import Toolbar from "./toolbar.vue";
   import BottomBar from "./footer.vue";
   import AlbumPicker from "./album-picker.vue";
+  import Spinner from "./spinner.vue";
   import Toaster from "./toaster.vue";
   import {useAuthentication} from "@/features/auth";
 
@@ -70,13 +72,25 @@
       AlbumPicker,
       BottomBar,
       Login,
+      Spinner,
       Toaster,
       Toolbar,
       Uploader,
     },
     setup() {
+      const state = reactive({
+        ready: false,
+      });
+
       const {checkUser} = useAuthentication();
-      checkUser();
+
+      onMounted(() => {
+        checkUser().finally(() => {
+          state.ready = true;
+        });
+      });
+
+      return toRefs(state);
     },
   });
 </script>

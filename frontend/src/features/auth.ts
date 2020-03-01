@@ -5,17 +5,27 @@ import {EventBus} from "@/components/bus";
 const state = reactive({
   username: "",
   loggedIn: false,
+  wasLoggedIn: undefined as Boolean | undefined,
 });
 
 export function useAuthentication() {
+  function checkUserChanged() {
+    if (state.loggedIn !== state.wasLoggedIn) {
+      EventBus.$emit("user-changed");
+      state.wasLoggedIn = state.loggedIn;
+    }
+  }
+
   function checkUser() {
     return Axios.get("/users/me")
       .then(({data}) => {
         state.username = data.username;
         state.loggedIn = true;
+        checkUserChanged();
       })
       .catch(() => {
         state.loggedIn = false;
+        checkUserChanged();
       });
   }
 
@@ -23,6 +33,7 @@ export function useAuthentication() {
     return Axios.get("/logout").then(() => {
       state.loggedIn = false;
       EventBus.$emit("toast", "You have been logged out");
+      checkUserChanged();
     });
   }
 

@@ -128,12 +128,15 @@
         }
       });
 
-      useEventListener("refresh-gallery", () => {
+      function refresh() {
         state.selection = {};
         state.offset = 0;
         state.hasMore = true;
         update();
-      });
+      }
+
+      useEventListener("refresh-gallery", refresh);
+      useEventListener("user-changed", refresh);
 
       const selectionCount = computed(() => Object.keys(state.selection).length);
       const selecting = computed(() => selectionCount.value > 0);

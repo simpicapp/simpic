@@ -59,6 +59,7 @@
       }
 
       useEventListener("albums-updated", refresh);
+      useEventListener("user-changed", refresh);
       onMounted(refresh);
 
       return {loggedIn, ...toRefs(state)};
