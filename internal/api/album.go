@@ -12,8 +12,8 @@ import (
 
 func (s *server) handleAddAlbum() http.HandlerFunc {
 	type AlbumData struct {
-		Name       string              `json:"name" validate:"required,min=1,max=128"`
-		Visibility internal.Visibility `json:"visibility" validate:"required,min=0,max=2"`
+		Name       *string              `json:"name" validate:"required,min=1,max=128"`
+		Visibility *internal.Visibility `json:"visibility" validate:"required,min=0,max=2"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -23,7 +23,7 @@ func (s *server) handleAddAlbum() http.HandlerFunc {
 		}
 
 		user := r.Context().Value(ctxUser).(*internal.User)
-		album := internal.NewAlbum(data.Name, user.Id, data.Visibility)
+		album := internal.NewAlbum(*data.Name, user.Id, *data.Visibility)
 
 		if err := s.db.AddAlbum(album); err != nil {
 			if strings.Contains(err.Error(), "albums_album_name_unique") {
