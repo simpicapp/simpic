@@ -53,6 +53,37 @@ func (s *server) handleDeleteAlbum() http.HandlerFunc {
 	}
 }
 
+func (s *server) handleUpdateAlbum() http.HandlerFunc {
+	type AlbumData struct {
+		Name       *string              `json:"name" validate:"min=1,max=128"`
+		Visibility *internal.Visibility `json:"visibility" validate:"min=0,max=2"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		data := &AlbumData{}
+		if !bind(w, r, data) {
+			return
+		}
+
+		album := r.Context().Value(ctxAlbum).(*internal.Album)
+
+		if data.Name != nil {
+			album.Name = *data.Name
+		}
+		if data.Visibility != nil {
+			album.Visibility = *data.Visibility
+		}
+
+		if err := s.db.UpdateAlbum(album); err != nil {
+			log.Printf("Unable to update album '%s': %v\n", album.Id, err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
+	}
+}
+
 func (s *server) handleGetAlbums() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		paginate(w, r, func(offset, count int) (i interface{}, err error) {

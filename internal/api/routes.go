@@ -62,6 +62,7 @@ func (s *server) albumRoutes(r chi.Router) {
 		r.Group(func(r chi.Router) {
 			r.Use(s.requireAnyUser)
 			r.Delete("/{uuid}", s.handleDeleteAlbum())
+			r.Post("/{uuid}", s.handleUpdateAlbum())
 		})
 	})
 
