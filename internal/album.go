@@ -28,11 +28,12 @@ type AlbumPhoto struct {
 	Photo
 }
 
-func NewAlbum(name string, owner int) *Album {
+func NewAlbum(name string, owner int, visibility Visibility) *Album {
 	return &Album{
-		Id:      uuid.NewV4(),
-		Name:    name,
-		Owner:   owner,
-		Created: time.Now(),
+		Id:         uuid.NewV4(),
+		Name:       name,
+		Owner:      owner,
+		Created:    time.Now(),
+		Visibility: visibility,
 	}
 }

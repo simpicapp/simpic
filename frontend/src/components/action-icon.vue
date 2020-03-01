@@ -2,7 +2,7 @@
   <Icon :name="icon" :spin="working" @click="$emit('click')" scale="1.5"></Icon>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
   @use "src/assets/css/vars";
 
   .fa-icon {
