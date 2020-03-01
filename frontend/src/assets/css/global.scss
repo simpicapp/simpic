@@ -1,5 +1,17 @@
 @use 'vars';
 
+:root {
+  --ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  --ease-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
 button {
   box-sizing: border-box;
   border: 1px solid #cccccc;
@@ -20,4 +32,26 @@ button {
       border-color: darken(red, 10%);
     }
   }
+}
+
+input {
+  padding: 5px;
+  border: 1px solid #dddddd;
+
+  &:focus,
+  &:active {
+    border: 1px solid vars.$primary;
+  }
+}
+
+input[type="submit"] {
+  padding: 10px;
+  background-color: #eeeeee;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+input[type="submit"]:hover,
+input[type="submit"]:active {
+  background-color: vars.$primary;
 }
