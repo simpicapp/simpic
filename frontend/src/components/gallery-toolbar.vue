@@ -48,9 +48,9 @@
   import {EventBus} from "./bus";
   import Axios from "axios";
   import DeleteDialog from "./delete-dialog.vue";
-  import Vue from "vue";
+  import {computed, defineComponent, reactive, toRefs} from "@vue/composition-api";
 
-  export default Vue.extend({
+  export default defineComponent({
     components: {
       DeleteDialog,
     },
@@ -59,53 +59,65 @@
       selectionCount: Number,
       selection: Object,
     },
-    data() {
-      return {
+    setup(props, ctx) {
+      const state = reactive({
         showConfirmation: false,
-      };
-    },
-    methods: {
-      doDelete() {
-        Axios.post("/photos/delete", {photos: Object.keys(this.selection)}).then(() => {
-          EventBus.$emit("toast", this.selectionCount + " photo" + (this.selectionCount === 1 ? "" : "s") + " deleted");
+      });
+
+      const selectionNoun = computed(() => props.selectionCount + " photo" + (props.selectionCount === 1 ? "" : "s"));
+
+      function selectionKeys() {
+        if (props.selection) {
+          return Object.keys(props.selection);
+        } else {
+          return [];
+        }
+      }
+
+      function doDelete() {
+        if (!props.selection) {
+          return;
+        }
+
+        Axios.post("/photos/delete", {photos: selectionKeys()}).then(() => {
+          EventBus.$emit("toast", `${selectionNoun.value} deleted`);
           EventBus.$emit("refresh-gallery");
         });
-      },
-      handleAddToAlbum() {
+      }
+
+      function handleAddToAlbum() {
         new Promise((resolve, reject) => {
           EventBus.$emit("pick-album", resolve, reject);
         })
           .then(album =>
             Axios.post("/albums/" + album + "/photos", {
               // eslint-disable-next-line @typescript-eslint/camelcase
-              add_photos: Object.keys(this.selection),
+              add_photos: selectionKeys(),
             }).then(() => {
-              EventBus.$emit(
-                "toast",
-                this.selectionCount + " photo" + (this.selectionCount === 1 ? "" : "s") + " added to album"
-              );
+              EventBus.$emit("toast", `${selectionNoun.value} added to album`);
               EventBus.$emit("album-updated", album);
-              this.$emit("clear-selection");
+              ctx.emit("clear-selection");
             })
           )
           .catch(() => {
             /* ignore */
           });
-      },
-      handleDelete() {
-        this.showConfirmation = true;
-      },
-      handleRemoveFromAlbum() {
+      }
+
+      function handleDelete() {
+        state.showConfirmation = true;
+      }
+
+      function handleRemoveFromAlbum() {
         // eslint-disable-next-line @typescript-eslint/camelcase
-        Axios.post("/albums/" + this.album + "/photos", {remove_photos: Object.keys(this.selection)}).then(() => {
-          EventBus.$emit(
-            "toast",
-            this.selectionCount + " photo" + (this.selectionCount === 1 ? "" : "s") + " removed from album"
-          );
-          EventBus.$emit("album-updated", this.album);
-          this.$emit("clear-selection");
+        Axios.post("/albums/" + props.album + "/photos", {remove_photos: selectionKeys()}).then(() => {
+          EventBus.$emit("toast", `${selectionNoun.value} removed from album`);
+          EventBus.$emit("album-updated", props.album);
+          ctx.emit("clear-selection");
         });
-      },
+      }
+
+      return {handleDelete, handleRemoveFromAlbum, handleAddToAlbum, doDelete, ...toRefs(state)};
     },
   });
 </script>

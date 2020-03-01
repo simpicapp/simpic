@@ -102,8 +102,12 @@ It currently has the following options:
 
 === Project structure
 
-Simpic has a Go backend and a JavaScript frontend that uses Vue.js. The Go code lives under `cmd` (for the program
-entry points) and `internal` (for everything else). The JavaScript is contained under the `frontend` folder.
+Simpic has a Go backend and a TypeScript frontend that uses Vue.js. The Go code lives under `cmd` (for the program
+entry points) and `internal` (for everything else). The TypeScript is contained under the `frontend` folder.
+
+The frontend uses the https://github.com/vuejs/composition-api[Vue Composition API] in preparation for migration
+to Vue3. New logic should, where possible, be written in pure TypeScript under `frontend/src/features` and then
+pulled in from the `setup()` methods in the component.
 
 === Hot reloading
 

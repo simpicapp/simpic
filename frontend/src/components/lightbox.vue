@@ -73,96 +73,76 @@
 <script lang="ts">
   import Modal from "./modal.vue";
   import {cache} from "./cache";
-  import Vue from "vue";
-  import {Data} from "@vue/composition-api/dist/component";
   import {Photo} from "@/model/photo";
+  import {useWindowListener} from "@/features/listeners";
+  import {defineComponent, reactive, ref, toRefs, watch} from "@vue/composition-api";
 
-  interface State extends Data {
-    close: boolean;
-    width: number;
-    height: number;
-    metadata: Photo;
-  }
-
-  export default Vue.extend({
+  export default defineComponent({
     components: {Modal},
     props: {id: String},
 
-    data(): State {
-      return {
+    setup(props, ctx) {
+      const canvas = ref(null as HTMLCanvasElement | null);
+      const state = reactive({
         close: false,
-        height: 0,
-        metadata: {
-          id: "",
-          file_name: "", // eslint-disable-line @typescript-eslint/camelcase
-          width: 0,
-          height: 0,
-        },
         width: 0,
-      };
-    },
+        height: 0,
+        metadata: null as Photo | null,
+      });
 
-    methods: {
-      handleKey(event: KeyboardEvent) {
-        if (event.code === "Escape") {
-          this.close = true;
-        } else if (event.code === "ArrowLeft") {
-          this.$emit("go-to-previous-image", this.id);
-        } else if (event.code === "ArrowRight") {
-          this.$emit("go-to-next-image", this.id);
+      function setSize() {
+        if (!state.metadata) {
+          return;
         }
-      },
 
-      handleResize() {
-        this.setSize();
-        this.$nextTick(this.startLoading);
-      },
-
-      setSize() {
-        const widthRatio = this.metadata.width / (window.innerWidth * 0.95);
-        const heightRatio = this.metadata.height / (window.innerHeight * 0.9);
+        const widthRatio = state.metadata.width / (window.innerWidth * 0.95);
+        const heightRatio = state.metadata.height / (window.innerHeight * 0.9);
         const scale = Math.max(1, widthRatio, heightRatio);
 
-        this.width = Math.round(this.metadata.width / scale);
-        this.height = Math.round(this.metadata.height / scale);
-      },
+        state.width = Math.round(state.metadata.width / scale);
+        state.height = Math.round(state.metadata.height / scale);
+      }
 
-      context() {
-        return (this.$refs.canvas as HTMLCanvasElement).getContext("2d");
-      },
+      function context() {
+        return canvas.value && canvas.value.getContext("2d");
+      }
 
-      startLoading() {
-        const id = this.id;
+      function startLoading() {
+        const id = props.id;
+        if (!id) {
+          return;
+        }
+
         cache
-          .getMetadata(this.id)
+          .getMetadata(id)
           .then(metadata => {
-            if (this.id !== id) {
+            if (props.id !== id) {
               throw Error("wrong-id");
             }
-            this.metadata = metadata;
-            this.setSize();
-            return cache.getThumbnail(this.id);
+            state.metadata = metadata;
+            setSize();
+            return cache.getThumbnail(id);
           })
           .then(img => {
-            if (this.id !== id) {
+            if (props.id !== id) {
               throw Error("wrong-id");
             }
-            const ctx = this.context();
+            const ctx = context();
             if (ctx) {
               ctx.filter = "blur(4px)";
-              ctx.clearRect(0, 0, this.width, this.height);
-              ctx.drawImage(img, 0, 0, this.width, this.height);
+              ctx.clearRect(0, 0, state.width, state.height);
+              ctx.drawImage(img, 0, 0, state.width, state.height);
             }
-            return cache.getImage(this.id);
+            return cache.getImage(id);
           })
           .then(img => {
-            if (this.id !== id) {
+            if (props.id !== id) {
               throw Error("wrong-id");
             }
-            const ctx = this.context();
+            const ctx = context();
             if (ctx) {
               ctx.filter = "none";
-              ctx.drawImage(img, 0, 0, this.width, this.height);
+              ctx.drawImage(img, 0, 0, state.width, state.height);
             }
           })
           .catch(err => {
@@ -170,24 +150,26 @@
               console.log(err);
             }
           });
-      },
-    },
+      }
 
-    watch: {
-      id() {
-        this.startLoading();
-      },
-    },
+      useWindowListener("keyup", (event: KeyboardEvent) => {
+        if (event.code === "Escape") {
+          state.close = true;
+        } else if (event.code === "ArrowLeft") {
+          ctx.emit("go-to-previous-image", props.id);
+        } else if (event.code === "ArrowRight") {
+          ctx.emit("go-to-next-image", props.id);
+        }
+      });
 
-    mounted() {
-      window.addEventListener("keyup", this.handleKey);
-      window.addEventListener("resize", this.handleResize);
-      this.$nextTick(this.startLoading);
-    },
+      useWindowListener("resize", () => {
+        setSize();
+        startLoading();
+      });
 
-    destroyed() {
-      window.removeEventListener("keyup", this.handleKey);
-      window.removeEventListener("resize", this.handleResize);
+      watch(() => props.id, startLoading);
+
+      return {canvas, ...toRefs(state)};
     },
   });
 </script>

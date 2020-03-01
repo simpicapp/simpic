@@ -23,9 +23,9 @@
 <script lang="ts">
   import Modal from "./modal.vue";
   import Popup from "./popup.vue";
-  import Vue from "vue";
+  import {defineComponent, ref} from "@vue/composition-api";
 
-  export default Vue.extend({
+  export default defineComponent({
     props: {
       body: String,
       dangerous: {
@@ -42,28 +42,25 @@
         default: "Yes",
       },
     },
-    data() {
-      return {
-        shouldClose: false,
-      };
-    },
     components: {
       Modal,
       Popup,
     },
-    methods: {
-      onClose() {
-        this.$emit("close");
-        this.shouldClose = false;
-      },
-      onNo() {
-        this.$emit("no");
-        this.shouldClose = true;
-      },
-      onYes() {
-        this.$emit("yes");
-        this.shouldClose = true;
-      },
+    setup(_, ctx) {
+      const shouldClose = ref(false);
+
+      function emitAndClose(eventName: string, close: boolean) {
+        return () => {
+          ctx.emit(eventName);
+          shouldClose.value = close;
+        };
+      }
+
+      const onClose = emitAndClose("close", false);
+      const onYes = emitAndClose("yes", true);
+      const onNo = emitAndClose("no", true);
+
+      return {shouldClose, onClose, onYes, onNo};
     },
   });
 </script>
