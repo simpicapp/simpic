@@ -6,12 +6,13 @@ import (
 )
 
 type Album struct {
-	Id      uuid.UUID  `json:"id" db:"album_uuid"`
-	Name    string     `json:"name" db:"album_name"`
-	Cover   *uuid.UUID `json:"cover_photo,omitempty" db:"photo_uuid,omitempty"`
-	Owner   int        `json:"owner_id" db:"album_owner"`
-	Created time.Time  `json:"created" db:"album_created"`
-	Photos  int        `json:"photos" db:"photo_count,omitempty"`
+	Id         uuid.UUID  `json:"id" db:"album_uuid"`
+	Name       string     `json:"name" db:"album_name"`
+	Cover      *uuid.UUID `json:"cover_photo,omitempty" db:"photo_uuid,omitempty"`
+	Owner      int        `json:"owner_id" db:"album_owner"`
+	Created    time.Time  `json:"created" db:"album_created"`
+	Photos     int        `json:"photos" db:"photo_count,omitempty"`
+	Visibility Visibility `json:"visibility" db:"album_visibility"`
 }
 
 type AlbumEntry struct {
