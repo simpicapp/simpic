@@ -35,13 +35,12 @@
   import "vue-awesome/icons/trash-alt";
   import Axios from "axios";
   import Gallery from "../components/gallery.vue";
-  import {EventBus} from "../components/bus";
   import ActionIcon from "../components/action-icon.vue";
   import DeleteDialog from "../components/delete-dialog.vue";
   import {defineComponent, onMounted, reactive, toRefs} from "@vue/composition-api";
   import {useRouter} from "@/features/router";
   import {useAuthentication} from "@/features/auth";
-  import {useEventListener} from "@/features/eventbus";
+  import {EventBus, useEventListener} from "@/features/eventbus";
 
   export default defineComponent({
     components: {

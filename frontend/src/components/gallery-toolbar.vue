@@ -56,7 +56,6 @@
 </style>
 
 <script lang="ts">
-  import {EventBus} from "./bus";
   import Axios from "axios";
   import DeleteDialog from "./delete-dialog.vue";
   import {computed, defineComponent, reactive, toRefs} from "@vue/composition-api";
@@ -65,6 +64,7 @@
   import "vue-awesome/icons/times";
   import "vue-awesome/icons/trash-alt";
   import Icon from "vue-awesome/components/Icon.vue";
+  import {EventBus} from "@/features/eventbus";
 
   export default defineComponent({
     components: {

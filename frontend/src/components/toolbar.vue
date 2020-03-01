@@ -92,9 +92,9 @@
 </style>
 
 <script lang="ts">
-  import {EventBus} from "./bus";
   import {defineComponent} from "@vue/composition-api";
   import {useAuthentication} from "@/features/auth";
+  import {EventBus} from "@/features/eventbus";
 
   export default defineComponent({
     setup() {

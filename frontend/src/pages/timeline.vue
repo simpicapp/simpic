@@ -3,10 +3,9 @@
 </template>
 
 <script lang="ts">
-  import {EventBus} from "../components/bus";
   import Gallery from "../components/gallery.vue";
   import {defineComponent} from "@vue/composition-api";
-  import {useEventListener} from "@/features/eventbus";
+  import {EventBus, useEventListener} from "@/features/eventbus";
 
   export default defineComponent({
     components: {

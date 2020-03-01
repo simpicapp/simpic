@@ -1,6 +1,6 @@
 import {reactive, toRefs} from "@vue/composition-api";
 import Axios from "axios";
-import {EventBus} from "@/components/bus";
+import {EventBus} from "@/features/eventbus";
 
 const state = reactive({
   username: "",

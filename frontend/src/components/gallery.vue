@@ -58,7 +58,7 @@
   import Thumbnail from "./thumbnail.vue";
   import GalleryToolbar from "./gallery-toolbar.vue";
   import Spinner from "./spinner.vue";
-  import {cache} from "./cache";
+  import {cache} from "../features/cache";
   import {computed, defineComponent, onMounted, reactive, toRefs} from "@vue/composition-api";
   import {useAuthentication} from "@/features/auth";
   import {useScrollWatcher} from "@/features/scroll";

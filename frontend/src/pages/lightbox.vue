@@ -72,7 +72,7 @@
 
 <script lang="ts">
   import Modal from "../components/modal.vue";
-  import {cache} from "../components/cache";
+  import {cache} from "../features/cache";
   import {Photo} from "@/model/photo";
   import {useWindowListener} from "@/features/listeners";
   import {defineComponent, reactive, ref, toRefs, watch} from "@vue/composition-api";

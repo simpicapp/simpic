@@ -1,5 +1,5 @@
 import {onMounted, ref} from "@vue/composition-api";
-import {cache} from "@/components/cache";
+import {cache} from "@/features/cache";
 
 export function useThumbnail(id: string | undefined) {
   const styles = ref({});

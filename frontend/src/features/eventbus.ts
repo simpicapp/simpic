@@ -1,5 +1,7 @@
 import {onMounted, onUnmounted} from "@vue/composition-api";
-import {EventBus} from "@/components/bus";
+import Vue from "vue";
+
+export const EventBus = new Vue();
 
 export function useEventListener(event: string, handler: Function) {
   onMounted(() => EventBus.$on(event, handler));

@@ -68,11 +68,11 @@
 <script lang="ts">
   import {debounce} from "lodash-es";
   import Axios from "axios";
-  import {EventBus} from "./bus";
   import Popup from "./popup.vue";
   import {defineComponent, reactive, toRefs} from "@vue/composition-api";
   import {useAuthentication} from "@/features/auth";
   import {useDocumentListener} from "@/features/listeners";
+  import {EventBus} from "@/features/eventbus";
 
   export default defineComponent({
     components: {
