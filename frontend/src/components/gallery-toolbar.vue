@@ -74,19 +74,23 @@
       handleAddToAlbum() {
         new Promise((resolve, reject) => {
           EventBus.$emit("pick-album", resolve, reject);
-        }).then(album =>
-          Axios.post("/albums/" + album + "/photos", {
-            // eslint-disable-next-line @typescript-eslint/camelcase
-            add_photos: Object.keys(this.selection),
-          }).then(() => {
-            EventBus.$emit(
-              "toast",
-              this.selectionCount + " photo" + (this.selectionCount === 1 ? "" : "s") + " added to album"
-            );
-            EventBus.$emit("album-updated", album);
-            this.$emit("clear-selection");
-          })
-        );
+        })
+          .then(album =>
+            Axios.post("/albums/" + album + "/photos", {
+              // eslint-disable-next-line @typescript-eslint/camelcase
+              add_photos: Object.keys(this.selection),
+            }).then(() => {
+              EventBus.$emit(
+                "toast",
+                this.selectionCount + " photo" + (this.selectionCount === 1 ? "" : "s") + " added to album"
+              );
+              EventBus.$emit("album-updated", album);
+              this.$emit("clear-selection");
+            })
+          )
+          .catch(() => {
+            /* ignore */
+          });
       },
       handleDelete() {
         this.showConfirmation = true;

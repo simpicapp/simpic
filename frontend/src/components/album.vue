@@ -2,7 +2,7 @@
   <div>
     <div class="toolbar">
       <h2>{{ name }}</h2>
-      <ActionIcon :working="deleting" @click="confirmDelete()" name="trash-alt" v-if="loggedIn"></ActionIcon>
+      <ActionIcon :working="deleting" @click="confirmDelete" name="trash-alt" v-if="loggedIn"></ActionIcon>
     </div>
     <gallery :album="id" :endpoint="'/albums/' + id + '/photos'"></gallery>
 

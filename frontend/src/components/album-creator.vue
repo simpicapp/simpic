@@ -1,7 +1,7 @@
 <template>
   <popup @close="handleClosed" position="center" title="Create new album">
     <form @submit="doCreate">
-      <p class="alert" v-if="alert.length > 0">{{ alert }}</p>
+      <p class="alert" v-if="hasAlert">{{ alert }}</p>
       <label for="name">Name</label>
       <input id="name" placeholder="My Holiday" type="text" v-focus v-model="name" />
       <input type="submit" value="Create" />
@@ -37,35 +37,30 @@
 <script lang="ts">
   import Axios from "axios";
   import Popup from "./popup.vue";
-  import Vue from "vue";
+  import {defineComponent, ref} from "@vue/composition-api";
+  import {useAlert} from "@/features/alert";
 
-  export default Vue.extend({
+  export default defineComponent({
     components: {Popup},
-    data() {
-      return {
-        alert: "",
-        name: "",
-      };
-    },
-    methods: {
-      doCreate() {
-        Axios.post("/albums", {name: this.name})
+    setup(_, ctx) {
+      const {alert, hasAlert, setAlert} = useAlert();
+      const name = ref("");
+
+      function doCreate() {
+        Axios.post("/albums", {name: name.value})
           .then(({data: {id}}) => {
-            this.$emit("created", id);
-            this.name = "";
+            ctx.emit("created", id);
+            name.value = "";
           })
-          .catch(error => {
-            if (error.response) {
-              this.alert = error.response.data.error || error.message;
-            } else {
-              this.alert = error.message;
-            }
-          });
-      },
-      handleClosed() {
-        this.$emit("close");
-        this.name = "";
-      },
+          .catch(error => setAlert(error));
+      }
+
+      function handleClosed() {
+        ctx.emit("close");
+        name.value = "";
+      }
+
+      return {doCreate, handleClosed, alert, hasAlert, name};
     },
   });
 </script>

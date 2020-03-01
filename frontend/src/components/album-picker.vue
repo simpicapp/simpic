@@ -19,7 +19,7 @@
         <div @click="handleNewAlbumSelected"><span>Create new album...</span></div>
       </div>
     </popup>
-    <album-creator @close="handleClosed" @created="handleAlbumSelected" v-else> </album-creator>
+    <album-creator @close="handleClosed" @created="handleAlbumSelected" v-else></album-creator>
   </modal>
 </template>
 
@@ -80,9 +80,9 @@
   import Axios from "axios";
   import Modal from "./modal.vue";
   import Popup from "./popup.vue";
-  import {EventBus} from "./bus";
   import AlbumCreator from "./album-creator.vue";
-  import Vue from "vue";
+  import {defineComponent, reactive, toRefs} from "@vue/composition-api";
+  import {useEventListener} from "@/features/eventbus";
 
   interface Album {
     id: string;
@@ -93,59 +93,60 @@
     photos: number;
   }
 
-  export default Vue.extend({
+  export default defineComponent({
     components: {
       AlbumCreator,
       Modal,
       Popup,
     },
-    data() {
-      return {
-        albums: Array<Album>(),
-        alert: "",
+    setup() {
+      const state = reactive({
+        albums: new Array<Album>(),
         close: false,
-        name: "",
+        selecting: false,
+        visible: false,
+      });
+
+      const promise = {
         reject() {
-          /* noop */
+          // noop
         },
+
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         resolve(_: string) {
-          /* noop */
+          // noop
         },
-        selecting: true,
-        visible: false,
       };
-    },
-    methods: {
-      handleAlbumSelected(albumId: string) {
-        this.visible = false;
-        this.resolve(albumId);
-      },
-      handleClosed() {
-        this.visible = false;
-        this.reject();
-      },
-      handleNewAlbumSelected() {
-        this.selecting = false;
-      },
-      show(resolve: (_: string) => void, reject: () => void) {
-        this.albums = [];
-        this.resolve = resolve;
-        this.reject = reject;
-        this.close = false;
-        this.selecting = true;
-        this.visible = true;
+
+      useEventListener("pick-album", (resolve: (_: string) => void, reject: () => void) => {
+        state.albums = [];
+        state.close = false;
+        state.selecting = true;
+        state.visible = true;
+
+        promise.resolve = resolve;
+        promise.reject = reject;
 
         Axios.get("/albums").then(({data}) => {
-          this.albums = data;
+          state.albums = data;
         });
-      },
-    },
-    created() {
-      EventBus.$on("pick-album", this.show);
-    },
-    beforeDestroy() {
-      EventBus.$off("pick-album", this.show);
+      });
+
+      function handleAlbumSelected(albumId: string) {
+        state.visible = false;
+        promise.resolve(albumId);
+      }
+
+      function handleClosed() {
+        state.visible = false;
+        promise.reject();
+      }
+
+      function handleNewAlbumSelected() {
+        state.selecting = false;
+      }
+
+      return {handleAlbumSelected, handleNewAlbumSelected, handleClosed, ...toRefs(state)};
     },
   });
 </script>

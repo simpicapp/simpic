@@ -2,7 +2,7 @@
   <modal :should-close="close" @close="visible = false" v-if="visible">
     <popup @close="close = true" position="center" title="Login">
       <form @submit="doLogin">
-        <p class="alert" v-if="alert.length > 0">{{ alert }}</p>
+        <p class="alert" v-if="hasAlert">{{ alert }}</p>
         <label for="username">Username</label>
         <input :disabled="loggingIn" id="username" type="text" v-focus v-model="username" />
         <label for="password">Password</label>
@@ -44,6 +44,7 @@
   import {defineComponent, reactive, toRefs} from "@vue/composition-api";
   import {useAuthentication} from "@/features/auth";
   import {useEventListener} from "@/features/eventbus";
+  import {useAlert} from "@/features/alert";
 
   export default defineComponent({
     components: {
@@ -52,9 +53,9 @@
     },
     setup() {
       const {login} = useAuthentication();
+      const {alert, hasAlert, setAlert} = useAlert();
 
       const state = reactive({
-        alert: "",
         close: false,
         loggingIn: false,
         password: "",
@@ -63,7 +64,7 @@
       });
 
       function doLogin() {
-        state.alert = "";
+        setAlert();
         state.loggingIn = true;
 
         login(state.username, state.password)
@@ -72,25 +73,19 @@
             state.username = "";
             state.password = "";
           })
-          .catch(error => {
-            if (error.response) {
-              state.alert = error.response.data.error;
-            } else {
-              state.alert = error.message;
-            }
-          })
+          .catch(error => setAlert(error))
           .finally(() => {
             state.loggingIn = false;
           });
       }
 
       useEventListener("login", () => {
+        setAlert();
         state.close = false;
-        state.alert = "";
         state.visible = true;
       });
 
-      return {doLogin, ...toRefs(state)};
+      return {doLogin, alert, hasAlert, ...toRefs(state)};
     },
   });
 </script>

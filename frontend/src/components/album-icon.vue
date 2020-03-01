@@ -1,9 +1,11 @@
 <template>
-  <a :href="'#/albums/' + id + '/'" :style="styles" @click.prevent="handleClick">
-    <div class="caption">
-      <span>{{ caption }}</span> <span>{{ photos }}</span>
-    </div>
-  </a>
+  <router-link :to="`/albums/${id}/`" v-slot="{href, navigate}">
+    <a :href="href" :style="styles" @click="navigate">
+      <div class="caption">
+        <span>{{ caption }}</span> <span>{{ photos }}</span>
+      </div>
+    </a>
+  </router-link>
 </template>
 
 <style lang="scss" scoped>
@@ -55,7 +57,6 @@
 
 <script lang="ts">
   import {defineComponent} from "@vue/composition-api";
-  import {useRouter} from "@/features/router";
   import {useThumbnail} from "@/features/thumbnail";
 
   export default defineComponent({
@@ -66,14 +67,8 @@
       imageId: String,
     },
     setup(props) {
-      const {router} = useRouter();
       const {styles} = useThumbnail(props.imageId);
-
-      function handleClick() {
-        router.push({path: "./" + props.id + "/"});
-      }
-
-      return {handleClick, styles};
+      return {styles};
     },
   });
 </script>
