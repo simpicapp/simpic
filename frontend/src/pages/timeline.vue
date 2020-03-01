@@ -3,8 +3,8 @@
 </template>
 
 <script lang="ts">
-  import {EventBus} from "./bus";
-  import Gallery from "./gallery.vue";
+  import {EventBus} from "../components/bus";
+  import Gallery from "../components/gallery.vue";
   import {defineComponent} from "@vue/composition-api";
   import {useEventListener} from "@/features/eventbus";
 

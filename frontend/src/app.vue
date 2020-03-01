@@ -14,9 +14,9 @@
 </template>
 
 <style lang="scss">
-  @use '../assets/css/vars';
-  @import "../assets/css/global";
-  @import "../assets/css/reset";
+  @use 'assets/css/vars';
+  @import "assets/css/global";
+  @import "assets/css/reset";
 
   body {
     font-family: sans-serif;
@@ -52,13 +52,13 @@
   import Vue from "vue";
   import {defineComponent, onMounted, reactive, toRefs} from "@vue/composition-api";
 
-  import Uploader from "./uploader.vue";
-  import Login from "./login.vue";
-  import Toolbar from "./toolbar.vue";
-  import BottomBar from "./footer.vue";
-  import AlbumPicker from "./album-picker.vue";
-  import Spinner from "./spinner.vue";
-  import Toaster from "./toaster.vue";
+  import Uploader from "./components/uploader.vue";
+  import Login from "./components/login.vue";
+  import Toolbar from "./components/toolbar.vue";
+  import BottomBar from "./components/footer.vue";
+  import AlbumPicker from "./components/album-picker.vue";
+  import Spinner from "./components/spinner.vue";
+  import Toaster from "./components/toaster.vue";
   import {useAuthentication} from "@/features/auth";
 
   Vue.directive("focus", {

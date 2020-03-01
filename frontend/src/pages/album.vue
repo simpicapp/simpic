@@ -34,10 +34,10 @@
 <script lang="ts">
   import "vue-awesome/icons/trash-alt";
   import Axios from "axios";
-  import Gallery from "./gallery.vue";
-  import {EventBus} from "./bus";
-  import ActionIcon from "./action-icon.vue";
-  import DeleteDialog from "./delete-dialog.vue";
+  import Gallery from "../components/gallery.vue";
+  import {EventBus} from "../components/bus";
+  import ActionIcon from "../components/action-icon.vue";
+  import DeleteDialog from "../components/delete-dialog.vue";
   import {defineComponent, onMounted, reactive, toRefs} from "@vue/composition-api";
   import {useRouter} from "@/features/router";
   import {useAuthentication} from "@/features/auth";

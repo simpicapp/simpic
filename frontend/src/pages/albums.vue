@@ -35,7 +35,7 @@
 </style>
 
 <script lang="ts">
-  import Album from "./album-icon.vue";
+  import Album from "../components/album-icon.vue";
   import Axios from "axios";
   import {defineComponent, onMounted, reactive, toRefs} from "@vue/composition-api";
   import {useEventListener} from "@/features/eventbus";

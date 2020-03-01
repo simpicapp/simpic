@@ -1,8 +1,8 @@
 import VueRouter from "vue-router";
-import Lightbox from "@/components/lightbox.vue";
-import Timeline from "@/components/timeline.vue";
-import Albums from "@/components/albums.vue";
-import Album from "@/components/album.vue";
+import Lightbox from "@/pages/lightbox.vue";
+import Timeline from "@/pages/timeline.vue";
+import Albums from "@/pages/albums.vue";
+import Album from "@/pages/album.vue";
 
 const router = new VueRouter({
   routes: [
