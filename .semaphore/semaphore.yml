@@ -1,0 +1,45 @@
+version: v1.0
+name: CI
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+  containers:
+    - name: main
+      image: "simpicapp/simpic-ci:latest"
+blocks:
+  - name: Backend
+    dependencies: []
+    run:
+      when: "change_in(['/go.mod', '/go.sum', '/internal/', '/cmd/'])"
+    task:
+      jobs:
+        - name: Build
+          commands:
+            - checkout
+            - go build ./...
+            - go fmt ./...
+  - name: Frontend
+    dependencies: []
+    run:
+      when: change_in('/frontend/')
+    task:
+      jobs:
+        - name: Build
+          commands:
+            - checkout
+            - cd frontend
+            - npm ci
+            - npm run lint
+  - name: Docker
+    dependencies: []
+    task:
+      jobs:
+        - name: Build
+          commands:
+            - checkout
+            - docker build .
+      agent:
+        machine:
+          type: e1-standard-2
+          os_image: ubuntu1804
