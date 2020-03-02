@@ -14,15 +14,19 @@ import (
 	"net/http/cookiejar"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 )
 
 var (
-	simpicUrl  = flag.String("url", "", "URL to the simpic instance to import to")
-	simpicUser = flag.String("user", "", "Username to authenticate to simpic with")
-	simpicPass = flag.String("password", "-", "Password to authenticate to simpic with. Use '-' to read from stdin")
-	directory  = flag.String("directory", ".", "Directory to scan")
+	simpicUrl   = flag.String("url", "", "URL to the simpic instance to import to")
+	simpicUser  = flag.String("user", "", "Username to authenticate to simpic with")
+	simpicPass  = flag.String("password", "-", "Password to authenticate to simpic with. Use '-' to read from stdin")
+	directory   = flag.String("directory", ".", "Directory to scan")
+	parallelism = flag.Int("parallelism", 1, "Number of photos to upload at once")
+	skipFiles   = flag.String("skip", "", "Glob pattern of files to skip")
 
 	scanned  int64
 	failed   int64
@@ -54,7 +58,21 @@ func main() {
 		close(files)
 	}()
 
-	upload(client, files)
+	status := make(chan bool, math.MaxInt32)
+
+	wg := &sync.WaitGroup{}
+	for i := 0; i < *parallelism; i++ {
+		wg.Add(1)
+		go func() {
+			upload(client, files, status)
+			wg.Done()
+		}()
+	}
+
+	go acceptStatuses(status)
+
+	wg.Wait()
+	close(status)
 
 	done <- true
 	ticker.Stop()
@@ -62,6 +80,23 @@ func main() {
 	bar.SetCurrent(uploaded)
 	bar.Write()
 	bar.Finish()
+}
+
+func acceptStatuses(channel <-chan bool) {
+	for {
+		select {
+		case status, more := <-channel:
+			if more {
+				if status {
+					uploaded++
+				} else {
+					failed++
+				}
+			} else {
+				return
+			}
+		}
+	}
 }
 
 func updateProgress(bar *pb.ProgressBar, ticker *time.Ticker, done <-chan bool) {
@@ -87,8 +122,15 @@ func scanFiles(dir string, out chan<- string) {
 		if f.IsDir() {
 			scanFiles(path.Join(dir, f.Name()), out)
 		} else if isImageFile(f.Name()) {
-			out <- path.Join(dir, f.Name())
-			scanned++
+			match, err := filepath.Match(*skipFiles, f.Name())
+			if err != nil {
+				log.Panicf("Bad skip glob pattern: %v\n", err)
+			}
+
+			if !match {
+				out <- path.Join(dir, f.Name())
+				scanned++
+			}
 		}
 	}
 }

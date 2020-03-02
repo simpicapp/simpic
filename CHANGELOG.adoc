@@ -24,3 +24,4 @@
 
 * Fixed version not being set in docker builds
 * Album covers are now updated if you remove that photo from the album
+* Fixed the borders on some input fields being a bit off in Chrome
