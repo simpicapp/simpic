@@ -54,10 +54,12 @@ func (d DiskStore) pathFor(id uuid.UUID, kind StoreKind) string {
 	var suffix string
 
 	switch kind {
-	case KindPhoto:
+	case KindRaw:
 		suffix = ".photo"
 	case KindThumbnail:
 		suffix = ".thumb"
+	case KindScreenJpeg:
+		suffix = ".screen.jpg"
 	default:
 		suffix = fmt.Sprintf(".%d", kind)
 	}

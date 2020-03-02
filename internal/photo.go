@@ -14,6 +14,13 @@ type Photo struct {
 	Type       PhotoType  `json:"type" db:"photo_type"`
 	Uploader   int        `json:"user_id" db:"photo_uploader"`
 	Visibility Visibility `json:"visibility" db:"photo_visibility"`
+	Processed  int        `json:"-" db:"photo_processed"`
+}
+
+type ExifTag struct {
+	Photo uuid.UUID `db:"photo_uuid"`
+	Field string    `db:"exif_field"`
+	Value string    `db:"exif_value"`
 }
 
 func NewPhoto(fileName string) *Photo {

@@ -32,16 +32,14 @@ func (s *server) handleDeletePhotos() http.HandlerFunc {
 			return
 		}
 
-		if err := s.db.DeletePhotos(data.Ids); err != nil {
-			log.Printf("Failed to delete photo batch: %v\n", err)
-			writeError(w, http.StatusInternalServerError, "Unexpected error")
-			return
-		}
-
 		for _, id := range data.Ids {
-			if err := s.storer.Delete(id); err != nil {
-				log.Printf("Failed to delete stored photo %s: %v\n", id, err)
+			photo, err := s.db.GetPhoto(id, visForAccess(r))
+			if err != nil {
+				log.Printf("Couldn't retrieve photo %s for deletion: %v\n", id, err)
+				continue
 			}
+
+			s.processor.RollBack(photo)
 		}
 
 		if err := s.db.RefreshMissingCoverImages(); err != nil {
@@ -92,8 +90,18 @@ func (s *server) handleStorePhoto() http.HandlerFunc {
 		}()
 
 		user := r.Context().Value(ctxUser).(*internal.User)
-		photo, err := s.storer.Store(headers.Filename, user.Id, getDefaultVisibility(), file)
-		if err != nil {
+		photo := internal.NewPhoto(headers.Filename)
+		photo.Uploader = user.Id
+		photo.Visibility = getDefaultVisibility()
+
+		if err := s.db.AddPhoto(photo); err != nil {
+			log.Printf("Unable to save photo '%s': %v\n", headers.Filename, err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		if err := s.processor.Migrate(photo, file); err != nil {
+			_ = s.db.DeletePhoto(photo)
 			log.Printf("unable to create photo '%s': %v\n", headers.Filename, err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -105,9 +113,9 @@ func (s *server) handleStorePhoto() http.HandlerFunc {
 
 func mimeTypeFor(t internal.PhotoType) string {
 	switch t {
-	case internal.Jpeg:
+	case internal.TypeJpeg:
 		return "image/jpeg"
-	case internal.Png:
+	case internal.TypePng:
 		return "image/png"
 	default:
 		log.Printf("No known content type for type %d\n", t)

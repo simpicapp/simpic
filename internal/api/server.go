@@ -6,6 +6,7 @@ import (
 	"fmt"
 	uuid "github.com/satori/go.uuid"
 	"github.com/simpicapp/simpic/internal"
+	"github.com/simpicapp/simpic/internal/processing"
 	"github.com/simpicapp/simpic/internal/storage"
 	"io"
 	"net/http"
@@ -27,17 +28,17 @@ type Server interface {
 
 type server struct {
 	db          *internal.Database
-	storer      *internal.Storer
+	processor   *processing.Processor
 	usermanager *internal.UserManager
 	photoReader PhotoReader
 	srv         *http.Server
 }
 
-func NewServer(db *internal.Database, usermanager *internal.UserManager, photoReader PhotoReader, storer *internal.Storer) Server {
+func NewServer(db *internal.Database, usermanager *internal.UserManager, photoReader PhotoReader, processor *processing.Processor) Server {
 	s := server{
 		db:          db,
 		photoReader: photoReader,
-		storer:      storer,
+		processor:   processor,
 		usermanager: usermanager,
 	}
 

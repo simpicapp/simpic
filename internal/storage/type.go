@@ -3,10 +3,11 @@ package storage
 type StoreKind int
 
 const (
-	KindPhoto StoreKind = iota
+	KindRaw StoreKind = iota
 	KindThumbnail
+	KindScreenJpeg
 )
 
 var (
-	StoreKinds = []StoreKind{KindPhoto, KindThumbnail}
+	StoreKinds = []StoreKind{KindRaw, KindThumbnail, KindScreenJpeg}
 )

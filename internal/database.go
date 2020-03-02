@@ -68,9 +68,13 @@ func (d *Database) migrate(migrationPath string) error {
 
 //region Photos
 
-func (d *Database) Add(photo *Photo) (err error) {
+func (d *Database) AddPhoto(photo *Photo) (err error) {
 	_, err = d.db.Collection("photos").Insert(photo)
 	return
+}
+
+func (d *Database) UpdatePhoto(photo *Photo) (err error) {
+	return d.db.Collection("photos").Find("photo_uuid", photo.Id).Update(photo)
 }
 
 func (d *Database) GetPhoto(id uuid.UUID, maxVisibility Visibility) (photo *Photo, err error) {
@@ -97,6 +101,35 @@ func (d *Database) DeletePhoto(photo *Photo) error {
 
 func (d *Database) DeletePhotos(uuids []uuid.UUID) error {
 	return d.db.Collection("photos").Find("photo_uuid", uuids).Delete()
+}
+
+//endregion
+
+//region Exif
+
+func (d *Database) StoreExifTags(photo uuid.UUID, tags map[string]string) error {
+	batch := d.db.InsertInto("photo_exif").Amend(onConflictUpdate("photo_uuid,exif_field", "exif_value = excluded.exif_value")).Batch(20)
+
+	go func() {
+		defer batch.Done()
+		for field, value := range tags {
+			batch.Values(ExifTag{
+				Photo: photo,
+				Field: field,
+				Value: value,
+			})
+		}
+	}()
+
+	return batch.Wait()
+}
+
+func (d *Database) GetExifTag(photo uuid.UUID, field string) (tag *ExifTag, err error) {
+	err = d.db.Collection("photo_exif").
+		Find("photo_uuid", photo).
+		And("exif_field", field).
+		One(&tag)
+	return
 }
 
 //endregion
@@ -252,6 +285,12 @@ func (d *Database) DeleteExpiredSessions() error {
 
 //endregion
 
-func onConflictDoNothing(queryIn string) (queryOut string) {
+func onConflictDoNothing(queryIn string) string {
 	return fmt.Sprintf("%s ON CONFLICT DO NOTHING", queryIn)
+}
+
+func onConflictUpdate(constraint, set string) func(string) string {
+	return func(queryIn string) string {
+		return fmt.Sprintf("%s ON CONFLICT (%s) DO UPDATE SET %s", queryIn, constraint, set)
+	}
 }

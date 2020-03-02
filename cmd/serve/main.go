@@ -6,6 +6,7 @@ import (
 	"github.com/jamiealquiza/envy"
 	"github.com/simpicapp/simpic/internal"
 	"github.com/simpicapp/simpic/internal/api"
+	"github.com/simpicapp/simpic/internal/processing"
 	"github.com/simpicapp/simpic/internal/storage"
 	"log"
 	"os"
@@ -69,7 +70,7 @@ func makeServer() {
 		db,
 		userManager,
 		driver,
-		internal.NewStorer(db, driver, 220))
+		processing.NewProcessor(db, driver, 220, 2160))
 }
 
 func startServer() {
