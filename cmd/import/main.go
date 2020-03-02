@@ -21,12 +21,13 @@ import (
 )
 
 var (
-	simpicUrl   = flag.String("url", "", "URL to the simpic instance to import to")
-	simpicUser  = flag.String("user", "", "Username to authenticate to simpic with")
-	simpicPass  = flag.String("password", "-", "Password to authenticate to simpic with. Use '-' to read from stdin")
-	directory   = flag.String("directory", ".", "Directory to scan")
-	parallelism = flag.Int("parallelism", 1, "Number of photos to upload at once")
-	skipFiles   = flag.String("skip", "", "Glob pattern of files to skip")
+	simpicUrl    = flag.String("url", "", "URL to the simpic instance to import to")
+	simpicUser   = flag.String("user", "", "Username to authenticate to simpic with")
+	simpicPass   = flag.String("password", "-", "Password to authenticate to simpic with. Use '-' to read from stdin")
+	directory    = flag.String("directory", ".", "Directory to scan")
+	parallelism  = flag.Int("parallelism", 1, "Number of photos to upload at once")
+	skipFiles    = flag.String("skip", "", "Glob pattern of files to skip")
+	includeFiles = flag.String("include", "*", "Glob pattern of files to include")
 
 	scanned  int64
 	failed   int64
@@ -122,12 +123,17 @@ func scanFiles(dir string, out chan<- string) {
 		if f.IsDir() {
 			scanFiles(path.Join(dir, f.Name()), out)
 		} else if isImageFile(f.Name()) {
-			match, err := filepath.Match(*skipFiles, f.Name())
+			skipMatch, err := filepath.Match(*skipFiles, f.Name())
 			if err != nil {
 				log.Panicf("Bad skip glob pattern: %v\n", err)
 			}
 
-			if !match {
+			includeMatch, err := filepath.Match(*includeFiles, f.Name())
+			if err != nil {
+				log.Panicf("Bad include glob pattern: %v\n", err)
+			}
+
+			if includeMatch && !skipMatch {
 				out <- path.Join(dir, f.Name())
 				scanned++
 			}
@@ -136,8 +142,14 @@ func scanFiles(dir string, out chan<- string) {
 }
 
 func isImageFile(name string) bool {
+	suffixes := []string{".png", ".jpg", ".jpeg", ".gif", ".tiff", ".orf", ".cr2"}
 	lower := strings.ToLower(name)
-	return strings.HasSuffix(lower, ".png") || strings.HasSuffix(lower, ".jpg") || strings.HasSuffix(lower, ".jpeg")
+	for _, s := range suffixes {
+		if strings.HasSuffix(lower, s) {
+			return true
+		}
+	}
+	return false
 }
 
 func grabCookies(client http.Client) {
