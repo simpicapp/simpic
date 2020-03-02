@@ -35,11 +35,6 @@ func (*exifMigration) migrate(c *context, photo *internal.Photo, raw io.Reader) 
 	return nil
 }
 
-func (*exifMigration) rollback(_ *context, _ *internal.Photo) error {
-	// No need to do anything, foreign key references on the database will tidy up for us
-	return nil
-}
-
 type exifWalker struct {
 	db      *internal.Database
 	photoId uuid.UUID

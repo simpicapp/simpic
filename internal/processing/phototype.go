@@ -18,10 +18,6 @@ func (*photoTypeMigration) migrate(_ *context, photo *internal.Photo, raw io.Rea
 	return nil
 }
 
-func (*photoTypeMigration) rollback(*context, *internal.Photo) error {
-	return nil
-}
-
 func init() {
 	migrations[migrationUpdateType] = &photoTypeMigration{}
 }

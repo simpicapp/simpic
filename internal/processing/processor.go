@@ -26,6 +26,9 @@ type context struct {
 
 type migration interface {
 	migrate(c *context, photo *internal.Photo, raw io.Reader) error
+}
+
+type rollback interface {
 	rollback(c *context, photo *internal.Photo) error
 }
 
@@ -109,8 +112,11 @@ func (m *Processor) Migrate(photo *internal.Photo, raw io.Reader) error {
 
 func (m *Processor) RollBack(photo *internal.Photo) {
 	for photo.Processed > 0 {
-		if err := migrations[photo.Processed].rollback(m.context, photo); err != nil {
-			fmt.Printf("Rollback of migration %d failed for photo %s: %v\n", photo.Processed, photo.Id, err)
+		rb, ok := migrations[photo.Processed].(rollback)
+		if ok {
+			if err := rb.rollback(m.context, photo); err != nil {
+				fmt.Printf("Rollback of migration %d failed for photo %s: %v\n", photo.Processed, photo.Id, err)
+			}
 		}
 		photo.Processed--
 	}
