@@ -19,7 +19,7 @@ func (d DiskStore) Read(id uuid.UUID, kind StoreKind) (io.ReadCloser, error) {
 	return os.Open(d.pathFor(id, kind))
 }
 
-func (d DiskStore) Write(id uuid.UUID, kind StoreKind) (io.WriteCloser, error) {
+func (d DiskStore) Write(id uuid.UUID, kind StoreKind) (*os.File, error) {
 	file := d.pathFor(id, kind)
 
 	if err := os.MkdirAll(path.Dir(file), os.ModePerm); err != nil {
@@ -56,7 +56,7 @@ func (d DiskStore) pathFor(id uuid.UUID, kind StoreKind) string {
 	switch kind {
 	case KindRaw:
 		suffix = ".photo"
-	case KindThumbnail:
+	case KindThumbnailJpeg:
 		suffix = ".thumb"
 	case KindScreenJpeg:
 		suffix = ".screen.jpg"

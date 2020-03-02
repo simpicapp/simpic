@@ -9,115 +9,117 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"os"
 )
 
 type PhotoStore interface {
 	Read(id uuid.UUID, kind storage.StoreKind) (io.ReadCloser, error)
-	Write(id uuid.UUID, kind storage.StoreKind) (io.WriteCloser, error)
+	Write(id uuid.UUID, kind storage.StoreKind) (*os.File, error)
 	Delete(id uuid.UUID, kind storage.StoreKind) error
 }
 
-type context struct {
+type Processor struct {
 	db              *internal.Database
 	store           PhotoStore
-	thumbnailHeight int
-	screenHeight    int
+	thumbnailHeight uint
+	screenHeight    uint
 }
 
-type migration interface {
-	migrate(c *context, photo *internal.Photo, raw io.Reader) error
-}
-
-type rollback interface {
-	rollback(c *context, photo *internal.Photo) error
-}
-
-type Processor struct {
-	context *context
-}
-
-var migrations = make(map[int]migration)
-
-const (
-	_ = iota
-	migrationUpdateType
-	migrationSaveRaw
-	migrationReadExif
-	migrationSaveSampled
-)
-
-func NewProcessor(db *internal.Database, store PhotoStore, thumbnailHeight, screenHeight int) *Processor {
+func NewProcessor(db *internal.Database, store PhotoStore, thumbnailHeight, screenHeight uint) *Processor {
 	m := &Processor{
-		context: &context{
-			db:              db,
-			store:           store,
-			thumbnailHeight: thumbnailHeight,
-			screenHeight:    screenHeight,
-		},
+		db:              db,
+		store:           store,
+		thumbnailHeight: thumbnailHeight,
+		screenHeight:    screenHeight,
 	}
 
 	return m
 }
 
-func (m *Processor) MigrateAll() {
-	photos, err := m.context.db.GetPhotosByProcessedLevel(len(migrations))
+func (p *Processor) MigrateAll() {
+	photos, err := p.db.GetPhotosByProcessedLevel(len(migrations))
 	if err != nil {
 		log.Printf("Unable to get photos to be migrated: %v\n", err)
 		return
 	}
 
 	for _, photo := range photos {
-		reader, err := m.context.store.Read(photo.Id, storage.KindRaw)
+		b, err := p.bytes(photo.Id)
 		if err != nil {
-			log.Printf("Unable to migrate photo %s, couldn't open: %v\n", photo.Id, err)
+			log.Printf("Failed to read photo %s: %v\n", photo.Id, err)
 			continue
 		}
 
-		err = m.Migrate(&photo, reader)
-		if err != nil {
+		if err := p.performActions(&photo, b, p.migrationFrom(photo.Processed)); err != nil {
 			log.Printf("Failed to migrate photo %s: %v\n", photo.Id, err)
-			// Fall-through to close
+			continue
 		}
 
-		_ = reader.Close()
+		photo.Processed = len(migrations)
+		if err := p.db.UpdatePhoto(&photo); err != nil {
+			log.Printf("Failed to update photo %s after migrating: %v\n", photo.Id, err)
+			continue
+		}
 	}
 }
 
-func (m *Processor) Migrate(photo *internal.Photo, raw io.Reader) error {
-	if photo.Processed >= len(migrations) {
-		return nil
-	}
-
-	b, err := ioutil.ReadAll(raw)
+func (p *Processor) Process(photo *internal.Photo, reader io.Reader) error {
+	b, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return err
 	}
 
-	r := bytes.NewReader(b)
-	for photo.Processed < len(migrations) {
-		if _, err := r.Seek(0, 0); err != nil {
-			return fmt.Errorf("unable to seek buffer: %v", err)
-		}
-
-		if err := migrations[photo.Processed+1].migrate(m.context, photo, r); err != nil {
-			m.RollBack(photo)
-			return fmt.Errorf("migration %d failed: %v", photo.Processed+1, err)
-		}
-
-		photo.Processed++
+	if err := p.performActions(photo, b, initialActions); err != nil {
+		return err
 	}
 
-	return m.context.db.UpdatePhoto(photo)
+	photo.Processed = len(migrations)
+	return p.db.UpdatePhoto(photo)
 }
 
-func (m *Processor) RollBack(photo *internal.Photo) {
-	for photo.Processed > 0 {
-		rb, ok := migrations[photo.Processed].(rollback)
-		if ok {
-			if err := rb.rollback(m.context, photo); err != nil {
-				fmt.Printf("Rollback of migration %d failed for photo %s: %v\n", photo.Processed, photo.Id, err)
+func (p *Processor) bytes(id uuid.UUID) ([]byte, error) {
+	reader, err := p.store.Read(id, storage.KindRaw)
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() {
+		_ = reader.Close()
+	}()
+
+	return ioutil.ReadAll(reader)
+}
+
+func (p *Processor) migrationFrom(oldLevel int) action {
+	actions := actionNoop
+	for i := oldLevel; i < len(migrations); i++ {
+		actions |= migrations[i]
+	}
+	return actions
+}
+
+func (p *Processor) performActions(photo *internal.Photo, b []byte, actions action) error {
+	for _, action := range allActions {
+		if action&actions == action {
+			err := p.performAction(photo, b, action)
+			if err != nil {
+				return err
 			}
 		}
-		photo.Processed--
+	}
+
+	return nil
+}
+
+func (p *Processor) performAction(photo *internal.Photo, b []byte, a action) error {
+	switch a {
+	case actionSaveRaw:
+		return p.saveRaw(photo.Id, bytes.NewReader(b))
+	case actionGenerateSamples:
+		return p.generateSamples(photo, b)
+	case actionExtractExif:
+		return p.extractExif(photo.Id, bytes.NewReader(b))
+	default:
+		return fmt.Errorf("unknown action %d", a)
 	}
 }

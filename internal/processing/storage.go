@@ -1,22 +1,15 @@
 package processing
 
 import (
-	"fmt"
-	"github.com/disintegration/imaging"
-	"github.com/rwcarlsen/goexif/exif"
 	uuid "github.com/satori/go.uuid"
 	"github.com/simpicapp/simpic/internal"
 	"github.com/simpicapp/simpic/internal/storage"
-	"image"
-	"image/jpeg"
+	"gopkg.in/gographics/imagick.v3/imagick"
 	"io"
-	"strconv"
 )
 
-type saveRawMigration struct{}
-
-func (*saveRawMigration) migrate(c *context, photo *internal.Photo, raw io.Reader) error {
-	out, err := c.store.Write(photo.Id, storage.KindRaw)
+func (p *Processor) saveRaw(id uuid.UUID, raw io.Reader) error {
+	out, err := p.store.Write(id, storage.KindRaw)
 	if err != nil {
 		return err
 	}
@@ -30,84 +23,87 @@ func (*saveRawMigration) migrate(c *context, photo *internal.Photo, raw io.Reade
 	return out.Close()
 }
 
-func (*saveRawMigration) rollback(c *context, photo *internal.Photo) error {
-	return c.store.Delete(photo.Id, storage.KindRaw)
+func (p *Processor) generateSamples(photo *internal.Photo, bytes []byte) error {
+	mw := imagick.NewMagickWand()
+	defer mw.Destroy()
+
+	if err := mw.ReadImageBlob(bytes); err != nil {
+		return err
+	}
+
+	if err := mw.AutoOrientImage(); err != nil {
+		return err
+	}
+
+	format := mw.GetImageFormat()
+	width := mw.GetImageWidth()
+	height := mw.GetImageHeight()
+
+	largeWidth, largeHeight := p.resizedDimensions(width, height, p.screenHeight)
+	smallWidth, smallHeight := p.resizedDimensions(width, height, p.thumbnailHeight)
+
+	if err := p.saveResampled(mw, largeWidth, largeHeight, 95, photo.Id, storage.KindScreenJpeg); err != nil {
+		return err
+	}
+
+	if err := p.saveResampled(mw, smallWidth, smallHeight, 80, photo.Id, storage.KindThumbnailJpeg); err != nil {
+		return err
+	}
+
+	photo.Width = largeWidth
+	photo.Height = largeHeight
+	photo.Format = format
+	return p.db.UpdatePhoto(photo)
 }
 
-type saveSampledMigration struct{}
+func (p *Processor) saveResampled(mw *imagick.MagickWand, width, height, quality uint, id uuid.UUID, kind storage.StoreKind) error {
+	if err := mw.ResizeImage(width, height, imagick.FILTER_LANCZOS2_SHARP); err != nil {
+		return err
+	}
 
-func (s *saveSampledMigration) migrate(c *context, photo *internal.Photo, raw io.Reader) error {
-	img, _, err := image.Decode(raw)
+	if err := mw.SetImageCompressionQuality(quality); err != nil {
+		return err
+	}
+
+	if err := mw.SetImageFormat("JPEG"); err != nil {
+		return err
+	}
+
+	file, err := p.store.Write(id, kind)
 	if err != nil {
 		return err
 	}
 
-	orientation := s.exifOrientation(c, photo)
-	if orientation == 5 || orientation == 6 {
-		img = imaging.Rotate270(img)
-	} else if orientation == 3 || orientation == 4 {
-		img = imaging.Rotate180(img)
-	} else if orientation == 7 || orientation == 8 {
-		img = imaging.Rotate90(img)
-	}
+	defer func() {
+		_ = file.Close()
+	}()
 
-	if orientation == 2 || orientation == 4 || orientation == 5 || orientation == 7 {
-		img = imaging.FlipH(img)
-	}
-
-	_, _, err = s.storeSampled(c.store, storage.KindThumbnail, c.thumbnailHeight, 80, photo.Id, img)
-	if err != nil {
+	if err := mw.WriteImageFile(file); err != nil {
 		return err
 	}
 
-	width, height, err := s.storeSampled(c.store, storage.KindScreenJpeg, c.screenHeight, 95, photo.Id, img)
-	if err != nil {
-		return err
-	}
-
-	photo.Width = width
-	photo.Height = height
-	return c.db.UpdatePhoto(photo)
-}
-
-func (*saveSampledMigration) exifOrientation(c *context, photo *internal.Photo) int {
-	tag, err := c.db.GetExifTag(photo.Id, string(exif.Orientation))
-	if err == nil {
-		val, err := strconv.Atoi(tag.Value)
-		if err == nil {
-			return val
-		}
-	}
-	return 1
-}
-
-func (*saveSampledMigration) rollback(c *context, photo *internal.Photo) error {
-	_ = c.store.Delete(photo.Id, storage.KindScreenJpeg)
-	_ = c.store.Delete(photo.Id, storage.KindThumbnail)
 	return nil
 }
 
-func (*saveSampledMigration) storeSampled(pw PhotoStore, kind storage.StoreKind, height, quality int, id uuid.UUID, img image.Image) (int, int, error) {
-	targetHeight := height
-	if img.Bounds().Dy() < targetHeight {
-		targetHeight = img.Bounds().Dy()
+func (p *Processor) resizedDimensions(inputWidth, inputHeight, targetHeight uint) (width, height uint) {
+	if inputHeight <= targetHeight {
+		width = inputWidth
+		height = targetHeight
+	} else {
+		ratio := float32(inputHeight) / float32(targetHeight)
+		height = uint(float32(inputHeight) / ratio)
+		width = uint(float32(inputWidth) / ratio)
 	}
 
-	thumb := imaging.Resize(img, 0, targetHeight, imaging.Lanczos)
-	thumbOut, err := pw.Write(id, kind)
-	if err != nil {
-		return 0, 0, err
+	if width > 5*height {
+		ratio := float32(width) / float32(height*5)
+		height = uint(float32(height) / ratio)
+		width = uint(float32(width) / ratio)
 	}
 
-	if err := jpeg.Encode(thumbOut, thumb, &jpeg.Options{Quality: quality}); err != nil {
-		_ = thumbOut.Close()
-		return 0, 0, fmt.Errorf("unable to create resampled image: %v", err)
-	}
-
-	return thumb.Bounds().Dx(), thumb.Bounds().Dy(), thumbOut.Close()
+	return
 }
 
 func init() {
-	migrations[migrationSaveRaw] = &saveRawMigration{}
-	migrations[migrationSaveSampled] = &saveSampledMigration{}
+	imagick.Initialize()
 }

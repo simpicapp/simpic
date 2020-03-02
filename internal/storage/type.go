@@ -4,10 +4,10 @@ type StoreKind int
 
 const (
 	KindRaw StoreKind = iota
-	KindThumbnail
+	KindThumbnailJpeg
 	KindScreenJpeg
 )
 
 var (
-	StoreKinds = []StoreKind{KindRaw, KindThumbnail, KindScreenJpeg}
+	StoreKinds = []StoreKind{KindRaw, KindThumbnailJpeg, KindScreenJpeg}
 )

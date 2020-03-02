@@ -17,8 +17,9 @@ var (
 	frontendDir = flag.String("frontend", "dist", "the path to serve frontend files from")
 )
 
-type PhotoReader interface {
+type PhotoStore interface {
 	Read(id uuid.UUID, kind storage.StoreKind) (io.ReadCloser, error)
+	DeleteAll(id uuid.UUID) error
 }
 
 type Server interface {
@@ -30,14 +31,14 @@ type server struct {
 	db          *internal.Database
 	processor   *processing.Processor
 	usermanager *internal.UserManager
-	photoReader PhotoReader
+	store       PhotoStore
 	srv         *http.Server
 }
 
-func NewServer(db *internal.Database, usermanager *internal.UserManager, photoReader PhotoReader, processor *processing.Processor) Server {
+func NewServer(db *internal.Database, usermanager *internal.UserManager, store PhotoStore, processor *processing.Processor) Server {
 	s := server{
 		db:          db,
-		photoReader: photoReader,
+		store:       store,
 		processor:   processor,
 		usermanager: usermanager,
 	}

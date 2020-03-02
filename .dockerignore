@@ -1,1 +1,8 @@
-data
+/data
+/frontend/node_modules
+
+/.*ignore
+/*.adoc
+/*.yaml
+/*.yml
+/Dockerfile

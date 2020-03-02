@@ -5,22 +5,29 @@
 === Features
 
 * Added ability to delete albums
-* Albums and photos now have a visibility:
-** *Public*:
-*** public photos always appear in the timeline and any albums they're added to;
-*** public albums are listed in the albums page for all users.
-** *Unlisted*:
-*** unlisted photos only appear in the timeline or public albums for logged-in users;
-*** unlisted albums only appear in the albums page for logged-in users
-*** if an anonymous user knows the ID (or URL) for an unlisted resource they can still see it
-*** if an anonymous user browses an unlisted album they will see unlisted photos in it
-** *Private*:
-*** photos and albums are hidden and cannot be seen or browsed except by logged-in users
-** Visibility for albums is selected when creating a new one
-** Visibility for newly uploaded photos can be controlled with the `SIMPIC_DEFAULT_VISIBILITY` env var
 * The toolbar when selecting images is now less intrusive and uses icons
 * Simpic now creates a "screen friendly" version of photos for use in the UI (JPEG, maximum height 2160px)
 * Photos are now rotated according to their EXIF orientation tags
+* Added support for ORF, CV2, and many other formats!
+
+==== Visibility
+
+Albums and photos now have a visibility setting, which can be one of:
+
+* *Public*:
+** public photos always appear in the timeline and any albums they're added to;
+** public albums are listed in the albums page for all users.
+* *Unlisted*:
+** unlisted photos only appear in the timeline or public albums for logged-in users;
+** unlisted albums only appear in the albums page for logged-in users
+** if an anonymous user knows the ID (or URL) for an unlisted resource they can still see it
+** if an anonymous user browses an unlisted album they will see unlisted photos in it
+* *Private*:
+** photos and albums are hidden and cannot be seen or browsed except by logged-in users
+
+Visibility for albums is selected when creating a new one.
+Visibility for newly uploaded photos can be controlled with the `SIMPIC_DEFAULT_VISIBILITY` env var.
+
 
 === Fixes
 

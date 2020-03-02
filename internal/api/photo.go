@@ -32,14 +32,16 @@ func (s *server) handleDeletePhotos() http.HandlerFunc {
 			return
 		}
 
-		for _, id := range data.Ids {
-			photo, err := s.db.GetPhoto(id, visForAccess(r))
-			if err != nil {
-				log.Printf("Couldn't retrieve photo %s for deletion: %v\n", id, err)
-				continue
-			}
+		if err := s.db.DeletePhotos(data.Ids); err != nil {
+			log.Printf("Unable to delete photos: %v\n", err)
+			writeError(w, http.StatusInternalServerError, "Unexpected error")
+			return
+		}
 
-			s.processor.RollBack(photo)
+		for _, id := range data.Ids {
+			if err := s.store.DeleteAll(id); err != nil {
+				log.Printf("Unable to remove files for photo %s: %v\n", id, err)
+			}
 		}
 
 		if err := s.db.RefreshMissingCoverImages(); err != nil {
@@ -54,7 +56,7 @@ func (s *server) handleGetData(t storage.StoreKind) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		photo := r.Context().Value(ctxPhoto).(*internal.Photo)
 
-		stream, err := s.photoReader.Read(photo.Id, t)
+		stream, err := s.store.Read(photo.Id, t)
 		if err != nil {
 			log.Printf("unable to retrieve photo '%s': %v\n", photo.Id, err)
 			writeError(w, http.StatusInternalServerError, "No photo found")
@@ -65,7 +67,12 @@ func (s *server) handleGetData(t storage.StoreKind) http.HandlerFunc {
 			_ = stream.Close()
 		}()
 
-		w.Header().Set("Content-Type", mimeTypeFor(photo.Type))
+		if t == storage.KindScreenJpeg || t == storage.KindThumbnailJpeg {
+			w.Header().Set("Content-Type", mimeTypeFor("JPEG"))
+		} else {
+			w.Header().Set("Content-Type", mimeTypeFor(photo.Format))
+		}
+
 		_, _ = io.Copy(w, stream)
 	}
 }
@@ -100,8 +107,9 @@ func (s *server) handleStorePhoto() http.HandlerFunc {
 			return
 		}
 
-		if err := s.processor.Migrate(photo, file); err != nil {
+		if err := s.processor.Process(photo, file); err != nil {
 			_ = s.db.DeletePhoto(photo)
+			_ = s.store.DeleteAll(photo.Id)
 			log.Printf("unable to create photo '%s': %v\n", headers.Filename, err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -111,14 +119,29 @@ func (s *server) handleStorePhoto() http.HandlerFunc {
 	}
 }
 
-func mimeTypeFor(t internal.PhotoType) string {
-	switch t {
-	case internal.TypeJpeg:
-		return "image/jpeg"
-	case internal.TypePng:
-		return "image/png"
-	default:
-		log.Printf("No known content type for type %d\n", t)
+var mimeTypes = map[string]string{
+	"ARW":  "image/x-sony-arw",
+	"CR2":  "image/x-canon-cr2",
+	"CRW":  "image/x-canon-crw",
+	"DCR":  "image/x-kodak-dcr",
+	"DNG":  "image/x-adobe-dng",
+	"GIF":  "image/gif",
+	"JPEG": "image/jpeg",
+	"MRW":  "image/x-minolta-mrw",
+	"NEF":  "image/x-nikon-nef",
+	"ORF":  "image/x-olympus-orf",
+	"PNG":  "image/png",
+	"RAF":  "image/x-fuji-raf",
+	"TIFF": "image/tiff",
+	"WEBP": "image/webp",
+}
+
+func mimeTypeFor(t string) string {
+	mt, ok := mimeTypes[t]
+	if ok {
+		return mt
+	} else {
+		log.Printf("No known content type for type %s\n", t)
 		return "application/octet-stream"
 	}
 }

@@ -27,7 +27,7 @@ func (s *server) routes() http.Handler {
 			r.Use(s.photoContext, s.cacheContext)
 			r.Get("/raw/{uuid}", s.handleGetData(storage.KindRaw))
 			r.Get("/image/{uuid}", s.handleGetData(storage.KindScreenJpeg))
-			r.Get("/thumb/{uuid}", s.handleGetData(storage.KindThumbnail))
+			r.Get("/thumb/{uuid}", s.handleGetData(storage.KindThumbnailJpeg))
 		})
 	})
 
