@@ -95,6 +95,13 @@ func (d *Database) GetPhotosByTime(maxVisibility Visibility, offset, count int) 
 	return
 }
 
+func (d *Database) GetPhotosByProcessedLevel(targetProcessedLevel int) (photos []Photo, err error) {
+	err = d.db.Collection("photos").Find().
+		Where("photo_processed <", targetProcessedLevel).
+		All(&photos)
+	return
+}
+
 func (d *Database) DeletePhoto(photo *Photo) error {
 	return d.db.Collection("photos").Find("photo_uuid", photo.Id).Delete()
 }

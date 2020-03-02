@@ -19,28 +19,38 @@ import (
 var (
 	dataDir = flag.String("path", "data", "the path to store data in")
 
-	db  *internal.Database
-	sm  *internal.SessionManager
-	srv api.Server
-	wg  = &sync.WaitGroup{}
+	db    *internal.Database
+	sm    *internal.SessionManager
+	pr    *processing.Processor
+	store storage.DiskStore
+	srv   api.Server
+	wg    = &sync.WaitGroup{}
 )
 
 func main() {
 	envy.Parse("SIMPIC")
 	flag.Parse()
 
+	log.Printf("%s has started\n", internal.GetVersionString())
+
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	signal.Notify(c, syscall.SIGTERM)
 
 	makeDatabase()
+	makeStore()
 	makeSessionManager()
+	makeProcessor()
 	makeServer()
+
+	log.Println("Checking for photos needing migration...")
+
+	pr.MigrateAll()
 
 	startServer()
 	startPruningSessions()
 
-	log.Printf("%s has started\n", internal.GetVersionString())
+	log.Println("Server is up.")
 
 	<-c
 
@@ -56,21 +66,27 @@ func makeDatabase() {
 	}
 }
 
+func makeStore() {
+	store = storage.DiskStore{Path: *dataDir}
+}
+
 func makeSessionManager() {
 	sm = internal.NewSessionManager(db)
+}
+
+func makeProcessor() {
+	pr = processing.NewProcessor(db, store, 220, 2160)
 }
 
 func makeServer() {
 	userManager := internal.NewUserManager(db)
 	userManager.CreateAdmin()
 
-	driver := storage.DiskStore{Path: *dataDir}
-
 	srv = api.NewServer(
 		db,
 		userManager,
-		driver,
-		processing.NewProcessor(db, driver, 220, 2160))
+		store,
+		pr)
 }
 
 func startServer() {

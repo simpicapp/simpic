@@ -16,7 +16,7 @@ import (
 type saveRawMigration struct{}
 
 func (*saveRawMigration) migrate(c *context, photo *internal.Photo, raw io.Reader) error {
-	out, err := c.writer.Write(photo.Id, storage.KindRaw)
+	out, err := c.store.Write(photo.Id, storage.KindRaw)
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,7 @@ func (*saveRawMigration) migrate(c *context, photo *internal.Photo, raw io.Reade
 }
 
 func (*saveRawMigration) rollback(c *context, photo *internal.Photo) error {
-	return c.writer.Delete(photo.Id, storage.KindRaw)
+	return c.store.Delete(photo.Id, storage.KindRaw)
 }
 
 type saveSampledMigration struct{}
@@ -55,12 +55,12 @@ func (s *saveSampledMigration) migrate(c *context, photo *internal.Photo, raw io
 		img = imaging.FlipH(img)
 	}
 
-	_, _, err = s.storeSampled(c.writer, storage.KindThumbnail, c.thumbnailHeight, 80, photo.Id, img)
+	_, _, err = s.storeSampled(c.store, storage.KindThumbnail, c.thumbnailHeight, 80, photo.Id, img)
 	if err != nil {
 		return err
 	}
 
-	width, height, err := s.storeSampled(c.writer, storage.KindScreenJpeg, c.screenHeight, 95, photo.Id, img)
+	width, height, err := s.storeSampled(c.store, storage.KindScreenJpeg, c.screenHeight, 95, photo.Id, img)
 	if err != nil {
 		return err
 	}
@@ -82,12 +82,12 @@ func (*saveSampledMigration) exifOrientation(c *context, photo *internal.Photo) 
 }
 
 func (*saveSampledMigration) rollback(c *context, photo *internal.Photo) error {
-	_ = c.writer.Delete(photo.Id, storage.KindScreenJpeg)
-	_ = c.writer.Delete(photo.Id, storage.KindThumbnail)
+	_ = c.store.Delete(photo.Id, storage.KindScreenJpeg)
+	_ = c.store.Delete(photo.Id, storage.KindThumbnail)
 	return nil
 }
 
-func (*saveSampledMigration) storeSampled(pw PhotoWriter, kind storage.StoreKind, height, quality int, id uuid.UUID, img image.Image) (int, int, error) {
+func (*saveSampledMigration) storeSampled(pw PhotoStore, kind storage.StoreKind, height, quality int, id uuid.UUID, img image.Image) (int, int, error) {
 	targetHeight := height
 	if img.Bounds().Dy() < targetHeight {
 		targetHeight = img.Bounds().Dy()
