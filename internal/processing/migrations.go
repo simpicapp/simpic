@@ -20,4 +20,5 @@ var migrations = []action{
 	actionNoop,            // Used to be extract photo type, now done as sampling
 	actionGenerateSamples, // First time generate of samples
 	actionExtractExif,     // First time extraction of EXIF
+	actionExtractExif,     // Switch to using the Simpic fork of goexif with support for ORFs
 }
