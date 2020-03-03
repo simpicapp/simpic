@@ -15,6 +15,7 @@ import (
 type PhotoStore interface {
 	Read(id uuid.UUID, kind storage.StoreKind) (io.ReadCloser, error)
 	Write(id uuid.UUID, kind storage.StoreKind) (*os.File, error)
+	Size(id uuid.UUID, kind storage.StoreKind) int64
 	Delete(id uuid.UUID, kind storage.StoreKind) error
 }
 
@@ -43,7 +44,9 @@ func (p *Processor) MigrateAll() {
 		return
 	}
 
-	for _, photo := range photos {
+	log.Printf("%d photos need migrating\n", len(photos))
+
+	for i, photo := range photos {
 		b, err := p.bytes(photo.Id)
 		if err != nil {
 			log.Printf("Failed to read photo %s: %v\n", photo.Id, err)
@@ -60,7 +63,13 @@ func (p *Processor) MigrateAll() {
 			log.Printf("Failed to update photo %s after migrating: %v\n", photo.Id, err)
 			continue
 		}
+
+		if i%20 == 0 {
+			log.Printf("%d photos migrated...\n", i)
+		}
 	}
+
+	log.Printf("Migration of %d photos completed\n", len(photos))
 }
 
 func (p *Processor) Process(photo *internal.Photo, reader io.Reader) error {

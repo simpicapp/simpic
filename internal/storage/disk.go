@@ -34,6 +34,14 @@ func (d DiskStore) Exists(id uuid.UUID, kind StoreKind) bool {
 	return err == nil
 }
 
+func (d DiskStore) Size(id uuid.UUID, kind StoreKind) int64 {
+	stat, err := os.Stat(d.pathFor(id, kind))
+	if err != nil {
+		return 0
+	}
+	return stat.Size()
+}
+
 func (d DiskStore) Delete(id uuid.UUID, kind StoreKind) error {
 	return os.Remove(d.pathFor(id, kind))
 }
