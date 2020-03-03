@@ -112,6 +112,31 @@ func (d *Database) DeletePhotos(uuids []uuid.UUID) error {
 
 //endregion
 
+//region Formats
+
+func (d *Database) AddFormat(format *Format) (err error) {
+	_, err = d.db.Collection("photo_formats").Insert(format)
+	return
+}
+
+func (d *Database) GetFormats(photo uuid.UUID) (formats []Format, err error) {
+	err = d.db.Collection("photo_formats").Find().
+		Where("photo_uuid", photo).
+		OrderBy("-format_purpose").
+		All(&formats)
+	return
+}
+
+func (d *Database) GetOriginalFormat(photo uuid.UUID) (format *Format, err error) {
+	err = d.db.Collection("photo_formats").Find().
+		Where("photo_uuid", photo).
+		And("format_purpose", PurposeDownload).
+		One(&format)
+	return
+}
+
+//region
+
 //region Exif
 
 func (d *Database) StoreExifTags(photo uuid.UUID, tags map[string]string) error {

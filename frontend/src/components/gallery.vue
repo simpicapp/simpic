@@ -58,7 +58,6 @@
   import Thumbnail from "./thumbnail.vue";
   import GalleryToolbar from "./gallery-toolbar.vue";
   import Spinner from "./spinner.vue";
-  import {cache} from "../features/cache";
   import {computed, defineComponent, onMounted, reactive, toRefs} from "@vue/composition-api";
   import {useAuthentication} from "@/features/auth";
   import {useScrollWatcher} from "@/features/scroll";
@@ -116,7 +115,6 @@
           state.offset = state.offset + data.length;
           state.hasMore = data.length > 0;
           state.loading = false;
-          cache.storeMetadata(data);
         });
       }
 
