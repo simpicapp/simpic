@@ -1,10 +1,10 @@
 package processing
 
 import (
-	"github.com/rwcarlsen/goexif/exif"
-	"github.com/rwcarlsen/goexif/mknote"
-	"github.com/rwcarlsen/goexif/tiff"
 	uuid "github.com/satori/go.uuid"
+	"github.com/simpicapp/goexif/exif"
+	"github.com/simpicapp/goexif/mknote"
+	"github.com/simpicapp/goexif/tiff"
 	"io"
 	"log"
 )
