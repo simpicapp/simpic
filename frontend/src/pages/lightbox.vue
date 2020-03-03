@@ -4,7 +4,26 @@
       <div @click.stop.prevent="$emit('go-to-previous-image', id)" id="prev-overlay">
         <span>←</span>
       </div>
-      <div id="close">&times; Close</div>
+      <ul id="buttons">
+        <li>
+          <Icon @click.stop="showingDownloads = !showingDownloads" name="download" scale="1.5" title="Download"></Icon>
+        </li>
+        <li>
+          <Icon name="window-close" scale="1.5" title="Close"></Icon>
+        </li>
+      </ul>
+      <ul id="downloader" v-if="showingDownloads">
+        <li>
+          <a :href="`/data/image/${id}?download`" @click.stop="showingDownloads = false">
+            Screen optimised (JPEG)
+          </a>
+        </li>
+        <li>
+          <a :href="`/data/raw/${id}?download`" @click.stop="showingDownloads = false">
+            Original ({{ metadata && metadata.type }})
+          </a>
+        </li>
+      </ul>
       <canvas :height="height" :width="width" @click.stop ref="canvas"></canvas>
       <div @click.stop.prevent="$emit('go-to-next-image', id)" id="next-overlay">
         <span>→</span>
@@ -28,16 +47,85 @@
     flex-direction: column;
   }
 
-  #close {
+  ul {
     position: fixed;
-    top: 10px;
-    right: 220px;
     color: #999;
-    padding: 10px;
+    padding: 0;
     cursor: pointer;
+    background: #111111cc;
+    list-style: none;
+    border-radius: 5px;
 
-    &:hover {
-      color: white;
+    li {
+      transition: all 200ms linear;
+      cursor: pointer;
+
+      &.selected,
+      &:hover {
+        background-color: #333333;
+        color: white;
+      }
+    }
+  }
+
+  #buttons {
+    top: 20px;
+    right: 220px;
+    display: flex;
+    justify-content: space-between;
+    user-select: none;
+
+    li {
+      border-left: 1px solid #000000;
+      display: flex;
+      align-items: center;
+
+      svg {
+        box-sizing: content-box;
+        padding: 10px 15px;
+      }
+
+      &:first-child {
+        border-bottom-left-radius: 5px;
+        border-top-left-radius: 5px;
+        border-left: 0;
+      }
+
+      &:last-child {
+        border-bottom-right-radius: 5px;
+        border-top-right-radius: 5px;
+      }
+    }
+  }
+
+  #downloader {
+    top: 80px;
+    right: 220px;
+
+    li {
+      border-top: 1px solid #000000;
+      display: flex;
+      align-items: stretch;
+      align-content: stretch;
+
+      &:first-child {
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        border-top: 0;
+      }
+
+      &:last-child {
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+      }
+
+      a {
+        padding: 10px;
+        flex-grow: 1;
+        text-decoration: none;
+        text-align: center;
+        color: inherit;
+      }
     }
   }
 
@@ -72,13 +160,16 @@
 
 <script lang="ts">
   import Modal from "../components/modal.vue";
-  import {cache} from "../features/cache";
+  import {cache} from "@/features/cache";
   import {Photo} from "@/model/photo";
   import {useWindowListener} from "@/features/listeners";
   import {defineComponent, reactive, ref, toRefs, watch} from "@vue/composition-api";
+  import "vue-awesome/icons/window-close";
+  import "vue-awesome/icons/download";
+  import Icon from "vue-awesome/components/Icon.vue";
 
   export default defineComponent({
-    components: {Modal},
+    components: {Modal, Icon},
     props: {id: String},
 
     setup(props, ctx) {
@@ -88,6 +179,7 @@
         width: 0,
         height: 0,
         metadata: null as Photo | null,
+        showingDownloads: false,
       });
 
       function setSize() {
