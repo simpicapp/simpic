@@ -67,6 +67,14 @@ func (s *server) handleGetData(t storage.StoreKind) http.HandlerFunc {
 			_ = stream.Close()
 		}()
 
+		if _, dl := r.URL.Query()["download"]; dl {
+			fileName := photo.FileName
+			if t == storage.KindScreenJpeg || t == storage.KindThumbnailJpeg {
+				fileName = fmt.Sprintf("%s.jpg", fileName)
+			}
+			w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, fileName))
+		}
+
 		if t == storage.KindScreenJpeg || t == storage.KindThumbnailJpeg {
 			w.Header().Set("Content-Type", mimeTypeFor("JPEG"))
 		} else {
