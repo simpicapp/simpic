@@ -24,7 +24,7 @@
     "@types/lodash-es": "^4.17.3",
     "@types/mocha": "^7.0.1",
     "@typescript-eslint/eslint-plugin": "^2.22.0",
-    "@typescript-eslint/parser": "^2.18.0",
+    "@typescript-eslint/parser": "^2.22.0",
     "@vue/cli-plugin-e2e-nightwatch": "~4.2.0",
     "@vue/cli-plugin-eslint": "~4.2.0",
     "@vue/cli-plugin-router": "~4.2.0",
