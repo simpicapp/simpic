@@ -18,7 +18,17 @@ var (
 func (s *server) handleGetPhotoInfo() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		photo := r.Context().Value(ctxPhoto).(*internal.Photo)
-		writeJSON(w, http.StatusOK, photo)
+		formats, err := s.db.GetFormats(photo.Id)
+		if err != nil {
+			log.Printf("Unable to get formats for photo %s: %v\n", photo.Id, err)
+			writeError(w, http.StatusInternalServerError, "Unexpected error")
+			return
+		}
+
+		writeJSON(w, http.StatusOK, internal.PhotoWithFormats{
+			Photo:   photo,
+			Formats: formats,
+		})
 	}
 }
 
@@ -78,7 +88,14 @@ func (s *server) handleGetData(t storage.StoreKind) http.HandlerFunc {
 		if t == storage.KindScreenJpeg || t == storage.KindThumbnailJpeg {
 			w.Header().Set("Content-Type", mimeTypeFor("JPEG"))
 		} else {
-			w.Header().Set("Content-Type", mimeTypeFor(photo.Format))
+			format, err := s.db.GetOriginalFormat(photo.Id)
+			if err != nil {
+				log.Printf("unable to retrieve original format for photo '%s': %v\n", photo.Id, err)
+				writeError(w, http.StatusInternalServerError, "No photo found")
+				return
+			}
+
+			w.Header().Set("Content-Type", mimeTypeFor(format.Format))
 		}
 
 		_, _ = io.Copy(w, stream)

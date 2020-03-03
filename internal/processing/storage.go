@@ -42,21 +42,25 @@ func (p *Processor) generateSamples(photo *internal.Photo, bytes []byte) error {
 	largeWidth, largeHeight := p.resizedDimensions(width, height, p.screenHeight)
 	smallWidth, smallHeight := p.resizedDimensions(width, height, p.thumbnailHeight)
 
-	if err := p.saveResampled(mw, largeWidth, largeHeight, 95, photo.Id, storage.KindScreenJpeg); err != nil {
+	if err := p.saveResampled(mw, largeWidth, largeHeight, 95, photo.Id, internal.PurposeScreen); err != nil {
 		return err
 	}
 
-	if err := p.saveResampled(mw, smallWidth, smallHeight, 80, photo.Id, storage.KindThumbnailJpeg); err != nil {
+	if err := p.saveResampled(mw, smallWidth, smallHeight, 80, photo.Id, internal.PurposePreview); err != nil {
 		return err
 	}
 
-	photo.Width = largeWidth
-	photo.Height = largeHeight
-	photo.Format = format
-	return p.db.UpdatePhoto(photo)
+	return p.db.AddFormat(&internal.Format{
+		Photo:   photo.Id,
+		Purpose: internal.PurposeDownload,
+		Format:  format,
+		Width:   width,
+		Height:  height,
+		Size:    int64(len(bytes)),
+	})
 }
 
-func (p *Processor) saveResampled(mw *imagick.MagickWand, width, height, quality uint, id uuid.UUID, kind storage.StoreKind) error {
+func (p *Processor) saveResampled(mw *imagick.MagickWand, width, height, quality uint, id uuid.UUID, purpose internal.FormatPurpose) error {
 	if err := mw.ResizeImage(width, height, imagick.FILTER_LANCZOS2_SHARP); err != nil {
 		return err
 	}
@@ -69,7 +73,29 @@ func (p *Processor) saveResampled(mw *imagick.MagickWand, width, height, quality
 		return err
 	}
 
-	file, err := p.store.Write(id, kind)
+	var storageKind storage.StoreKind
+	if purpose == internal.PurposePreview {
+		storageKind = storage.KindThumbnailJpeg
+	} else {
+		storageKind = storage.KindScreenJpeg
+	}
+
+	if err := p.write(mw, id, storageKind); err != nil {
+		return err
+	}
+
+	return p.db.AddFormat(&internal.Format{
+		Photo:   id,
+		Purpose: purpose,
+		Format:  "JPEG",
+		Width:   width,
+		Height:  height,
+		Size:    p.store.Size(id, storageKind),
+	})
+}
+
+func (p *Processor) write(mw *imagick.MagickWand, id uuid.UUID, storageKind storage.StoreKind) error {
+	file, err := p.store.Write(id, storageKind)
 	if err != nil {
 		return err
 	}
@@ -78,11 +104,7 @@ func (p *Processor) saveResampled(mw *imagick.MagickWand, width, height, quality
 		_ = file.Close()
 	}()
 
-	if err := mw.WriteImageFile(file); err != nil {
-		return err
-	}
-
-	return nil
+	return mw.WriteImageFile(file)
 }
 
 func (p *Processor) resizedDimensions(inputWidth, inputHeight, targetHeight uint) (width, height uint) {

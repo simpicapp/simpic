@@ -13,14 +13,9 @@
         </li>
       </ul>
       <ul id="downloader" v-if="showingDownloads">
-        <li>
-          <a :href="`/data/image/${id}?download`" @click.stop="showingDownloads = false">
-            Screen optimised (JPEG)
-          </a>
-        </li>
-        <li>
-          <a :href="`/data/raw/${id}?download`" @click.stop="showingDownloads = false">
-            Original ({{ metadata && metadata.type }})
+        <li v-for="format in formats" :key="format.url">
+          <a :href="format.url" @click.stop="showingDownloads = false">
+            {{ format.name }} {{ format.format }} ({{ format.width }}x{{ format.height }}, {{ format.size }})
           </a>
         </li>
       </ul>
@@ -161,12 +156,14 @@
 <script lang="ts">
   import Modal from "../components/modal.vue";
   import {cache} from "@/features/cache";
-  import {Photo} from "@/model/photo";
+  import {Photo, PurposeScreen} from "@/model/photo";
   import {useWindowListener} from "@/features/listeners";
-  import {defineComponent, reactive, ref, toRefs, watch} from "@vue/composition-api";
+  import {computed, defineComponent, reactive, ref, toRefs, watch} from "@vue/composition-api";
   import "vue-awesome/icons/window-close";
   import "vue-awesome/icons/download";
   import Icon from "vue-awesome/components/Icon.vue";
+  import Axios from "axios";
+  import {formatDownloadUrl, formatFileSize, formatPurpose} from "@/features/formatting";
 
   export default defineComponent({
     components: {Modal, Icon},
@@ -187,12 +184,18 @@
           return;
         }
 
-        const widthRatio = state.metadata.width / (window.innerWidth * 0.95);
-        const heightRatio = state.metadata.height / (window.innerHeight * 0.9);
+        const displayFormat = state.metadata.formats.find(el => el.purpose === PurposeScreen);
+        if (!displayFormat) {
+          console.log("No display format found!");
+          return;
+        }
+
+        const widthRatio = displayFormat.width / (window.innerWidth * 0.95);
+        const heightRatio = displayFormat.height / (window.innerHeight * 0.9);
         const scale = Math.max(1, widthRatio, heightRatio);
 
-        state.width = Math.round(state.metadata.width / scale);
-        state.height = Math.round(state.metadata.height / scale);
+        state.width = Math.round(displayFormat.width / scale);
+        state.height = Math.round(displayFormat.height / scale);
       }
 
       function context() {
@@ -205,13 +208,12 @@
           return;
         }
 
-        cache
-          .getMetadata(id)
-          .then(metadata => {
+        Axios.get("/photos/" + id)
+          .then(({data}) => {
             if (props.id !== id) {
               throw Error("wrong-id");
             }
-            state.metadata = metadata;
+            state.metadata = data;
             setSize();
             return cache.getThumbnail(id);
           })
@@ -261,7 +263,25 @@
 
       watch(() => props.id, startLoading);
 
-      return {canvas, ...toRefs(state)};
+      const formats = computed(() => {
+        if (!state.metadata || !props.id) {
+          return [];
+        }
+
+        const id = props.id;
+        return state.metadata.formats.map(f => {
+          return {
+            width: f.width,
+            height: f.height,
+            format: f.format,
+            name: formatPurpose(f.purpose),
+            size: formatFileSize(f.size),
+            url: formatDownloadUrl(id, f),
+          };
+        });
+      });
+
+      return {canvas, formats, ...toRefs(state)};
     },
   });
 </script>

@@ -21,4 +21,5 @@ var migrations = []action{
 	actionGenerateSamples, // First time generate of samples
 	actionExtractExif,     // First time extraction of EXIF
 	actionExtractExif,     // Switch to using the Simpic fork of goexif with support for ORFs
+	actionGenerateSamples, // Switch how image formats are stored in the DB, add more details
 }
