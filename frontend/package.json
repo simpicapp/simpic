@@ -20,7 +20,7 @@
     "vue-router": "^3.1.5"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.8",
+    "@types/chai": "^4.2.10",
     "@types/lodash-es": "^4.17.3",
     "@types/mocha": "^7.0.1",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
