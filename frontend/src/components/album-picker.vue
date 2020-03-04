@@ -19,7 +19,7 @@
         <div @click="handleNewAlbumSelected"><span>Create new album...</span></div>
       </div>
     </popup>
-    <album-creator @close="handleClosed" @created="handleAlbumSelected" v-else></album-creator>
+    <album-dialog @close="handleClosed" @created="handleAlbumSelected" v-else></album-dialog>
   </modal>
 </template>
 
@@ -80,7 +80,7 @@
   import Axios from "axios";
   import Modal from "./modal.vue";
   import Popup from "./popup.vue";
-  import AlbumCreator from "./album-creator.vue";
+  import AlbumDialog from "./album-dialog.vue";
   import {defineComponent, reactive, toRefs} from "@vue/composition-api";
   import {useEventListener} from "@/features/eventbus";
 
@@ -95,7 +95,7 @@
 
   export default defineComponent({
     components: {
-      AlbumCreator,
+      AlbumDialog,
       Modal,
       Popup,
     },

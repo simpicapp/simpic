@@ -2,12 +2,37 @@
   <div>
     <div class="toolbar">
       <h2>{{ name }}</h2>
-      <ActionIcon :working="deleting" @click="confirmDelete" name="trash-alt" v-if="loggedIn"></ActionIcon>
+      <div class="buttons">
+        <ActionIcon
+          :working="false"
+          @click="handleEditClicked"
+          name="edit"
+          title="Change this album's name or visibility"
+          v-if="loggedIn"
+        ></ActionIcon>
+        <ActionIcon
+          :working="deleting"
+          @click="confirmDelete"
+          name="trash-alt"
+          title="Delete this album"
+          v-if="loggedIn"
+        ></ActionIcon>
+      </div>
     </div>
     <gallery :album="id" :endpoint="'/albums/' + id + '/photos'"></gallery>
 
     <DeleteDialog @close="showConfirmation = false" @yes="doDelete" v-if="showConfirmation" what="this album">
     </DeleteDialog>
+
+    <modal :closeable="true" :should-close="editShouldClose" @close="showEdit = false" v-if="showEdit">
+      <AlbumDialog
+        :id="id"
+        :initialName="name"
+        :initialVisibility="visibility"
+        @close="editShouldClose = true"
+        @created="handleEditFinished"
+      ></AlbumDialog>
+    </modal>
   </div>
 </template>
 
@@ -25,18 +50,20 @@
   .buttons {
     display: grid;
     grid-template-columns: auto auto;
-    grid-column-gap: 20px;
+    grid-column-gap: 10px;
     justify-items: stretch;
-    margin-top: 30px;
   }
 </style>
 
 <script lang="ts">
   import "vue-awesome/icons/trash-alt";
+  import "vue-awesome/icons/edit";
   import Axios from "axios";
   import Gallery from "../components/gallery.vue";
   import ActionIcon from "../components/action-icon.vue";
+  import AlbumDialog from "../components/album-dialog.vue";
   import DeleteDialog from "../components/delete-dialog.vue";
+  import Modal from "../components/modal.vue";
   import {defineComponent, onMounted, reactive, toRefs} from "@vue/composition-api";
   import {useRouter} from "@/features/router";
   import {useAuthentication} from "@/features/auth";
@@ -47,6 +74,8 @@
       ActionIcon,
       DeleteDialog,
       Gallery,
+      Modal,
+      AlbumDialog,
     },
     props: {
       id: String,
@@ -65,6 +94,9 @@
         name: "",
         showConfirmation: false,
         deleting: false,
+        editShouldClose: false,
+        showEdit: false,
+        visibility: 0,
       });
 
       function confirmDelete() {
@@ -81,13 +113,29 @@
         });
       }
 
-      onMounted(() => {
-        Axios.get("/albums/" + props.id).then(({data: {name}}) => {
+      function update() {
+        Axios.get("/albums/" + props.id).then(({data: {name, visibility}}) => {
           state.name = name;
+          state.visibility = visibility;
         });
+      }
+
+      onMounted(() => {
+        update();
       });
 
-      return {confirmDelete, doDelete, loggedIn, ...toRefs(state)};
+      function handleEditClicked() {
+        state.editShouldClose = false;
+        state.showEdit = true;
+      }
+
+      function handleEditFinished() {
+        EventBus.$emit("toast", "Album has been updated");
+        state.editShouldClose = true;
+        update();
+      }
+
+      return {confirmDelete, doDelete, handleEditClicked, handleEditFinished, loggedIn, ...toRefs(state)};
     },
   });
 </script>
