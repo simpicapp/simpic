@@ -10,8 +10,6 @@ agent:
 blocks:
   - name: Backend
     dependencies: []
-    run:
-      when: "change_in(['/go.mod', '/go.sum', '/internal/', '/cmd/'])"
     task:
       jobs:
         - name: Build
@@ -21,8 +19,6 @@ blocks:
             - go fmt ./...
   - name: Frontend
     dependencies: []
-    run:
-      when: change_in('/frontend/')
     task:
       jobs:
         - name: Build
