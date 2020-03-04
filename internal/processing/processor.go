@@ -66,6 +66,9 @@ func (p *Processor) MigrateAll() {
 	}
 
 	log.Printf("%d photos need migrating\n", len(photos))
+	if len(photos) == 0 {
+		return
+	}
 
 	for i, photo := range photos {
 		cache := &cachingBytesProvider{
@@ -85,7 +88,7 @@ func (p *Processor) MigrateAll() {
 			continue
 		}
 
-		if i%20 == 0 {
+		if i%10 == 0 {
 			log.Printf("%d photos migrated...\n", i)
 		}
 	}
@@ -158,6 +161,8 @@ func (p *Processor) performAction(photo *internal.Photo, bp byteProvider, a acti
 		if b, err = bp(); err == nil {
 			err = p.extractExif(photo.Id, bytes.NewReader(b))
 		}
+	case actionCalculateTimestamp:
+		return p.calculateTimestamp(photo)
 	default:
 		err = fmt.Errorf("unknown action %d", a)
 	}

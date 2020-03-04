@@ -8,7 +8,8 @@ import (
 type Photo struct {
 	Id         uuid.UUID  `json:"id" db:"photo_uuid"`
 	FileName   string     `json:"file_name" db:"photo_filename"`
-	Timestamp  time.Time  `json:"timestamp" db:"photo_uploaded"`
+	UploadTime *time.Time `json:"uploaded" db:"photo_uploaded"`
+	TakenTime  *time.Time `json:"taken" db:"photo_taken"`
 	Uploader   int        `json:"user_id" db:"photo_uploader"`
 	Visibility Visibility `json:"visibility" db:"photo_visibility"`
 	Processed  int        `json:"-" db:"photo_processed"`
@@ -43,9 +44,10 @@ type ExifTag struct {
 }
 
 func NewPhoto(fileName string) *Photo {
+	t := time.Now()
 	return &Photo{
-		Id:        uuid.NewV4(),
-		FileName:  fileName,
-		Timestamp: time.Now(),
+		Id:         uuid.NewV4(),
+		FileName:   fileName,
+		UploadTime: &t,
 	}
 }
