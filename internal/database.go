@@ -88,7 +88,7 @@ func (d *Database) GetPhoto(id uuid.UUID, maxVisibility Visibility) (photo *Phot
 func (d *Database) GetPhotosByTime(maxVisibility Visibility, offset, count int) (photos []Photo, err error) {
 	err = d.db.Collection("photos").Find().
 		Where("photo_visibility <=", maxVisibility).
-		OrderBy("-photo_uploaded").
+		OrderBy("-photo_taken").
 		Offset(offset).
 		Limit(count).
 		All(&photos)
