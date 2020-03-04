@@ -26,6 +26,27 @@ type Processor struct {
 	screenHeight    uint
 }
 
+type byteProvider func() ([]byte, error)
+
+type cachingBytesProvider struct {
+	cache    []byte
+	provider byteProvider
+}
+
+func (cp *cachingBytesProvider) bytes() ([]byte, error) {
+	if len(cp.cache) > 0 {
+		return cp.cache, nil
+	}
+
+	b, err := cp.provider()
+	if err != nil {
+		return nil, err
+	}
+
+	cp.cache = b
+	return b, nil
+}
+
 func NewProcessor(db *internal.Database, store PhotoStore, thumbnailHeight, screenHeight uint) *Processor {
 	m := &Processor{
 		db:              db,
@@ -47,13 +68,13 @@ func (p *Processor) MigrateAll() {
 	log.Printf("%d photos need migrating\n", len(photos))
 
 	for i, photo := range photos {
-		b, err := p.bytes(photo.Id)
-		if err != nil {
-			log.Printf("Failed to read photo %s: %v\n", photo.Id, err)
-			continue
+		cache := &cachingBytesProvider{
+			provider: func() (i []byte, err error) {
+				return p.bytes(photo.Id)
+			},
 		}
 
-		if err := p.performActions(&photo, b, p.migrationFrom(photo.Processed)); err != nil {
+		if err := p.performActions(&photo, cache.bytes, p.migrationFrom(photo.Processed)); err != nil {
 			log.Printf("Failed to migrate photo %s: %v\n", photo.Id, err)
 			continue
 		}
@@ -73,12 +94,13 @@ func (p *Processor) MigrateAll() {
 }
 
 func (p *Processor) Process(photo *internal.Photo, reader io.Reader) error {
-	b, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return err
+	cache := &cachingBytesProvider{
+		provider: func() (i []byte, err error) {
+			return ioutil.ReadAll(reader)
+		},
 	}
 
-	if err := p.performActions(photo, b, initialActions); err != nil {
+	if err := p.performActions(photo, cache.bytes, initialActions); err != nil {
 		return err
 	}
 
@@ -107,10 +129,10 @@ func (p *Processor) migrationFrom(oldLevel int) action {
 	return actions
 }
 
-func (p *Processor) performActions(photo *internal.Photo, b []byte, actions action) error {
+func (p *Processor) performActions(photo *internal.Photo, bp byteProvider, actions action) error {
 	for _, action := range allActions {
 		if action&actions == action {
-			err := p.performAction(photo, b, action)
+			err := p.performAction(photo, bp, action)
 			if err != nil {
 				return err
 			}
@@ -120,15 +142,25 @@ func (p *Processor) performActions(photo *internal.Photo, b []byte, actions acti
 	return nil
 }
 
-func (p *Processor) performAction(photo *internal.Photo, b []byte, a action) error {
+func (p *Processor) performAction(photo *internal.Photo, bp byteProvider, a action) (err error) {
+	var b []byte
+
 	switch a {
 	case actionSaveRaw:
-		return p.saveRaw(photo.Id, bytes.NewReader(b))
+		if b, err = bp(); err == nil {
+			err = p.saveRaw(photo.Id, bytes.NewReader(b))
+		}
 	case actionGenerateSamples:
-		return p.generateSamples(photo, b)
+		if b, err = bp(); err == nil {
+			err = p.generateSamples(photo, b)
+		}
 	case actionExtractExif:
-		return p.extractExif(photo.Id, bytes.NewReader(b))
+		if b, err = bp(); err == nil {
+			err = p.extractExif(photo.Id, bytes.NewReader(b))
+		}
 	default:
-		return fmt.Errorf("unknown action %d", a)
+		err = fmt.Errorf("unknown action %d", a)
 	}
+
+	return
 }
