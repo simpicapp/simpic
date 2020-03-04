@@ -9,6 +9,7 @@
 * Simpic now creates a "screen friendly" version of photos for use in the UI (JPEG, maximum height 2160px)
 * Photos are now rotated according to their EXIF orientation tags
 * Added support for ORF, CV2, and many other formats!
+* Added option to download image in various formats from the lightbox
 
 ==== Visibility
 
@@ -27,7 +28,6 @@ Albums and photos now have a visibility setting, which can be one of:
 
 Visibility for albums is selected when creating a new one.
 Visibility for newly uploaded photos can be controlled with the `SIMPIC_DEFAULT_VISIBILITY` env var.
-
 
 === Fixes
 
