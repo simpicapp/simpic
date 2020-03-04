@@ -27,4 +27,5 @@ var migrations = []action{
 	actionExtractExif,        // Switch to using the Simpic fork of goexif with support for ORFs
 	actionGenerateSamples,    // Switch how image formats are stored in the DB, add more details
 	actionCalculateTimestamp, // Newly added
+	actionCalculateTimestamp, // More file name formats added
 }
