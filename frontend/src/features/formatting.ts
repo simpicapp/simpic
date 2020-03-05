@@ -1,4 +1,4 @@
-import {Format, PurposeDownload, PurposePreview, PurposeScreen} from "@/model/photo";
+import {PurposeDownload, PurposePreview, PurposeScreen} from "@/model/photo";
 
 export function formatFileSize(bytes: number) {
   const thresh = 1024;
@@ -25,20 +25,4 @@ export function formatPurpose(purpose: number) {
     default:
       return "Unknown";
   }
-}
-
-export function formatDownloadUrl(image: string, format: Format) {
-  let url = "";
-  switch (format.purpose) {
-    case PurposeScreen:
-      url = "image";
-      break;
-    case PurposeDownload:
-      url = "raw";
-      break;
-    case PurposePreview:
-      url = "thumb";
-      break;
-  }
-  return `/data/${url}/${image}?download`;
 }

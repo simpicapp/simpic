@@ -5,7 +5,6 @@ import (
 	"fmt"
 	uuid "github.com/satori/go.uuid"
 	"github.com/simpicapp/simpic/internal"
-	"github.com/simpicapp/simpic/internal/storage"
 	"io"
 	"io/ioutil"
 	"log"
@@ -13,10 +12,10 @@ import (
 )
 
 type PhotoStore interface {
-	Read(id uuid.UUID, kind storage.StoreKind) (io.ReadCloser, error)
-	Write(id uuid.UUID, kind storage.StoreKind) (*os.File, error)
-	Size(id uuid.UUID, kind storage.StoreKind) int64
-	Delete(id uuid.UUID, kind storage.StoreKind) error
+	Read(id uuid.UUID, purpose internal.FormatPurpose, format string) (io.ReadCloser, error)
+	Write(id uuid.UUID, purpose internal.FormatPurpose, format string) (*os.File, error)
+	Size(id uuid.UUID, purpose internal.FormatPurpose, format string) int64
+	Delete(id uuid.UUID, purpose internal.FormatPurpose, format string) error
 }
 
 type Processor struct {
@@ -112,7 +111,7 @@ func (p *Processor) Process(photo *internal.Photo, reader io.Reader) error {
 }
 
 func (p *Processor) bytes(id uuid.UUID) ([]byte, error) {
-	reader, err := p.store.Read(id, storage.KindRaw)
+	reader, err := p.store.Read(id, internal.PurposeOriginal, "")
 	if err != nil {
 		return nil, err
 	}

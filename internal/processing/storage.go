@@ -3,13 +3,12 @@ package processing
 import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/simpicapp/simpic/internal"
-	"github.com/simpicapp/simpic/internal/storage"
 	"gopkg.in/gographics/imagick.v3/imagick"
 	"io"
 )
 
 func (p *Processor) saveRaw(id uuid.UUID, raw io.Reader) error {
-	out, err := p.store.Write(id, storage.KindRaw)
+	out, err := p.store.Write(id, internal.PurposeOriginal, "")
 	if err != nil {
 		return err
 	}
@@ -42,17 +41,25 @@ func (p *Processor) generateSamples(photo *internal.Photo, bytes []byte) error {
 	largeWidth, largeHeight := p.resizedDimensions(width, height, p.screenHeight)
 	smallWidth, smallHeight := p.resizedDimensions(width, height, p.thumbnailHeight)
 
-	if err := p.saveResampled(mw, largeWidth, largeHeight, 95, photo.Id, internal.PurposeScreen); err != nil {
+	if err := p.saveResampled(mw, largeWidth, largeHeight, 85, photo.Id, "WEBP", internal.PurposeScreen); err != nil {
 		return err
 	}
 
-	if err := p.saveResampled(mw, smallWidth, smallHeight, 80, photo.Id, internal.PurposePreview); err != nil {
+	if err := p.saveResampled(mw, largeWidth, largeHeight, 85, photo.Id, "JPEG", internal.PurposeScreen); err != nil {
+		return err
+	}
+
+	if err := p.saveResampled(mw, smallWidth, smallHeight, 65, photo.Id, "WEBP", internal.PurposePreview); err != nil {
+		return err
+	}
+
+	if err := p.saveResampled(mw, smallWidth, smallHeight, 65, photo.Id, "JPEG", internal.PurposePreview); err != nil {
 		return err
 	}
 
 	return p.db.AddFormat(&internal.Format{
 		Photo:   photo.Id,
-		Purpose: internal.PurposeDownload,
+		Purpose: internal.PurposeOriginal,
 		Format:  format,
 		Width:   width,
 		Height:  height,
@@ -60,7 +67,7 @@ func (p *Processor) generateSamples(photo *internal.Photo, bytes []byte) error {
 	})
 }
 
-func (p *Processor) saveResampled(mw *imagick.MagickWand, width, height, quality uint, id uuid.UUID, purpose internal.FormatPurpose) error {
+func (p *Processor) saveResampled(mw *imagick.MagickWand, width, height, quality uint, id uuid.UUID, format string, purpose internal.FormatPurpose) error {
 	if err := mw.ResizeImage(width, height, imagick.FILTER_LANCZOS2_SHARP); err != nil {
 		return err
 	}
@@ -69,33 +76,26 @@ func (p *Processor) saveResampled(mw *imagick.MagickWand, width, height, quality
 		return err
 	}
 
-	if err := mw.SetImageFormat("JPEG"); err != nil {
+	if err := mw.SetImageFormat(format); err != nil {
 		return err
 	}
 
-	var storageKind storage.StoreKind
-	if purpose == internal.PurposePreview {
-		storageKind = storage.KindThumbnailJpeg
-	} else {
-		storageKind = storage.KindScreenJpeg
-	}
-
-	if err := p.write(mw, id, storageKind); err != nil {
+	if err := p.write(mw, id, purpose, format); err != nil {
 		return err
 	}
 
 	return p.db.AddFormat(&internal.Format{
 		Photo:   id,
 		Purpose: purpose,
-		Format:  "JPEG",
+		Format:  format,
 		Width:   width,
 		Height:  height,
-		Size:    p.store.Size(id, storageKind),
+		Size:    p.store.Size(id, purpose, format),
 	})
 }
 
-func (p *Processor) write(mw *imagick.MagickWand, id uuid.UUID, storageKind storage.StoreKind) error {
-	file, err := p.store.Write(id, storageKind)
+func (p *Processor) write(mw *imagick.MagickWand, id uuid.UUID, purpose internal.FormatPurpose, format string) error {
+	file, err := p.store.Write(id, purpose, format)
 	if err != nil {
 		return err
 	}
@@ -110,7 +110,7 @@ func (p *Processor) write(mw *imagick.MagickWand, id uuid.UUID, storageKind stor
 func (p *Processor) resizedDimensions(inputWidth, inputHeight, targetHeight uint) (width, height uint) {
 	if inputHeight <= targetHeight {
 		width = inputWidth
-		height = targetHeight
+		height = inputHeight
 	} else {
 		ratio := float32(inputHeight) / float32(targetHeight)
 		height = uint(float32(inputHeight) / ratio)
