@@ -28,4 +28,5 @@ var migrations = []action{
 	actionGenerateSamples,    // Switch how image formats are stored in the DB, add more details
 	actionCalculateTimestamp, // Newly added
 	actionCalculateTimestamp, // More file name formats added
+	actionGenerateSamples,    // Bug fix and support for WebP images
 }
