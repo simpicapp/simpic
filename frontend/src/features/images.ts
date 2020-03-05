@@ -22,7 +22,7 @@ function supportsWebp(): Promise<boolean> {
   }
 }
 
-export function formatUrl(image: string, purpose: number, format: string = "auto", download: boolean = false) {
+export function formatUrl(image: string, purpose: number, format = "auto", download = false) {
   const downloadQuery = download ? "?download" : "";
   if (format === "auto") {
     return supportsWebp().then(result => {
