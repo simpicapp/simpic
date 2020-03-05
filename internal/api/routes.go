@@ -3,7 +3,6 @@ package api
 import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/simpicapp/simpic/internal/storage"
 	"net/http"
 )
 
@@ -25,9 +24,7 @@ func (s *server) routes() http.Handler {
 	r.Route("/data", func(r chi.Router) {
 		r.Group(func(r chi.Router) {
 			r.Use(s.photoContext, s.cacheContext)
-			r.Get("/raw/{uuid}", s.handleGetData(storage.KindRaw))
-			r.Get("/image/{uuid}", s.handleGetData(storage.KindScreenJpeg))
-			r.Get("/thumb/{uuid}", s.handleGetData(storage.KindThumbnailJpeg))
+			r.Get("/{uuid}/{purpose}.{format}", s.handleGetData())
 		})
 	})
 

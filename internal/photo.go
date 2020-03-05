@@ -20,7 +20,7 @@ type FormatPurpose int
 const (
 	PurposePreview FormatPurpose = iota + 1
 	PurposeScreen
-	PurposeDownload
+	PurposeOriginal
 )
 
 type Format struct {

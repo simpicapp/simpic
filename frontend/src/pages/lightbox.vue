@@ -13,11 +13,15 @@
         </li>
       </ul>
       <ul id="downloader" v-if="showingDownloads">
-        <li v-for="format in formats" :key="format.url">
-          <a :href="format.url" @click.stop="showingDownloads = false">
-            {{ format.name }} {{ format.format }} ({{ format.width }}x{{ format.height }}, {{ format.size }})
-          </a>
-        </li>
+        <Promised :promise="formats">
+          <template v-slot="data">
+            <li :key="format.url" v-for="format in data">
+              <a :href="format.url" @click.stop="showingDownloads = false">
+                {{ format.name }} {{ format.format }} ({{ format.width }}x{{ format.height }}, {{ format.size }})
+              </a>
+            </li>
+          </template>
+        </Promised>
       </ul>
       <canvas :height="height" :width="width" @click.stop ref="canvas"></canvas>
       <div @click.stop.prevent="$emit('go-to-next-image', id)" id="next-overlay">
@@ -163,10 +167,12 @@
   import "vue-awesome/icons/download";
   import Icon from "vue-awesome/components/Icon.vue";
   import Axios from "axios";
-  import {formatDownloadUrl, formatFileSize, formatPurpose} from "@/features/formatting";
+  import {formatFileSize, formatPurpose} from "@/features/formatting";
+  import {formatDownloadUrl} from "@/features/images";
+  import {Promised} from "vue-promised";
 
   export default defineComponent({
-    components: {Modal, Icon},
+    components: {Modal, Icon, Promised},
     props: {id: String},
 
     setup(props, ctx) {
@@ -269,16 +275,18 @@
         }
 
         const id = props.id;
-        return state.metadata.formats.map(f => {
-          return {
-            width: f.width,
-            height: f.height,
-            format: f.format,
-            name: formatPurpose(f.purpose),
-            size: formatFileSize(f.size),
-            url: formatDownloadUrl(id, f),
-          };
-        });
+        return Promise.all(
+          state.metadata.formats.map(async f => {
+            return {
+              width: f.width,
+              height: f.height,
+              format: f.format,
+              name: formatPurpose(f.purpose),
+              size: formatFileSize(f.size),
+              url: await formatDownloadUrl(id, f),
+            };
+          })
+        );
       });
 
       return {canvas, formats, ...toRefs(state)};

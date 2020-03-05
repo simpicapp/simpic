@@ -11,6 +11,7 @@
 * Added support for ORF, CV2, and many other formats!
 * Added option to download image in various formats from the lightbox
 * Photos in the timeline are now sorted by the time they were taken, if it can be determined
+* Thumbnails and "screen friendly" images are now also generated as WebP and served to supported browsers
 
 ==== Visibility
 
