@@ -115,7 +115,12 @@ func (d *Database) DeletePhotos(uuids []uuid.UUID) error {
 //region Formats
 
 func (d *Database) AddFormat(format *Format) (err error) {
-	_, err = d.db.Collection("photo_formats").Insert(format)
+	_, err = d.db.InsertInto("photo_formats").
+		Amend(onConflictUpdate(
+			"photo_uuid,format_purpose,format_format",
+			"format_width = excluded.format_width, format_height = excluded.format_height, format_size = excluded.format_size")).
+		Values(format).
+		Exec()
 	return
 }
 
@@ -130,7 +135,7 @@ func (d *Database) GetFormats(photo uuid.UUID) (formats []Format, err error) {
 func (d *Database) GetOriginalFormat(photo uuid.UUID) (format *Format, err error) {
 	err = d.db.Collection("photo_formats").Find().
 		Where("photo_uuid", photo).
-		And("format_purpose", PurposeDownload).
+		And("format_purpose", PurposeOriginal).
 		One(&format)
 	return
 }

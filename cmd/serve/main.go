@@ -7,7 +7,6 @@ import (
 	"github.com/simpicapp/simpic/internal"
 	"github.com/simpicapp/simpic/internal/api"
 	"github.com/simpicapp/simpic/internal/processing"
-	"github.com/simpicapp/simpic/internal/storage"
 	"log"
 	"os"
 	"os/signal"
@@ -22,7 +21,7 @@ var (
 	db    *internal.Database
 	sm    *internal.SessionManager
 	pr    *processing.Processor
-	store storage.DiskStore
+	store internal.DiskStore
 	srv   api.Server
 	wg    = &sync.WaitGroup{}
 )
@@ -67,7 +66,7 @@ func makeDatabase() {
 }
 
 func makeStore() {
-	store = storage.DiskStore{Path: *dataDir}
+	store = internal.DiskStore{Path: *dataDir}
 }
 
 func makeSessionManager() {

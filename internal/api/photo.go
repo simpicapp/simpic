@@ -3,12 +3,14 @@ package api
 import (
 	"flag"
 	"fmt"
+	"github.com/go-chi/chi"
 	uuid "github.com/satori/go.uuid"
 	"github.com/simpicapp/simpic/internal"
-	"github.com/simpicapp/simpic/internal/storage"
 	"io"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 var (
@@ -62,11 +64,19 @@ func (s *server) handleDeletePhotos() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleGetData(t storage.StoreKind) http.HandlerFunc {
+func (s *server) handleGetData() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		photo := r.Context().Value(ctxPhoto).(*internal.Photo)
+		purposeStr := chi.URLParam(r, "purpose")
+		purpose, err := strconv.Atoi(purposeStr)
+		if err != nil {
+			writeError(w, http.StatusBadRequest, "Unparsable purpose")
+			return
+		}
 
-		stream, err := s.store.Read(photo.Id, t)
+		format := chi.URLParam(r, "format")
+
+		stream, err := s.store.Read(photo.Id, internal.FormatPurpose(purpose), format)
 		if err != nil {
 			log.Printf("unable to retrieve photo '%s': %v\n", photo.Id, err)
 			writeError(w, http.StatusInternalServerError, "No photo found")
@@ -79,25 +89,13 @@ func (s *server) handleGetData(t storage.StoreKind) http.HandlerFunc {
 
 		if _, dl := r.URL.Query()["download"]; dl {
 			fileName := photo.FileName
-			if t == storage.KindScreenJpeg || t == storage.KindThumbnailJpeg {
-				fileName = fmt.Sprintf("%s.jpg", fileName)
+			if !strings.HasSuffix(strings.ToUpper(fileName), fmt.Sprintf(".%s", format)) {
+				fileName = fmt.Sprintf("%s.%s", fileName, format)
 			}
 			w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, fileName))
 		}
 
-		if t == storage.KindScreenJpeg || t == storage.KindThumbnailJpeg {
-			w.Header().Set("Content-Type", mimeTypeFor("JPEG"))
-		} else {
-			format, err := s.db.GetOriginalFormat(photo.Id)
-			if err != nil {
-				log.Printf("unable to retrieve original format for photo '%s': %v\n", photo.Id, err)
-				writeError(w, http.StatusInternalServerError, "No photo found")
-				return
-			}
-
-			w.Header().Set("Content-Type", mimeTypeFor(format.Format))
-		}
-
+		w.Header().Set("Content-Type", mimeTypeFor(format))
 		_, _ = io.Copy(w, stream)
 	}
 }
@@ -162,7 +160,7 @@ var mimeTypes = map[string]string{
 }
 
 func mimeTypeFor(t string) string {
-	mt, ok := mimeTypes[t]
+	mt, ok := mimeTypes[strings.ToUpper(t)]
 	if ok {
 		return mt
 	} else {

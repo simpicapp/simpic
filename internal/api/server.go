@@ -7,7 +7,6 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/simpicapp/simpic/internal"
 	"github.com/simpicapp/simpic/internal/processing"
-	"github.com/simpicapp/simpic/internal/storage"
 	"io"
 	"net/http"
 )
@@ -18,7 +17,7 @@ var (
 )
 
 type PhotoStore interface {
-	Read(id uuid.UUID, kind storage.StoreKind) (io.ReadCloser, error)
+	Read(id uuid.UUID, purpose internal.FormatPurpose, format string) (io.ReadCloser, error)
 	DeleteAll(id uuid.UUID) error
 }
 

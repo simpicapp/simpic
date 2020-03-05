@@ -1,4 +1,6 @@
 import LRUMap from "mnemonist/lru-map";
+import {PurposePreview, PurposeScreen} from "@/model/photo";
+import {formatUrl} from "@/features/images";
 
 class Cache {
   private readonly _cachedImages: LRUMap<string, Promise<HTMLImageElement>>;
@@ -10,16 +12,16 @@ class Cache {
   }
 
   getThumbnail(id: string) {
-    return this._loadImage(this._cachedThumbnails, "/data/thumb/", id);
+    return this._loadImage(this._cachedThumbnails, PurposePreview, id);
   }
 
   getImage(id: string) {
-    return this._loadImage(this._cachedImages, "/data/image/", id);
+    return this._loadImage(this._cachedImages, PurposeScreen, id);
   }
 
   _loadImage(
     cache: LRUMap<string, Promise<HTMLImageElement> | null>,
-    prefix: string,
+    purpose: number,
     id: string
   ): Promise<HTMLImageElement> {
     const cached = cache.get(id);
@@ -27,16 +29,18 @@ class Cache {
       return cached;
     }
 
-    const created = new Promise<HTMLImageElement>((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        resolve(img);
-      };
-      img.onerror = () => {
-        cache.set(id, null);
-        reject(img);
-      };
-      img.src = prefix + id;
+    const created = formatUrl(id, purpose).then(url => {
+      return new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          resolve(img);
+        };
+        img.onerror = () => {
+          cache.set(id, null);
+          reject(img);
+        };
+        img.src = url;
+      });
     });
     cache.set(id, created);
     return created;
