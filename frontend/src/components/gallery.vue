@@ -156,12 +156,12 @@
 
       function handleLightboxNext(id: string) {
         const index = (findIndex(state.photos, {id}) + 1) % state.photos.length;
-        router.push({path: "../" + state.photos[index].id});
+        router.push({path: `../${state.photos[index].id}/`});
       }
 
       function handleLightboxPrevious(id: string) {
         const index = (findIndex(state.photos, {id}) - 1 + state.photos.length) % state.photos.length;
-        router.push({path: "../" + state.photos[index].id});
+        router.push({path: `../${state.photos[index].id}/`});
       }
 
       function handleSelectRange(id: string) {
