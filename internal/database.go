@@ -188,7 +188,7 @@ func (d *Database) DeleteAlbum(album *Album) error {
 	return d.db.Collection("albums").Find("album_uuid", album.Id).Delete()
 }
 
-func (d *Database) GetAlbum(maxVisibility Visibility, id uuid.UUID) (album *Album, err error) {
+func (d *Database) GetAlbum(id uuid.UUID, maxVisibility Visibility) (album *Album, err error) {
 	err = d.db.SelectFrom("albums").
 		Columns(db.Raw("(SELECT COUNT(*) FROM album_contents ac WHERE ac.album_uuid = albums.album_uuid) AS photo_count")).
 		Columns("albums.*").

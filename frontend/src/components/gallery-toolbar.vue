@@ -96,7 +96,7 @@
           return;
         }
 
-        Axios.post("/photos/delete", {photos: selectionKeys()}).then(() => {
+        Axios.post("/api/photos/delete", {photos: selectionKeys()}).then(() => {
           EventBus.$emit("toast", `${selectionNoun.value} deleted`);
           EventBus.$emit("refresh-gallery");
         });
@@ -107,7 +107,7 @@
           EventBus.$emit("pick-album", resolve, reject);
         })
           .then(album =>
-            Axios.post("/albums/" + album + "/photos", {
+            Axios.post("/api/albums/" + album + "/photos", {
               // eslint-disable-next-line @typescript-eslint/camelcase
               add_photos: selectionKeys(),
             }).then(() => {
@@ -127,7 +127,7 @@
 
       function handleRemoveFromAlbum() {
         // eslint-disable-next-line @typescript-eslint/camelcase
-        Axios.post("/albums/" + props.album + "/photos", {remove_photos: selectionKeys()}).then(() => {
+        Axios.post("/api/albums/" + props.album + "/photos", {remove_photos: selectionKeys()}).then(() => {
           EventBus.$emit("toast", `${selectionNoun.value} removed from album`);
           EventBus.$emit("album-updated", props.album);
           ctx.emit("clear-selection");

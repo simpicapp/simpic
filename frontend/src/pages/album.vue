@@ -19,14 +19,14 @@
         ></ActionIcon>
       </div>
     </div>
-    <gallery :album="id" :endpoint="'/albums/' + id + '/photos'"></gallery>
+    <gallery :album="album" :endpoint="'/api/albums/' + album + '/photos'"></gallery>
 
     <DeleteDialog @close="showConfirmation = false" @yes="doDelete" v-if="showConfirmation" what="this album">
     </DeleteDialog>
 
     <modal :closeable="true" :should-close="editShouldClose" @close="showEdit = false" v-if="showEdit">
       <AlbumDialog
-        :id="id"
+        :id="album"
         :initialName="name"
         :initialVisibility="visibility"
         @close="editShouldClose = true"
@@ -67,6 +67,7 @@
   import {defineComponent, onMounted, reactive, toRefs} from "@vue/composition-api";
   import {useRouter} from "@/features/router";
   import {useAuthentication} from "@/features/auth";
+  import {useTitle} from "@/features/title";
   import {EventBus, useEventListener} from "@/features/eventbus";
 
   export default defineComponent({
@@ -78,14 +79,15 @@
       AlbumDialog,
     },
     props: {
-      id: String,
+      album: String,
     },
     setup(props) {
       const {router} = useRouter();
       const {loggedIn} = useAuthentication();
+      const {setTitle} = useTitle();
 
       useEventListener("album-updated", (album: string) => {
-        if (album === props.id) {
+        if (album === props.album) {
           EventBus.$emit("refresh-gallery");
         }
       });
@@ -105,7 +107,7 @@
 
       function doDelete() {
         state.deleting = true;
-        Axios.delete("/albums/" + props.id).then(() => {
+        Axios.delete("/api/albums/" + props.album).then(() => {
           EventBus.$emit("albums-updated");
           EventBus.$emit("toast", "Album deleted");
           state.deleting = false;
@@ -114,9 +116,10 @@
       }
 
       function update() {
-        Axios.get("/albums/" + props.id).then(({data: {name, visibility}}) => {
+        Axios.get("/api/albums/" + props.album).then(({data: {name, visibility}}) => {
           state.name = name;
           state.visibility = visibility;
+          setTitle(1, state.name);
         });
       }
 

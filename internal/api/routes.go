@@ -9,6 +9,22 @@ import (
 func (s *server) routes() http.Handler {
 	r := createRouter()
 	r.Use(s.authenticatedContext, s.provideVersion)
+
+	r.Route("/api", s.apiRoutes)
+
+	r.Route("/data", func(r chi.Router) {
+		r.Group(func(r chi.Router) {
+			r.Use(s.photoContext, s.cacheContext)
+			r.Get("/{uuid}/{purpose}.{format}", s.handleGetData())
+		})
+	})
+
+	r.Route("/", s.frontendRoutes)
+	r.NotFound(http.FileServer(http.Dir(*frontendDir)).ServeHTTP)
+	return r
+}
+
+func (s *server) apiRoutes(r chi.Router) {
 	r.Post("/login", s.handleAuthenticate())
 	r.Get("/timeline", s.handleTimeline())
 
@@ -20,16 +36,6 @@ func (s *server) routes() http.Handler {
 		r.Get("/users/me", s.handleGetSelf())
 		r.Get("/logout", s.handleLogout())
 	})
-
-	r.Route("/data", func(r chi.Router) {
-		r.Group(func(r chi.Router) {
-			r.Use(s.photoContext, s.cacheContext)
-			r.Get("/{uuid}/{purpose}.{format}", s.handleGetData())
-		})
-	})
-
-	r.Mount("/", http.FileServer(http.Dir(*frontendDir)))
-	return r
 }
 
 func (s *server) photoRoutes(r chi.Router) {
@@ -72,7 +78,14 @@ func (s *server) albumRoutes(r chi.Router) {
 			r.Post("/", s.handleAlterPhotosInAlbum())
 		})
 	})
+}
 
+func (s *server) frontendRoutes(r chi.Router) {
+	r.Get("/timeline/", s.handleFrontendPath("Timeline"))
+	r.Get("/timeline/photo/{photoId}/", s.handleFrontendPath("Timeline"))
+	r.Get("/albums/", s.handleFrontendPath("Albums"))
+	r.Get("/albums/{albumId}/", s.handleFrontendPath("Albums"))
+	r.Get("/albums/{albumId}/photo/{photoId}/", s.handleFrontendPath("Albums"))
 }
 
 func createRouter() *chi.Mux {

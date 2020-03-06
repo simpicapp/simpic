@@ -61,6 +61,7 @@ func (s *server) handleAuthenticate() http.HandlerFunc {
 			Secure:   *secureCookies,
 			HttpOnly: true,
 			SameSite: http.SameSiteStrictMode,
+			Path:     "/",
 		})
 		w.WriteHeader(http.StatusNoContent)
 	}
@@ -102,6 +103,7 @@ func (s *server) clearAuthCookie(w http.ResponseWriter) {
 		Expires:  time.Now().Add(time.Hour * -24),
 		Secure:   *secureCookies,
 		HttpOnly: true,
+		Path:     "/",
 		SameSite: http.SameSiteStrictMode,
 	})
 }
