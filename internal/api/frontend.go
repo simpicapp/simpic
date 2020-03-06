@@ -52,15 +52,15 @@ func (s *server) handleFrontendPath(title string) http.HandlerFunc {
 		return s
 	}
 
-	buildOpenGraphImage := func(id uuid.UUID) string {
+	buildOpenGraphImage := func(r *http.Request, id uuid.UUID) string {
 		return fmt.Sprintf(`
-				<meta property="og:image" content="/data/%[1]s/2.webp">
+				<meta property="og:image" content="https://%[2]s/data/%[1]s/2.webp">
 				<meta property="og:image:type" content="image/webp">
-				<meta property="og:image" content="/data/%[1]s/2.jpeg">
+				<meta property="og:image" content="https://%[2]s/data/%[1]s/2.jpeg">
 				<meta property="og:image:type" content="image/jpeg">
 				<meta property="twitter:card" content="summary_large_image">
-				<meta property="twitter:image" content="/data/%[1]s/2.webp">
-		`, id)
+				<meta property="twitter:image" content="https://%[2]s/data/%[1]s/2.webp">
+		`, id, html.EscapeString(r.Host))
 	}
 
 	buildOpenGraphGeneral := func(title string) string {
@@ -71,14 +71,14 @@ func (s *server) handleFrontendPath(title string) http.HandlerFunc {
 		`, html.EscapeString(title))
 	}
 
-	buildOpenGraphTags := func(photo *internal.Photo, album *internal.Album) string {
+	buildOpenGraphTags := func(r *http.Request, photo *internal.Photo, album *internal.Album) string {
 		if photo != nil {
-			return buildOpenGraphImage(photo.Id) + buildOpenGraphGeneral(photo.FileName)
+			return buildOpenGraphImage(r, photo.Id) + buildOpenGraphGeneral(photo.FileName)
 		}
 		if album != nil {
 			content := buildOpenGraphGeneral(album.Name)
 			if album.Cover != nil {
-				content += buildOpenGraphImage(*album.Cover)
+				content += buildOpenGraphImage(r, *album.Cover)
 			}
 			return content
 		}
@@ -98,7 +98,7 @@ func (s *server) handleFrontendPath(title string) http.HandlerFunc {
 			titleParts = append(titleParts, photo.FileName)
 		}
 
-		content := fmt.Sprintf("%s<title>%s", buildOpenGraphTags(photo, album), html.EscapeString(strings.Join(reverse(titleParts), " - ")))
+		content := fmt.Sprintf("%s<title>%s", buildOpenGraphTags(r, photo, album), html.EscapeString(strings.Join(reverse(titleParts), " - ")))
 		w.Header().Set("Content-Type", "text/html")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(strings.Replace(htmlContent, "<title>", content, 1)))
