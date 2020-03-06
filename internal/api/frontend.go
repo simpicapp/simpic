@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	uuid "github.com/satori/go.uuid"
 	"github.com/simpicapp/simpic/internal"
 	"html"
 	"io/ioutil"
@@ -51,17 +52,51 @@ func (s *server) handleFrontendPath(title string) http.HandlerFunc {
 		return s
 	}
 
+	buildOpenGraphImage := func(id uuid.UUID) string {
+		return fmt.Sprintf(`
+				<meta property="og:image" content="/data/%[1]s/2.webp">
+				<meta property="og:image:type" content="image/webp">
+				<meta property="og:image" content="/data/%[1]s/2.jpeg">
+				<meta property="og:image:type" content="image/jpeg">
+		`, id)
+	}
+
+	buildOpenGraphGeneral := func(title string) string {
+		return fmt.Sprintf(`
+				<meta property="og:site_name" content="Simpic">
+				<meta property="og:type" content="article">
+				<meta property="og:title" content="%[1]s">
+		`, html.EscapeString(title))
+	}
+
+	buildOpenGraphTags := func(photo *internal.Photo, album *internal.Album) string {
+		if photo != nil {
+			return buildOpenGraphImage(photo.Id) + buildOpenGraphGeneral(photo.FileName)
+		}
+		if album != nil {
+			content := buildOpenGraphGeneral(album.Name)
+			if album.Cover != nil {
+				content += buildOpenGraphImage(*album.Cover)
+			}
+			return content
+		}
+		return ""
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		titleParts := []string{"", title}
-		if album := getAlbum(r); album != nil {
+
+		album := getAlbum(r)
+		if album != nil {
 			titleParts = append(titleParts, album.Name)
 		}
 
-		if photo := getPhoto(r); photo != nil {
+		photo := getPhoto(r)
+		if photo != nil {
 			titleParts = append(titleParts, photo.FileName)
 		}
 
-		content := fmt.Sprintf("<title>%s", html.EscapeString(strings.Join(reverse(titleParts), " - ")))
+		content := fmt.Sprintf("%s<title>%s", buildOpenGraphTags(photo, album), html.EscapeString(strings.Join(reverse(titleParts), " - ")))
 		w.Header().Set("Content-Type", "text/html")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(strings.Replace(htmlContent, "<title>", content, 1)))
