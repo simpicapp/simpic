@@ -1,6 +1,6 @@
 <template>
-  <popup @close="handleClosed" position="center" title="Create new album">
-    <form @submit="doCreate">
+  <popup :title="title" @close="handleClosed" position="center">
+    <form @submit="handleSubmit">
       <p class="alert" v-if="hasAlert">{{ alert }}</p>
       <label for="visibility">Visibility</label>
       <ul class="visibility" id="visibility">
@@ -19,7 +19,7 @@
       </ul>
       <label for="name">Name</label>
       <input id="name" placeholder="My Holiday" type="text" v-focus v-model="name" />
-      <input type="submit" value="Create" />
+      <input :value="action" type="submit" />
     </form>
   </popup>
 </template>
@@ -89,7 +89,7 @@
 <script lang="ts">
   import Axios from "axios";
   import Popup from "./popup.vue";
-  import {defineComponent, reactive, toRefs} from "@vue/composition-api";
+  import {computed, defineComponent, reactive, toRefs, watch} from "@vue/composition-api";
   import {useAlert} from "@/features/alert";
   import "vue-awesome/icons/globe-europe";
   import "vue-awesome/icons/link";
@@ -98,20 +98,30 @@
 
   export default defineComponent({
     components: {Icon, Popup},
-    setup(_, ctx) {
+    props: {
+      id: String,
+      initialName: String,
+      initialVisibility: Number,
+    },
+    setup(props, ctx) {
       const {alert, hasAlert, setAlert} = useAlert();
       const state = reactive({
-        name: "",
-        visibility: 0,
+        name: props.initialName || "",
+        visibility: props.initialVisibility || 0,
       });
 
-      function doCreate() {
-        Axios.post("/albums", {name: state.name, visibility: state.visibility})
+      const isNew = computed(() => !props.id);
+      const title = computed(() => (isNew.value ? "Create new album" : "Edit album"));
+      const action = computed(() => (isNew.value ? "Create" : "Update"));
+
+      function handleSubmit() {
+        const url = isNew.value ? "/albums" : `/albums/${props.id}`;
+        Axios.post(url, {name: state.name, visibility: state.visibility})
           .then(({data: {id}}) => {
             ctx.emit("created", id);
             state.name = "";
           })
-          .catch(error => setAlert(error));
+          .catch(setAlert);
       }
 
       function handleClosed() {
@@ -119,7 +129,21 @@
         state.name = "";
       }
 
-      return {doCreate, handleClosed, alert, hasAlert, ...toRefs(state)};
+      watch(
+        () => props.initialName,
+        () => {
+          console.log("Initial name updated ", props.initialName, state.name);
+          state.name = props.initialName || "";
+        }
+      );
+      watch(
+        () => props.initialVisibility,
+        () => {
+          state.visibility = props.initialVisibility || 0;
+        }
+      );
+
+      return {handleSubmit, handleClosed, alert, hasAlert, title, action, ...toRefs(state)};
     },
   });
 </script>

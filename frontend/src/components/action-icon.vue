@@ -1,5 +1,5 @@
 <template>
-  <Icon :name="icon" :spin="working" @click="$emit('click')" scale="1.5"></Icon>
+  <Icon :name="icon" :spin="working" @click="$emit('click')" scale="1.5" :title="title"></Icon>
 </template>
 
 <style lang="scss" scoped>
@@ -23,6 +23,7 @@
     props: {
       name: String,
       working: Boolean,
+      title: String,
     },
     components: {
       Icon,

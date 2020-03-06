@@ -179,6 +179,8 @@ func (d *Database) AddAlbum(album *Album) (err error) {
 }
 
 func (d *Database) UpdateAlbum(album *Album) error {
+	// Computed field - we can't insert it
+	album.Photos = 0
 	return d.db.Collection("albums").Find("album_uuid", album.Id).Update(album)
 }
 
