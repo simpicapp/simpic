@@ -1,7 +1,7 @@
 <template>
   <modal :should-close="close" @close="visible = false" v-if="visible">
     <popup @close="close = true" position="center" title="Login">
-      <form @submit="doLogin">
+      <form @submit.prevent="doLogin">
         <p class="alert" v-if="hasAlert">{{ alert }}</p>
         <label for="username">Username</label>
         <input :disabled="loggingIn" id="username" type="text" v-focus v-model="username" />
