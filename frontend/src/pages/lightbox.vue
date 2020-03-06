@@ -1,5 +1,5 @@
 <template>
-  <modal :darker="true" :should-close="close" @close="$router.push('../../')">
+  <modal :darker="true" :should-close="close" @close="goBack">
     <div @click="close = true" id="lightbox" ref="container">
       <div @click.stop.prevent="$emit('go-to-previous-image', id)" id="prev-overlay">
         <span>←</span>
@@ -170,12 +170,17 @@
   import {formatFileSize, formatPurpose} from "@/features/formatting";
   import {formatDownloadUrl} from "@/features/images";
   import {Promised} from "vue-promised";
+  import {useTitle} from "@/features/title";
+  import {useRouter} from "@/features/router";
 
   export default defineComponent({
     components: {Modal, Icon, Promised},
     props: {id: String},
 
     setup(props, ctx) {
+      const {setTitle, truncateTitle} = useTitle();
+      const {router} = useRouter();
+
       const canvas = ref(null as HTMLCanvasElement | null);
       const state = reactive({
         close: false,
@@ -184,6 +189,11 @@
         metadata: null as Photo | null,
         showingDownloads: false,
       });
+
+      function goBack() {
+        truncateTitle(2);
+        router.push("../../");
+      }
 
       function setSize() {
         if (!state.metadata) {
@@ -221,6 +231,7 @@
             }
             state.metadata = data;
             setSize();
+            setTitle(2, data.file_name);
             return cache.getThumbnail(id);
           })
           .then(img => {
@@ -289,7 +300,7 @@
         );
       });
 
-      return {canvas, formats, ...toRefs(state)};
+      return {canvas, formats, goBack, ...toRefs(state)};
     },
   });
 </script>

@@ -40,11 +40,13 @@
   import {defineComponent, onMounted, reactive, toRefs} from "@vue/composition-api";
   import {useEventListener} from "@/features/eventbus";
   import {useAuthentication} from "@/features/auth";
+  import {useTitle} from "@/features/title";
 
   export default defineComponent({
     components: {Album},
     setup() {
       const {loggedIn} = useAuthentication();
+      const {setTitle} = useTitle();
 
       const state = reactive({
         albums: [],
@@ -61,6 +63,7 @@
       useEventListener("albums-updated", refresh);
       useEventListener("user-changed", refresh);
       onMounted(refresh);
+      onMounted(() => setTitle(1, "Albums"));
 
       return {loggedIn, ...toRefs(state)};
     },

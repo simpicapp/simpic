@@ -31,7 +31,7 @@ const router = new VueRouter({
         },
       ],
       component: Album,
-      path: "/albums/:id",
+      path: "/albums/:album",
       props: true,
     },
     {
