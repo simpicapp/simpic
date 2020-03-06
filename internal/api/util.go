@@ -3,7 +3,9 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/go-chi/chi"
 	"github.com/go-playground/validator/v10"
+	uuid "github.com/satori/go.uuid"
 	"log"
 	"net/http"
 	"strconv"
@@ -27,6 +29,15 @@ func writeError(w http.ResponseWriter, code int, error string) {
 	}
 
 	writeJSON(w, code, Error{Error: error})
+}
+
+// uuidUrlParam parses a UUID from an URL param, returning nil if it is either not present or not valid
+func uuidUrlParam(r *http.Request, key string) *uuid.UUID {
+	id, err := uuid.FromString(chi.URLParam(r, key))
+	if err != nil {
+		return nil
+	}
+	return &id
 }
 
 func paginate(w http.ResponseWriter, r *http.Request, generator func(offset, count int) (interface{}, error)) {

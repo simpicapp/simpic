@@ -12,6 +12,9 @@
 * Added option to download image in various formats from the lightbox
 * Photos in the timeline are now sorted by the time they were taken, if it can be determined
 * Thumbnails and "screen friendly" images are now also generated as WebP and served to supported browsers
+* The page title now updates as you're navigating around Simpic
+* Navigation now uses the HTML5 history API (no more '#'s in URLs)
+* Images and albums linked to directly will offer open graph tags (preview images)
 
 ==== Visibility
 
@@ -36,3 +39,4 @@ Visibility for newly uploaded photos can be controlled with the `SIMPIC_DEFAULT_
 * Fixed version not being set in docker builds
 * Album covers are now updated if you remove that photo from the album
 * Fixed the borders on some input fields being a bit off in Chrome
+* Fixed album not loading when navigating directly to a photo within it

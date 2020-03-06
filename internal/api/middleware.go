@@ -2,8 +2,6 @@ package api
 
 import (
 	"context"
-	"github.com/go-chi/chi"
-	uuid "github.com/satori/go.uuid"
 	"github.com/simpicapp/simpic/internal"
 	"net/http"
 )
@@ -18,13 +16,13 @@ const (
 
 func (s *server) albumContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id, err := uuid.FromString(chi.URLParam(r, "uuid"))
-		if err != nil {
+		id := uuidUrlParam(r, "uuid")
+		if id == nil {
 			writeError(w, http.StatusNotFound, "No such album")
 			return
 		}
 
-		album, err := s.db.GetAlbum(visForAccess(r), id)
+		album, err := s.db.GetAlbum(*id, visForAccess(r))
 		if err != nil {
 			writeError(w, http.StatusNotFound, "No such album")
 			return
@@ -37,13 +35,13 @@ func (s *server) albumContext(next http.Handler) http.Handler {
 
 func (s *server) photoContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id, err := uuid.FromString(chi.URLParam(r, "uuid"))
-		if err != nil {
+		id := uuidUrlParam(r, "uuid")
+		if id == nil {
 			writeError(w, http.StatusNotFound, "No such photo")
 			return
 		}
 
-		photo, err := s.db.GetPhoto(id, visForAccess(r))
+		photo, err := s.db.GetPhoto(*id, visForAccess(r))
 		if err != nil {
 			writeError(w, http.StatusNotFound, "No such photo")
 			return

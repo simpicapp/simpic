@@ -107,7 +107,7 @@
         formData.append("file", file.file);
         file.started = true;
 
-        Axios.post("/photos", formData)
+        Axios.post("/api/photos", formData)
           .then(() => {
             file.finished = true;
             EventBus.$emit("upload-complete");

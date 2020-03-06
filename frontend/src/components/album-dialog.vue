@@ -115,7 +115,7 @@
       const action = computed(() => (isNew.value ? "Create" : "Update"));
 
       function handleSubmit() {
-        const url = isNew.value ? "/albums" : `/albums/${props.id}`;
+        const url = isNew.value ? "/api/albums" : `/api/albums/${props.id}`;
         Axios.post(url, {name: state.name, visibility: state.visibility})
           .then(({data: {id}}) => {
             ctx.emit("created", id);
