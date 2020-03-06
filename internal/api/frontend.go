@@ -58,6 +58,8 @@ func (s *server) handleFrontendPath(title string) http.HandlerFunc {
 				<meta property="og:image:type" content="image/webp">
 				<meta property="og:image" content="/data/%[1]s/2.jpeg">
 				<meta property="og:image:type" content="image/jpeg">
+				<meta property="twitter:card" content="summary_large_image">
+				<meta property="twitter:image" content="/data/%[1]s/2.webp">
 		`, id)
 	}
 
