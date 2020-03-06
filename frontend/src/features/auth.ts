@@ -17,7 +17,7 @@ export function useAuthentication() {
   }
 
   function checkUser() {
-    return Axios.get("/users/me")
+    return Axios.get("/api/users/me")
       .then(({data}) => {
         state.username = data.username;
         state.loggedIn = true;
@@ -30,7 +30,7 @@ export function useAuthentication() {
   }
 
   function logout() {
-    return Axios.get("/logout").then(() => {
+    return Axios.get("/api/logout").then(() => {
       state.loggedIn = false;
       EventBus.$emit("toast", "You have been logged out");
       checkUserChanged();
@@ -38,7 +38,7 @@ export function useAuthentication() {
   }
 
   function login(username: string, password: string) {
-    return Axios.post("/login", {
+    return Axios.post("/api/login", {
       username: username,
       password: password,
     }).then(() => {

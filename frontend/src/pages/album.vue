@@ -19,7 +19,7 @@
         ></ActionIcon>
       </div>
     </div>
-    <gallery :album="id" :endpoint="'/albums/' + id + '/photos'"></gallery>
+    <gallery :album="id" :endpoint="'/api/albums/' + id + '/photos'"></gallery>
 
     <DeleteDialog @close="showConfirmation = false" @yes="doDelete" v-if="showConfirmation" what="this album">
     </DeleteDialog>
@@ -105,7 +105,7 @@
 
       function doDelete() {
         state.deleting = true;
-        Axios.delete("/albums/" + props.id).then(() => {
+        Axios.delete("/api/albums/" + props.id).then(() => {
           EventBus.$emit("albums-updated");
           EventBus.$emit("toast", "Album deleted");
           state.deleting = false;
@@ -114,7 +114,7 @@
       }
 
       function update() {
-        Axios.get("/albums/" + props.id).then(({data: {name, visibility}}) => {
+        Axios.get("/api/albums/" + props.id).then(({data: {name, visibility}}) => {
           state.name = name;
           state.visibility = visibility;
         });

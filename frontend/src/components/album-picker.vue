@@ -127,7 +127,7 @@
         promise.resolve = resolve;
         promise.reject = reject;
 
-        Axios.get("/albums").then(({data}) => {
+        Axios.get("/api/albums").then(({data}) => {
           state.albums = data;
         });
       });

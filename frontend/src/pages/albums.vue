@@ -52,7 +52,7 @@
       });
 
       function refresh() {
-        Axios.get("albums").then(({data}) => {
+        Axios.get("/api/albums").then(({data}) => {
           state.albums = data;
           state.loading = false;
         });

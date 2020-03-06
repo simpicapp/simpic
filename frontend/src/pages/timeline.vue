@@ -1,5 +1,5 @@
 <template>
-  <gallery endpoint="/timeline"></gallery>
+  <gallery endpoint="/api/timeline"></gallery>
 </template>
 
 <script lang="ts">

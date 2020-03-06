@@ -214,7 +214,7 @@
           return;
         }
 
-        Axios.get("/photos/" + id)
+        Axios.get("/api/photos/" + id)
           .then(({data}) => {
             if (props.id !== id) {
               throw Error("wrong-id");
