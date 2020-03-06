@@ -1,5 +1,5 @@
 <template>
-  <modal :darker="true" :should-close="close" @close="$router.push('../')">
+  <modal :darker="true" :should-close="close" @close="$router.push('../../')">
     <div @click="close = true" id="lightbox" ref="container">
       <div @click.stop.prevent="$emit('go-to-previous-image', id)" id="prev-overlay">
         <span>←</span>

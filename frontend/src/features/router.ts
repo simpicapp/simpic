@@ -5,6 +5,7 @@ import Albums from "@/pages/albums.vue";
 import Album from "@/pages/album.vue";
 
 const router = new VueRouter({
+  mode: "history",
   routes: [
     {
       children: [
@@ -38,6 +39,14 @@ const router = new VueRouter({
       redirect: "/timeline/",
     },
   ],
+});
+
+router.beforeEach((to, _, next) => {
+  if (to.fullPath.endsWith("/")) {
+    next();
+  } else {
+    next(to.fullPath + "/");
+  }
 });
 
 export function useRouter() {

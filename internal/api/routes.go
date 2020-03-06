@@ -19,7 +19,8 @@ func (s *server) routes() http.Handler {
 		})
 	})
 
-	r.Mount("/", http.FileServer(http.Dir(*frontendDir)))
+	r.Route("/", s.frontendRoutes)
+	r.NotFound(http.FileServer(http.Dir(*frontendDir)).ServeHTTP)
 	return r
 }
 
@@ -77,7 +78,14 @@ func (s *server) albumRoutes(r chi.Router) {
 			r.Post("/", s.handleAlterPhotosInAlbum())
 		})
 	})
+}
 
+func (s *server) frontendRoutes(r chi.Router) {
+	r.Get("/timeline/", s.handleFrontendPath("Timeline"))
+	r.Get("/timeline/photo/{photoId}/", s.handleFrontendPath("Timeline"))
+	r.Get("/albums/", s.handleFrontendPath("Albums"))
+	r.Get("/albums/{albumId}/", s.handleFrontendPath("Albums"))
+	r.Get("/albums/{albumId}/photo/{photoId}/", s.handleFrontendPath("Albums"))
 }
 
 func createRouter() *chi.Mux {
