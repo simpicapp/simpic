@@ -27,6 +27,7 @@ blocks:
             - cd frontend
             - npm ci
             - npm run lint
+            - npm run test:e2e:headless:record
   - name: Docker
     dependencies: []
     task:
