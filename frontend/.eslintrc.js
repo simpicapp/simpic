@@ -1,33 +1,22 @@
 module.exports = {
   root: true,
   env: {
-    node: true
+    node: true,
   },
-  extends: [
-    'plugin:vue/essential',
-    '@vue/typescript/recommended'
-  ],
+  extends: ["plugin:vue/essential", "@vue/typescript/recommended"],
   parserOptions: {
-    ecmaVersion: 2020
+    ecmaVersion: 2020,
   },
   rules: {
-    'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'vue/script-indent': ['error', 2, { baseIndent: 1 }]
+    "no-console": process.env.NODE_ENV === "production" ? "error" : "off",
+    "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
+    "vue/script-indent": ["error", 2, {baseIndent: 1}],
+    "@typescript-eslint/camelcase": ["error", {properties: "never"}],
   },
   overrides: [
     {
-      files: [
-        '**/__tests__/*.{j,t}s?(x)',
-        '**/tests/unit/**/*.spec.{j,t}s?(x)'
-      ],
-      env: {
-        mocha: true
-      }
+      files: ["*.vue"],
+      rules: {indent: "off"},
     },
-    {
-      files: ['*.vue'],
-      rules: { indent: 'off' }
-    }
-  ]
-}
+  ],
+};
