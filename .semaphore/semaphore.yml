@@ -20,6 +20,8 @@ blocks:
   - name: Frontend
     dependencies: []
     task:
+      secrets:
+        - name: Cypress
       jobs:
         - name: Build
           commands:
