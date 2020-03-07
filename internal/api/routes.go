@@ -43,6 +43,7 @@ func (s *server) photoRoutes(r chi.Router) {
 		r.Use(s.requireAnyUser)
 		r.Post("/", s.handleStorePhoto())
 		r.Post("/delete", s.handleDeletePhotos())
+		r.Post("/update", s.handleUpdatePhotos())
 	})
 
 	r.Group(func(r chi.Router) {

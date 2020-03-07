@@ -110,6 +110,11 @@ func (d *Database) DeletePhotos(uuids []uuid.UUID) error {
 	return d.db.Collection("photos").Find("photo_uuid", uuids).Delete()
 }
 
+func (d *Database) SetPhotosVisibility(uuids []uuid.UUID, visibility Visibility) (err error) {
+	_, err = d.db.Update("photos").Where("photo_uuid", uuids).Set("photo_visibility", visibility).Exec()
+	return
+}
+
 //endregion
 
 //region Formats

@@ -34,6 +34,27 @@ func (s *server) handleGetPhotoInfo() http.HandlerFunc {
 	}
 }
 
+func (s *server) handleUpdatePhotos() http.HandlerFunc {
+	type UpdatePhotosData struct {
+		Ids        []uuid.UUID         `json:"photos"`
+		Visibility internal.Visibility `json:"visibility" validate:"required,min=0,max=2"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		data := &UpdatePhotosData{}
+		if !bind(w, r, data) {
+			return
+		}
+
+		if err := s.db.SetPhotosVisibility(data.Ids, data.Visibility); err != nil {
+			log.Printf("Unable to update photos: %v\n", err)
+			writeError(w, http.StatusInternalServerError, "Unexpected error")
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
+	}
+}
+
 func (s *server) handleDeletePhotos() http.HandlerFunc {
 	type DeletePhotosData struct {
 		Ids []uuid.UUID `json:"photos"`
