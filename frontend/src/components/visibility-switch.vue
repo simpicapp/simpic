@@ -1,14 +1,28 @@
 <template>
   <ul class="visibility" id="visibility">
-    <li :class="{selected: visibility === 0}" @click="$emit('change', 0)">
+    <li
+      :class="{selected: visibility === 0}"
+      @click="$emit('change', 0)"
+      title="Can be seen by anyone, whether they're logged in or not"
+    >
       <Icon name="globe-europe"></Icon>
       <span>Public</span>
     </li>
-    <li :class="{selected: visibility === 1}" @click="$emit('change', 1)">
+
+    <li
+      :class="{selected: visibility === 1}"
+      @click="$emit('change', 1)"
+      title="Can only be seen by users who are logged in to Simpic, unless accessed directly by its ID"
+    >
       <Icon name="link"></Icon>
       <span>Unlisted</span>
     </li>
-    <li :class="{selected: visibility === 2}" @click="$emit('change', 2)">
+
+    <li
+      :class="{selected: visibility === 2}"
+      @click="$emit('change', 2)"
+      title="Can only be seen by users who are logged in to Simpic, with no exceptions"
+    >
       <Icon name="lock"></Icon>
       <span>Private</span>
     </li>
