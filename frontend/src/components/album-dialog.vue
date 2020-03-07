@@ -1,22 +1,9 @@
 <template>
   <popup :title="title" @close="handleClosed" position="center">
-    <form @submit="handleSubmit">
+    <form @submit.prevent="handleSubmit">
       <p class="alert" v-if="hasAlert">{{ alert }}</p>
       <label for="visibility">Visibility</label>
-      <ul class="visibility" id="visibility">
-        <li :class="{selected: visibility === 0}" @click="visibility = 0">
-          <Icon name="globe-europe"></Icon>
-          <span>Public</span>
-        </li>
-        <li :class="{selected: visibility === 1}" @click="visibility = 1">
-          <Icon name="link"></Icon>
-          <span>Unlisted</span>
-        </li>
-        <li :class="{selected: visibility === 2}" @click="visibility = 2">
-          <Icon name="lock"></Icon>
-          <span>Private</span>
-        </li>
-      </ul>
+      <VisibilitySwitch :visibility="visibility" @change="n => (visibility = n)"></VisibilitySwitch>
       <label for="name">Name</label>
       <input id="name" placeholder="My Holiday" type="text" v-focus v-model="name" />
       <input :value="action" type="submit" />
@@ -47,57 +34,17 @@
     border-radius: 15px;
     white-space: pre-line;
   }
-
-  .visibility {
-    display: flex;
-    justify-content: space-between;
-    border-radius: 5px;
-    background-color: #eeeeee;
-  }
-
-  .visibility li {
-    padding: 5px 10px;
-    border-left: 1px solid #dddddd;
-    display: flex;
-    align-items: center;
-    transition: all 200ms linear;
-    cursor: pointer;
-
-    &:first-child {
-      border-bottom-left-radius: 5px;
-      border-top-left-radius: 5px;
-      border-left: 0;
-    }
-
-    &:last-child {
-      border-bottom-right-radius: 5px;
-      border-top-right-radius: 5px;
-    }
-
-    &.selected,
-    &:hover {
-      background-color: #333333;
-      color: white;
-    }
-
-    span {
-      margin-left: 5px;
-    }
-  }
 </style>
 
 <script lang="ts">
   import Axios from "axios";
   import Popup from "./popup.vue";
+  import VisibilitySwitch from "./visibility-switch.vue";
   import {computed, defineComponent, reactive, toRefs, watch} from "@vue/composition-api";
   import {useAlert} from "@/features/alert";
-  import "vue-awesome/icons/globe-europe";
-  import "vue-awesome/icons/link";
-  import "vue-awesome/icons/lock";
-  import Icon from "vue-awesome/components/Icon.vue";
 
   export default defineComponent({
-    components: {Icon, Popup},
+    components: {Popup, VisibilitySwitch},
     props: {
       id: String,
       initialName: String,

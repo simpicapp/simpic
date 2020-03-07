@@ -2,12 +2,13 @@
   <div>
     <aside class="selectionbar" v-if="selectionCount > 0">
       <span>{{ selectionNoun }} selected</span>
-      <Icon name="folder-plus" @click="handleAddToAlbum" title="Add to album"></Icon>
-      <Icon name="folder-minus" @click="handleRemoveFromAlbum" v-if="!!album" title="Remove from this album"></Icon>
+      <Icon @click="handleAddToAlbum" name="folder-plus" title="Add to album"></Icon>
+      <Icon @click="handleRemoveFromAlbum" name="folder-minus" title="Remove from this album" v-if="!!album"></Icon>
       &middot;
-      <Icon name="trash-alt" @click="handleDelete" title="Delete"></Icon>
+      <Icon @click="handleVisibility" name="eye-slash" title="Change visibility"></Icon>
+      <Icon @click="handleDelete" name="trash-alt" title="Delete"></Icon>
       &middot;
-      <Icon name="times" @click="$emit('clear-selection')" title="Clear selection"></Icon>
+      <Icon @click="$emit('clear-selection')" name="times" title="Clear selection"></Icon>
     </aside>
 
     <DeleteDialog
@@ -17,6 +18,21 @@
       v-if="showConfirmation"
     >
     </DeleteDialog>
+
+    <modal
+      :closeable="true"
+      :should-close="shouldVisibilityClose"
+      @close="showVisibility = false"
+      v-if="showVisibility"
+    >
+      <popup :closeable="true" position="center" title="Update photos" @close="showVisibility = false">
+        <form class="update-photos" @submit.prevent="changeVisibility">
+          <p>Change visibility of {{ selectionNoun }} to:</p>
+          <VisibilitySwitch :visibility="newVisibility" @change="n => (newVisibility = n)"></VisibilitySwitch>
+          <input type="submit" value="Change" :disabled="newVisibility < 0" />
+        </form>
+      </popup>
+    </modal>
   </div>
 </template>
 
@@ -53,16 +69,26 @@
       }
     }
   }
+
+  .update-photos {
+    display: grid;
+    grid-template-columns: 100%;
+    grid-row-gap: 20px;
+  }
 </style>
 
 <script lang="ts">
   import Axios from "axios";
   import DeleteDialog from "./delete-dialog.vue";
+  import Popup from "./popup.vue";
+  import Modal from "./modal.vue";
+  import VisibilitySwitch from "./visibility-switch.vue";
   import {computed, defineComponent, reactive, toRefs} from "@vue/composition-api";
   import "vue-awesome/icons/folder-plus";
   import "vue-awesome/icons/folder-minus";
   import "vue-awesome/icons/times";
   import "vue-awesome/icons/trash-alt";
+  import "vue-awesome/icons/eye-slash";
   import Icon from "vue-awesome/components/Icon.vue";
   import {EventBus} from "@/features/eventbus";
 
@@ -70,6 +96,9 @@
     components: {
       DeleteDialog,
       Icon,
+      Popup,
+      Modal,
+      VisibilitySwitch,
     },
     props: {
       album: String,
@@ -79,6 +108,9 @@
     setup(props, ctx) {
       const state = reactive({
         showConfirmation: false,
+        showVisibility: false,
+        shouldVisibilityClose: false,
+        newVisibility: -1,
       });
 
       const selectionNoun = computed(() => props.selectionCount + " photo" + (props.selectionCount === 1 ? "" : "s"));
@@ -121,6 +153,20 @@
           });
       }
 
+      function handleVisibility() {
+        state.newVisibility = -1;
+        state.shouldVisibilityClose = false;
+        state.showVisibility = true;
+      }
+
+      function changeVisibility() {
+        Axios.post("/api/photos/update", {photos: selectionKeys(), visibility: state.newVisibility}).then(() => {
+          state.shouldVisibilityClose = true;
+          EventBus.$emit("toast", `${selectionNoun.value} updated`);
+          ctx.emit("clear-selection");
+        });
+      }
+
       function handleDelete() {
         state.showConfirmation = true;
       }
@@ -134,7 +180,16 @@
         });
       }
 
-      return {handleDelete, handleRemoveFromAlbum, handleAddToAlbum, doDelete, selectionNoun, ...toRefs(state)};
+      return {
+        handleVisibility,
+        handleDelete,
+        handleRemoveFromAlbum,
+        handleAddToAlbum,
+        doDelete,
+        changeVisibility,
+        selectionNoun,
+        ...toRefs(state),
+      };
     },
   });
 </script>
