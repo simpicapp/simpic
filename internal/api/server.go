@@ -14,6 +14,8 @@ import (
 var (
 	port        = flag.Int("port", 8080, "the port to listen on")
 	frontendDir = flag.String("frontend", "dist", "the path to serve frontend files from")
+	certFile    = flag.String("https-cert", "", "the path to the certificate file to use for HTTPS")
+	keyFile     = flag.String("https-key", "", "the path to the private key file to use for HTTPS")
 )
 
 type PhotoStore interface {
@@ -51,7 +53,12 @@ func NewServer(db *internal.Database, usermanager *internal.UserManager, store P
 }
 
 func (s *server) Start() error {
-	err := s.srv.ListenAndServe()
+	var err error
+	if len(*certFile) > 0 && len(*keyFile) > 0 {
+		err = s.srv.ListenAndServeTLS(*certFile, *keyFile)
+	} else {
+		err = s.srv.ListenAndServe()
+	}
 	if err == http.ErrServerClosed {
 		return nil
 	} else {

@@ -15,6 +15,7 @@
 * The page title now updates as you're navigating around Simpic
 * Navigation now uses the HTML5 history API (no more '#'s in URLs)
 * Images and albums linked to directly will offer open graph tags (preview images)
+* Simpic can now serve over HTTPS if provided with a certificate and key
 
 ==== Visibility
 
