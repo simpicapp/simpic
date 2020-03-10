@@ -96,7 +96,11 @@ func (s *server) handleGetPhotosForAlbum() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		album := r.Context().Value(ctxAlbum).(*internal.Album)
 		paginate(w, r, func(offset, count int) (i interface{}, err error) {
-			return s.db.GetAlbumPhotos(album.Id, visForAccess(r), offset, count)
+			if album.Visibility > internal.VisPublic {
+				return s.db.GetAlbumPhotos(album.Id, visForAccess(r), offset, count)
+			} else {
+				return s.db.GetAlbumPhotos(album.Id, visForBrowsing(r), offset, count)
+			}
 		})
 	}
 }
