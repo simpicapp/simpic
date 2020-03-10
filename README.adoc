@@ -81,6 +81,16 @@ It currently has the following options:
 | dist
 | File system path to serve the compiled frontend files from.
 
+| SIMPIC_HTTPS_CERT
+| -
+| Path to the PEM-encoded certificate to use for HTTPS. If either of `SIMPIC_HTTPS_CERT` and `SIMPIC_HTTPS_KEY` are
+  unset, Simpic will use HTTP instead.
+
+| SIMPIC_HTTPS_KEY
+| -
+| Path to the PEM-encoded private key to use for HTTPS. If either of `SIMPIC_HTTPS_CERT` and `SIMPIC_HTTPS_KEY` are
+unset, Simpic will use HTTP instead.
+
 | SIMPIC_MIGRATIONS
 | migrations
 | File system path to the database migration files.
