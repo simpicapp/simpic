@@ -2,3 +2,6 @@ version = 1
 
 [approve]
 auto_approve_usernames = ["csmith"]
+
+[merge]
+notify_on_conflict = false
