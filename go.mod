@@ -13,8 +13,8 @@ require (
 	github.com/simpicapp/goexif v0.0.0-20200303171827-82bc4894aca4
 	github.com/spf13/cobra v0.0.5 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
+	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073
 	gopkg.in/gographics/imagick.v3 v3.3.0
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
-	upper.io/db.v3 v3.6.4+incompatible
+	upper.io/db.v3 v3.7.1+incompatible
 )
