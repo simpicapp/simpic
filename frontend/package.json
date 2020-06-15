@@ -19,7 +19,7 @@
     "vue": "^2.6.11",
     "vue-awesome": "^4.0.2",
     "vue-promised": "^1.2.2",
-    "vue-router": "^3.3.2"
+    "vue-router": "^3.3.4"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.3",
