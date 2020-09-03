@@ -63,7 +63,6 @@
   import {useScrollWatcher} from "@/features/scroll";
   import Vue from "vue";
   import {useRouter} from "@/features/router";
-  import {Data} from "@vue/composition-api/dist/component";
   import {useEventListener} from "@/features/eventbus";
   import {Photo} from "@/model/photo";
 
@@ -85,7 +84,7 @@
         [key: string]: boolean;
       }
 
-      interface State extends Data {
+      interface State {
         hasMore: boolean;
         lastSelection: null | string;
         loading: boolean;
@@ -94,14 +93,14 @@
         selection: Selection;
       }
 
-      const state: State = reactive({
+      const state = reactive({
         hasMore: true,
         lastSelection: null,
         loading: true,
         offset: 0,
         photos: [],
         selection: {},
-      });
+      } as State);
 
       function update() {
         state.loading = true;
