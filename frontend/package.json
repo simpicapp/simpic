@@ -17,7 +17,7 @@
     "lodash-es": "^4.17.15",
     "mnemonist": "^0.38.0",
     "vue": "^2.6.11",
-    "vue-awesome": "^4.0.2",
+    "vue-awesome": "^4.1.0",
     "vue-promised": "^1.2.2",
     "vue-router": "^3.3.4"
   },
