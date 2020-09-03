@@ -71,7 +71,7 @@
       position: {
         type: String,
         default: "bottom_right",
-        validator: value => ["bottom_right", "center"].indexOf(value) !== -1,
+        validator: value => ["bottom_right", "center"].indexOf(value as string) !== -1,
       },
       title: String,
     },
