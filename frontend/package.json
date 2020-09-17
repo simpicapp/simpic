@@ -41,7 +41,7 @@
     "eslint-plugin-standard": "^4.0.0",
     "eslint-plugin-vue": "^6.2.2",
     "geckodriver": "^1.19.1",
-    "prettier": "^2.0.5",
+    "prettier": "^2.1.2",
     "sass": "^1.26.10",
     "sass-loader": "^10.0.2",
     "typescript": "~4.0.2",
