@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/cheggaaa/pb/v3 v3.0.5
 	github.com/go-chi/chi v4.1.2+incompatible
-	github.com/go-playground/validator/v10 v10.3.0
+	github.com/go-playground/validator/v10 v10.4.0
 	github.com/golang-migrate/migrate/v4 v4.12.2
 	github.com/jamiealquiza/envy v1.1.0
 	github.com/satori/go.uuid v1.2.0
