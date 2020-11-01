@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@vue/composition-api": "^1.0.0-beta.14",
-    "axios": "^0.20.0",
+    "axios": "^0.21.0",
     "lodash-es": "^4.17.15",
     "mnemonist": "^0.38.0",
     "vue": "^2.6.12",
