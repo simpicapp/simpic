@@ -6,7 +6,7 @@ require (
 	github.com/cheggaaa/pb/v3 v3.0.5
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-playground/validator/v10 v10.4.1
-	github.com/golang-migrate/migrate/v4 v4.13.0
+	github.com/golang-migrate/migrate/v4 v4.14.1
 	github.com/jamiealquiza/envy v1.1.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/simpicapp/goexif v0.0.0-20200303171827-82bc4894aca4
