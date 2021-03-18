@@ -15,5 +15,5 @@ require (
 	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899
 	gopkg.in/gographics/imagick.v3 v3.3.0
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
-	upper.io/db.v3 v3.7.1+incompatible
+	upper.io/db.v3 v3.8.0+incompatible
 )

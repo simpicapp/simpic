@@ -798,3 +798,4 @@ upper.io/db.v3 v3.6.4+incompatible h1:ZWpoGpfyvRDxMW1lYLBwwSurzodIvAUP4aYBsH/ePi
 upper.io/db.v3 v3.6.4+incompatible/go.mod h1:FgTdD24eBjJAbPKsQSiHUNgXjOR4Lub3u1UMHSIh82Y=
 upper.io/db.v3 v3.7.1+incompatible h1:GiK/NmDUClH3LrZd54qj5OQsz8brGFv652QXyRXtg2U=
 upper.io/db.v3 v3.7.1+incompatible/go.mod h1:FgTdD24eBjJAbPKsQSiHUNgXjOR4Lub3u1UMHSIh82Y=
+upper.io/db.v3 v3.8.0+incompatible/go.mod h1:FgTdD24eBjJAbPKsQSiHUNgXjOR4Lub3u1UMHSIh82Y=
