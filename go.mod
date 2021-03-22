@@ -3,7 +3,7 @@ module github.com/simpicapp/simpic
 go 1.16
 
 require (
-	github.com/cheggaaa/pb/v3 v3.0.6
+	github.com/cheggaaa/pb/v3 v3.0.7
 	github.com/fatih/color v1.10.0 // indirect
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-playground/validator/v10 v10.4.1
