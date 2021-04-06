@@ -6,7 +6,7 @@ require (
 	github.com/cheggaaa/pb/v3 v3.0.6
 	github.com/fatih/color v1.10.0 // indirect
 	github.com/go-chi/chi v4.1.2+incompatible
-	github.com/go-playground/validator/v10 v10.4.1
+	github.com/go-playground/validator/v10 v10.4.2
 	github.com/golang-migrate/migrate/v4 v4.14.1
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
