@@ -20,7 +20,7 @@ require (
 	github.com/spf13/cobra v1.1.3 // indirect
 	golang.org/x/crypto v0.0.0-20210317152858-513c2a44f670
 	golang.org/x/sys v0.0.0-20210317225723-c4fcb01b228e // indirect
-	gopkg.in/gographics/imagick.v3 v3.3.0
+	gopkg.in/gographics/imagick.v3 v3.4.0
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
 	upper.io/db.v3 v3.8.0+incompatible
 )
