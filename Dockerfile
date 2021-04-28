@@ -1,4 +1,4 @@
-FROM node:15-stretch AS frontend
+FROM node:16-stretch AS frontend
 
 RUN mkdir /tmp/site
 WORKDIR /tmp/site
