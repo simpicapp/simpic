@@ -1,0 +1,67 @@
+version: 2
+updates:
+- package-ecosystem: gomod
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "10:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: github.com/go-playground/validator/v10
+    versions:
+    - 10.4.2
+  - dependency-name: github.com/cheggaaa/pb/v3
+    versions:
+    - 3.0.6
+    - 3.0.7
+- package-ecosystem: npm
+  directory: "/frontend"
+  schedule:
+    interval: monthly
+    time: "10:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: "@vue/cli-plugin-e2e-cypress"
+    versions:
+    - 4.5.11
+    - 4.5.12
+    - 4.5.9
+  - dependency-name: ini
+    versions:
+    - 1.3.7
+  - dependency-name: "@vue/cli-service"
+    versions:
+    - 4.5.11
+    - 4.5.9
+  - dependency-name: sass-loader
+    versions:
+    - 10.1.0
+    - 10.1.1
+  - dependency-name: sass
+    versions:
+    - 1.32.0
+    - 1.32.5
+  - dependency-name: "@vue/cli-plugin-router"
+    versions:
+    - 4.5.11
+    - 4.5.9
+  - dependency-name: chromedriver
+    versions:
+    - 87.0.4
+    - 88.0.0
+  - dependency-name: "@vue/cli-plugin-typescript"
+    versions:
+    - 4.5.11
+    - 4.5.9
+  - dependency-name: typescript
+    versions:
+    - 4.1.3
+  - dependency-name: vue-promised
+    versions:
+    - 2.0.2
+- package-ecosystem: docker
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "10:00"
+  open-pull-requests-limit: 10
