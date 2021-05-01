@@ -17,6 +17,9 @@ COPY . .
 
 RUN go install -ldflags "-X github.com/simpicapp/simpic/internal.GitSHA=$(git rev-parse --short HEAD)" github.com/simpicapp/simpic/cmd/serve
 
+# Generate licence information
+RUN go get github.com/google/go-licenses && go-licenses save ./... --save_path=/notices
+
 WORKDIR /
 COPY --from=frontend /tmp/site/frontend/dist /dist
 COPY migrations /migrations

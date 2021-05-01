@@ -141,3 +141,12 @@ commit; to enable it simply:
 
     pip install pre-commit
     pre-commit install
+
+== Licence and credits
+
+Simpic is licensed under the MIT licence. A full copy of the licence is available in
+the link:LICENCE.adoc[LICENCE.adoc] file.
+
+Simpic makes use of a number of third-party libraries. See the link:go.mod[go.mod] file
+for a list of direct dependencies. Users of the docker image will find a copy of the
+relevant licence and notice files under the `/notices` directory in the image.
