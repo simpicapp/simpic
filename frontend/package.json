@@ -15,7 +15,7 @@
     "@vue/composition-api": "^1.0.0-beta.14",
     "axios": "^0.21.1",
     "lodash-es": "^4.17.15",
-    "mnemonist": "^0.38.0",
+    "mnemonist": "^0.38.3",
     "vue": "^2.6.12",
     "vue-awesome": "^4.1.0",
     "vue-promised": "^1.2.2",
