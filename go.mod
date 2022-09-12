@@ -11,7 +11,7 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/simpicapp/goexif v1.0.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
-	gopkg.in/gographics/imagick.v3 v3.3.0
+	gopkg.in/gographics/imagick.v3 v3.4.2
 	upper.io/db.v3 v3.8.0+incompatible
 )
 
